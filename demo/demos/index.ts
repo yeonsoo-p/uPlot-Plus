@@ -177,7 +177,7 @@ export const demos: DemoEntry[] = [
   {
     id: 'large-dataset',
     title: 'Large Dataset',
-    description: '500,000 points rendered with minimal configuration to test performance.',
+    description: '2,000,000 points rendered with minimal configuration to test performance.',
     component: LargeDataset,
   },
   {

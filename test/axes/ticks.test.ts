@@ -29,11 +29,8 @@ describe('numAxisSplits', () => {
   });
 
   it('returns empty for zero increment', () => {
-    // 0 increment would infinite loop — but the loop condition val <= scaleMax handles it
-    // since val never increases. Practically the function shouldn't be called with 0 incr.
-    // Just verify it doesn't crash with a valid call.
-    const splits = numAxisSplits(0, 10, 5, 50, false);
-    expect(splits.length).toBeGreaterThan(0);
+    const splits = numAxisSplits(0, 10, 0, 50, false);
+    expect(splits.length).toBe(0);
   });
 
   it('eliminates negative zero', () => {

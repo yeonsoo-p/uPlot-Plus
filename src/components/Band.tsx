@@ -29,6 +29,7 @@ export function Band({ series, group, fill, dir }: BandConfig): null {
       cfgRef.current = null;
       store.scheduleRedraw();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount/update split: fill and dir are handled by the update effect below
   }, [store, s0, s1, group]);
 
   // Update effect: patch in-place when fill/dir change

@@ -31,6 +31,7 @@ export function Axis(props: AxisProps): null {
       registeredRef.current = false;
       store.scheduleRedraw();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount/update split: only re-mount when identity keys change, update effect handles other props
   }, [store, props.scale, props.side]);
 
   // Update effect: replace config when any prop changes
@@ -43,6 +44,7 @@ export function Axis(props: AxisProps): null {
         : a,
     );
     store.scheduleRedraw();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- propsKey (JSON.stringify) tracks all prop changes
   }, [store, props.scale, props.side, propsKey]);
 
   return null;

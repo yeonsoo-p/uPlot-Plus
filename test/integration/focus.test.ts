@@ -30,6 +30,6 @@ describe('Focus mode', () => {
     expect(cfg?.show).toBe(false);
 
     store.toggleSeries(0, 1);
-    expect(cfg?.show).toBeUndefined();
+    expect(cfg?.show).toBe(true);
   });
 });

@@ -10,6 +10,7 @@ interface LegendSnapshot {
   activeGroup: number;
   activeDataIdx: number;
   seriesCount: number;
+  revision: number;
 }
 
 /**
@@ -18,7 +19,7 @@ interface LegendSnapshot {
  */
 export function Legend({ show = true, position = 'bottom', className }: LegendProps): React.ReactElement | null {
   const store = useChart();
-  const snapRef = useRef<LegendSnapshot>({ activeGroup: -1, activeDataIdx: -1, seriesCount: 0 });
+  const snapRef = useRef<LegendSnapshot>({ activeGroup: -1, activeDataIdx: -1, seriesCount: 0, revision: -1 });
 
   const subscribe = useCallback(
     (cb: () => void) => store.subscribe(cb),
@@ -28,11 +29,12 @@ export function Legend({ show = true, position = 'bottom', className }: LegendPr
   const getSnapshot = useCallback((): LegendSnapshot => {
     const { activeGroup, activeDataIdx } = store.cursorManager.state;
     const seriesCount = store.seriesConfigs.length;
+    const { revision } = store;
     const prev = snapRef.current;
-    if (prev.activeGroup === activeGroup && prev.activeDataIdx === activeDataIdx && prev.seriesCount === seriesCount) {
+    if (prev.activeGroup === activeGroup && prev.activeDataIdx === activeDataIdx && prev.seriesCount === seriesCount && prev.revision === revision) {
       return prev;
     }
-    const next: LegendSnapshot = { activeGroup, activeDataIdx, seriesCount };
+    const next: LegendSnapshot = { activeGroup, activeDataIdx, seriesCount, revision };
     snapRef.current = next;
     return next;
   }, [store]);
@@ -52,7 +54,7 @@ export function Legend({ show = true, position = 'bottom', className }: LegendPr
       const yData = store.dataStore.getYValues(cfg.group, cfg.index);
       const val = yData[activeDataIdx];
       if (val != null) {
-        valueStr = typeof val === 'number' ? val.toFixed(2) : String(val);
+        valueStr = typeof val === 'number' ? val.toPrecision(4) : String(val);
       }
     }
 

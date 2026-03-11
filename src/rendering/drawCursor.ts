@@ -90,7 +90,7 @@ export function drawCursor(
     const di = cursor.activeDataIdx;
 
     const group = data[gi];
-    if (group != null) {
+    if (group != null && si >= 0 && si < (group.series.length)) {
       const xVal = group.x[di];
       const yData = group.series[si];
       const yVal = yData != null ? yData[di] : null;

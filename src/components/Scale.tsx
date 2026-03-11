@@ -26,6 +26,7 @@ export function Scale(props: ScaleProps): null {
       registeredRef.current = false;
       store.scheduleRedraw();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount/update split: only re-mount when identity key changes, update effect handles other props
   }, [store, props.id]);
 
   // Update effect: replace config when any prop changes
@@ -37,6 +38,7 @@ export function Scale(props: ScaleProps): null {
     );
     store.scaleManager.addScale({ ...props });
     store.scheduleRedraw();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- propsKey (JSON.stringify) tracks all prop changes
   }, [store, props.id, propsKey]);
 
   return null;

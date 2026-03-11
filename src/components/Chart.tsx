@@ -40,6 +40,7 @@ export function Chart({ width, height, data, children, className, pxRatio: pxRat
     return () => {
       store.canvas = null;
       store.scheduler.cancel();
+      store.focusedSeries = null;
     };
   }, [store]);
 
@@ -89,7 +90,6 @@ export function Chart({ width, height, data, children, className, pxRatio: pxRat
   onDrawRef.current = onDraw;
 
   useEffect(() => {
-    if (onDrawRef.current == null) return;
     const wrapper: DrawCallback = (dc) => { onDrawRef.current?.(dc); };
     store.drawHooks.push(wrapper);
     return () => { store.drawHooks = store.drawHooks.filter(h => h !== wrapper); };
@@ -100,7 +100,6 @@ export function Chart({ width, height, data, children, className, pxRatio: pxRat
   onCursorDrawRef.current = onCursorDraw;
 
   useEffect(() => {
-    if (onCursorDrawRef.current == null) return;
     const wrapper: CursorDrawCallback = (dc, cursor) => { onCursorDrawRef.current?.(dc, cursor); };
     store.cursorDrawHooks.push(wrapper);
     return () => { store.cursorDrawHooks = store.cursorDrawHooks.filter(h => h !== wrapper); };
@@ -109,23 +108,32 @@ export function Chart({ width, height, data, children, className, pxRatio: pxRat
   return (
     <ChartContext.Provider value={store}>
       <div
-        ref={containerRef}
         className={className}
         style={{
-          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
           width: `${width}px`,
-          height: `${height}px`,
-          cursor: 'crosshair',
         }}
       >
-        <canvas
-          ref={canvasRef}
+        <div
+          ref={containerRef}
           style={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
+            position: 'relative',
+            width: `${width}px`,
+            height: `${height}px`,
+            cursor: 'crosshair',
+            order: 0,
           }}
-        />
+        >
+          <canvas
+            ref={canvasRef}
+            style={{
+              position: 'absolute',
+              left: 0,
+              top: 0,
+            }}
+          />
+        </div>
         {children}
       </div>
     </ChartContext.Provider>

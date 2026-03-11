@@ -64,6 +64,9 @@ export interface ChartStore {
   // Focus mode: index of focused series, or null for none
   focusedSeries: number | null;
 
+  // Revision counter — incremented on visibility toggles to trigger subscriber re-renders
+  revision: number;
+
   // Methods
   registerScale: (cfg: ScaleConfig) => void;
   unregisterScale: (id: string) => void;
@@ -108,6 +111,7 @@ export function createChartStore(): ChartStore {
     drawHooks: [],
     cursorDrawHooks: [],
     focusedSeries: null,
+    revision: 0,
 
     registerScale(cfg: ScaleConfig) {
       store.scaleConfigs = store.scaleConfigs.filter(s => s.id !== cfg.id);
@@ -136,7 +140,8 @@ export function createChartStore(): ChartStore {
     toggleSeries(group: number, index: number) {
       const cfg = store.seriesConfigs.find(s => s.group === group && s.index === index);
       if (cfg != null) {
-        cfg.show = cfg.show === false ? undefined : false;
+        cfg.show = cfg.show === false ? true : false;
+        store.revision++;
         store.renderer.invalidateSeries(group, index);
         store.scheduleRedraw();
       }
@@ -204,7 +209,9 @@ export function createChartStore(): ChartStore {
         // Fire cursor draw hooks on the overlay
         if (store.cursorDrawHooks.length > 0) {
           const dc: DrawContext = { ctx, plotBox: store.plotBox, pxRatio };
-          for (const fn of store.cursorDrawHooks) fn(dc, store.cursorManager.state);
+          for (const fn of store.cursorDrawHooks) {
+            try { fn(dc, store.cursorManager.state); } catch { /* user hook error */ }
+          }
         }
         for (const fn of store.listeners) fn();
         return;
@@ -342,7 +349,9 @@ export function createChartStore(): ChartStore {
       // 9. Fire draw hooks (persistent layer), then save snapshot
       if (store.drawHooks.length > 0) {
         const dc: DrawContext = { ctx, plotBox: store.plotBox, pxRatio };
-        for (const fn of store.drawHooks) fn(dc);
+        for (const fn of store.drawHooks) {
+          try { fn(dc); } catch { /* user hook error */ }
+        }
       }
       renderer.saveSnapshot(ctx, width * pxRatio, height * pxRatio);
 
@@ -364,7 +373,9 @@ export function createChartStore(): ChartStore {
       // 12. Fire cursor draw hooks (overlay layer)
       if (store.cursorDrawHooks.length > 0) {
         const dc: DrawContext = { ctx, plotBox: store.plotBox, pxRatio };
-        for (const fn of store.cursorDrawHooks) fn(dc, store.cursorManager.state);
+        for (const fn of store.cursorDrawHooks) {
+          try { fn(dc, store.cursorManager.state); } catch { /* user hook error */ }
+        }
       }
 
       // 13. Notify subscribers (Legend, Tooltip, etc.)

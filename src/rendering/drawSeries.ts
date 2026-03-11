@@ -10,7 +10,7 @@ export function drawSeriesPath(
   paths: SeriesPaths,
   pxRatio: number,
 ): void {
-  if (!config.show) return;
+  if (config.show === false) return;
 
   const alpha = config.alpha ?? 1;
 
@@ -32,8 +32,9 @@ export function drawSeriesPath(
 
   // Draw stroke
   if (config.stroke) {
+    const lineWidth = (config.width ?? 1) * pxRatio;
     ctx.strokeStyle = config.stroke;
-    ctx.lineWidth = (config.width ?? 1) * pxRatio;
+    ctx.lineWidth = lineWidth;
     ctx.lineJoin = config.join ?? 'round';
     ctx.lineCap = config.cap ?? 'butt';
 
@@ -41,7 +42,14 @@ export function drawSeriesPath(
       ctx.setLineDash(config.dash.map(d => d * pxRatio));
     }
 
+    // Pixel alignment: shift by half-pixel for odd-width lines to avoid anti-aliasing blur
+    const pxAlign = config.pxAlign ?? 1;
+    const offset = (lineWidth % 2) / 2;
+    const doAlign = pxAlign === 1 && offset > 0;
+
+    if (doAlign) ctx.translate(offset, offset);
     ctx.stroke(paths.stroke);
+    if (doAlign) ctx.translate(-offset, -offset);
   }
 
   ctx.restore();

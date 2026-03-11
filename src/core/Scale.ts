@@ -94,6 +94,9 @@ export function pctToVal(pct: number, scale: ScaleState): number {
 
   const tMin = getTransformedMin(scale);
   const tMax = getTransformedMax(scale);
+
+  if (tMax === tMin) return scale.min;
+
   const { distr } = scale;
 
   if (distr === 3) {

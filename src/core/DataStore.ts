@@ -64,7 +64,7 @@ export class DataStore {
 
       if (!group || !xScale || xScale.min == null || xScale.max == null) {
         i0 = 0;
-        i1 = (group?.x.length || 1) - 1;
+        i1 = Math.max(0, (group?.x.length ?? 1) - 1);
       } else {
         const x = group.x;
         if (x.length === 0) {

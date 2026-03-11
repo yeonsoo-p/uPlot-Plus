@@ -29,6 +29,7 @@ export function Series(props: SeriesProps): null {
       registeredRef.current = false;
       store.scheduleRedraw();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount/update split: only re-mount when identity keys change, update effect handles other props
   }, [store, props.group, props.index]);
 
   // Update effect: replace config when any prop changes
@@ -42,6 +43,7 @@ export function Series(props: SeriesProps): null {
     );
     store.renderer.invalidateSeries(props.group, props.index);
     store.scheduleRedraw();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- propsKey (JSON.stringify) tracks all prop changes; listing props directly would cause object-identity reruns
   }, [store, props.group, props.index, propsKey]);
 
   return null;
