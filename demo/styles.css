@@ -1,0 +1,101 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #f5f5f5;
+  color: #333;
+}
+
+.demo-app {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 240px;
+  background: #1a1a2e;
+  color: #eee;
+  padding: 16px 0;
+  flex-shrink: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  overflow-y: auto;
+}
+
+.sidebar h1 {
+  font-size: 18px;
+  padding: 0 16px 16px;
+  border-bottom: 1px solid #333;
+  margin-bottom: 8px;
+}
+
+.sidebar-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  color: #ccc;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.sidebar-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.sidebar-item.active {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-left: 3px solid #4fc3f7;
+  padding-left: 13px;
+}
+
+.content {
+  margin-left: 240px;
+  flex: 1;
+  padding: 24px 32px;
+}
+
+.demo-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.demo-card h2 {
+  font-size: 20px;
+  margin-bottom: 4px;
+}
+
+.demo-description {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.sparkline-table {
+  border-collapse: collapse;
+}
+
+.sparkline-table th {
+  text-align: right;
+  padding: 4px 8px;
+  font-size: 13px;
+  color: #555;
+}
+
+.sparkline-table td {
+  padding: 2px 4px;
+}
