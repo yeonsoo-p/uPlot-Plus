@@ -14,12 +14,11 @@ function makeDC(): DrawContext {
 }
 
 describe('Draw hooks on ChartStore', () => {
-  it('fires drawHooks during redraw', () => {
+  it('stores and iterates drawHooks', () => {
     const store = createChartStore();
     const fn = vi.fn();
     store.drawHooks.add(fn);
 
-    // Simulate the draw hook firing
     const dc = makeDC();
     for (const hook of store.drawHooks) hook(dc);
 

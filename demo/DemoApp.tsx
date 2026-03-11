@@ -45,6 +45,10 @@ export function DemoApp() {
     <div className="demo-app">
       <nav className="sidebar">
         <h1>uPlot+ Demos</h1>
+        <div className="sidebar-controls">
+          <button onClick={() => setCollapsed(new Set())}>Expand All</button>
+          <button onClick={() => setCollapsed(new Set(categories.map(c => c.name)))}>Collapse All</button>
+        </div>
         {categories.map(cat => (
           <div key={cat.name} className="sidebar-group">
             <button

@@ -49,8 +49,13 @@ describe('wholeIncrs', () => {
 });
 
 describe('numIncrs', () => {
-  it('is combination of dec and one', () => {
-    expect(numIncrs.length).toBe(decIncrs.length + oneIncrs.length);
+  it('has 256 entries and contains expected key values', () => {
+    expect(numIncrs.length).toBe(256);
+    expect(numIncrs).toContain(0.001);
+    expect(numIncrs).toContain(0.01);
+    expect(numIncrs).toContain(0.1);
+    expect(numIncrs).toContain(1);
+    expect(numIncrs).toContain(10);
   });
 
   it('transitions from <1 to >=1', () => {

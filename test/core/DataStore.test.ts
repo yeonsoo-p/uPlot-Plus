@@ -54,9 +54,8 @@ describe('DataStore', () => {
       store.updateWindows(() => scale);
 
       const [i0, i1] = store.getWindow(0);
-      // Should include boundary points: 2 (val=3) and index for val=7
-      expect(i0).toBeLessThanOrEqual(2);
-      expect(i1).toBeGreaterThanOrEqual(6);
+      expect(i0).toBe(2);
+      expect(i1).toBe(6);
     });
 
     it('returns true when window changes', () => {

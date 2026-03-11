@@ -59,7 +59,8 @@ describe('monotoneCubic path builder', () => {
     expect(result.clip).toBeInstanceOf(Path2D);
 
     const clipRects = getCalls(result.clip!).filter((c: string[]) => c[0] === 'rect');
-    expect(clipRects.length).toBeGreaterThan(0);
+    // Gaps produce a single clip rect covering the drawable span
+    expect(clipRects.length).toBe(1);
   });
 
   it('all-null returns empty stroke, no fill', () => {

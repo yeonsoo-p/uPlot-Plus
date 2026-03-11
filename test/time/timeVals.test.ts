@@ -18,10 +18,7 @@ describe('timeAxisVals', () => {
   it('formats daily splits as month + day', () => {
     const splits = [1700006400, 1700092800]; // ~1 day apart
     const vals = timeAxisVals(splits, DAY, 'UTC');
-    expect(vals.length).toBe(2);
-    // Should contain day numbers
-    expect(vals[0]).toMatch(/\d+/);
-    expect(vals[0]).not.toEqual(vals[1]);
+    expect(vals).toEqual(['Nov 15', 'Nov 16']);
   });
 
   it('formats yearly splits as 4-digit year', () => {

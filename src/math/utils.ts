@@ -395,7 +395,7 @@ export function findIncr(
     const foundIncr = incrs[incrIdx] ?? 0;
     const foundSpace = dim * foundIncr / delta;
 
-    if (foundSpace >= minSpace && intDigits + (foundIncr < 5 ? (fixedDecMap.get(foundIncr) ?? 0) : 0) <= 17)
+    if (foundSpace >= minSpace * 0.9 && intDigits + (foundIncr < 5 ? (fixedDecMap.get(foundIncr) ?? 0) : 0) <= 17)
       return [foundIncr, foundSpace];
   } while (++incrIdx < incrs.length);
 

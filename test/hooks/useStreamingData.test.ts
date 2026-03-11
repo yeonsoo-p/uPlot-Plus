@@ -65,9 +65,9 @@ describe('useStreamingData sliding window', () => {
     expect(g.x).toEqual([1, 2, 3]);
   });
 
-  it('handles empty initial data', () => {
+  it('returns empty array unchanged when no groups exist', () => {
     const empty: ChartData = [];
     const result = slidingWindow(empty, 10, [1], [10]);
-    expect(result).toEqual([]);
+    expect(result).toBe(empty);
   });
 });

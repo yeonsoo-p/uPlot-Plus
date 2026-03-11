@@ -53,10 +53,7 @@ describe('numAxisVals', () => {
 
   it('formats large numbers with locale formatting', () => {
     const vals = numAxisVals([1000, 50000]);
-    expect(vals).toHaveLength(2);
-    // Should contain the digits regardless of locale formatting (commas, periods, etc.)
-    expect(vals[0]).toMatch(/1.*000/);
-    expect(vals[1]).toMatch(/50.*000/);
+    expect(vals).toEqual(['1,000', '50,000']);
   });
 
   it('formats decimals', () => {

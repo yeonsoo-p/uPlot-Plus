@@ -1,6 +1,7 @@
-import React, { useRef, useEffect, useCallback, useState } from 'react';
+import { useRef, useEffect, useCallback, useState } from 'react';
 import type { ChartProps } from '../types';
 import type { DrawCallback, CursorDrawCallback } from '../types/hooks';
+import type { EventCallbacks } from '../types/events';
 import { useChartStore } from '../hooks/useChartStore';
 import { ChartContext } from '../hooks/useChart';
 import { useInteraction } from '../hooks/useInteraction';
@@ -11,7 +12,12 @@ import { useSyncGroup } from '../sync/useSyncGroup';
  * Creates a canvas element, manages the chart store, and provides context to children.
  * Canvas drawing is completely decoupled from React's reconciliation cycle.
  */
-export function Chart({ width, height, data, children, className, pxRatio: pxRatioOverride, onDraw, onCursorDraw, syncKey, cursor }: ChartProps) {
+export function Chart({
+  width, height, data, children, className, pxRatio: pxRatioOverride,
+  onDraw, onCursorDraw, syncKey, cursor,
+  onClick, onContextMenu, onDblClick, onCursorMove, onCursorLeave,
+  onScaleChange, onSelect,
+}: ChartProps) {
   const store = useChartStore();
   const [containerEl, setContainerEl] = useState<HTMLDivElement | null>(null);
 
@@ -24,6 +30,16 @@ export function Chart({ width, height, data, children, className, pxRatio: pxRat
     store.wheelZoom = wheelZoom;
     store.focusAlpha = focusAlpha;
   }, [store, wheelZoom, focusAlpha]);
+
+  // Sync event callback props to store via refs (no DOM listener churn on callback changes)
+  const eventCallbacksRef = useRef<EventCallbacks>(store.eventCallbacks);
+  eventCallbacksRef.current.onClick = onClick;
+  eventCallbacksRef.current.onContextMenu = onContextMenu;
+  eventCallbacksRef.current.onDblClick = onDblClick;
+  eventCallbacksRef.current.onCursorMove = onCursorMove;
+  eventCallbacksRef.current.onCursorLeave = onCursorLeave;
+  eventCallbacksRef.current.onScaleChange = onScaleChange;
+  eventCallbacksRef.current.onSelect = onSelect;
 
   // Attach mouse/touch interaction handlers
   useInteraction(store, containerEl);

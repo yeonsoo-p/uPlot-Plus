@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useCallback } from 'react';
 import { Chart, Scale, Series, Axis } from '../../src';
-import type { ChartData, CursorDrawCallback } from '../../src';
+import type { ChartData, CursorDrawCallback, ChartEventInfo } from '../../src';
 
 function generateData(): ChartData {
   const n = 200;
@@ -18,15 +18,12 @@ export default function MeasureDatums() {
   const data = useMemo(() => generateData(), []);
   const [refPoint, setRefPoint] = useState<RefPoint | null>(null);
 
-  const handleClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const left = e.clientX - rect.left;
-    const top = e.clientY - rect.top;
-
+  const handleClick = useCallback((info: ChartEventInfo) => {
     setRefPoint(prev => {
       // Toggle: if already set, clear it; otherwise set new point
       if (prev != null) return null;
-      return { left, top };
+      // plotX/plotY are relative to plot area
+      return { left: info.plotX, top: info.plotY };
     });
   }, []);
 
@@ -34,10 +31,9 @@ export default function MeasureDatums() {
     if (cursor.left < 0 || cursor.top < 0) return;
     if (refPoint == null) return;
 
-    // refPoint.left/top are CSS pixels relative to the container (includes plotBox offset)
-    const rx = refPoint.left;
-    const ry = refPoint.top;
-    // cursor.left/top are CSS pixels relative to the plot area — add plotBox offset
+    // Both refPoint and cursor are in plot-relative CSS pixels — add plotBox offset for drawing
+    const rx = refPoint.left + plotBox.left;
+    const ry = refPoint.top + plotBox.top;
     const cx = cursor.left + plotBox.left;
     const cy = cursor.top + plotBox.top;
 
@@ -74,8 +70,8 @@ export default function MeasureDatums() {
     ctx.stroke();
 
     // Compute distances in CSS pixels
-    const dx = cx - refPoint.left;
-    const dy = cy - refPoint.top;
+    const dx = cx - rx;
+    const dy = cy - ry;
     const dist = Math.sqrt(dx * dx + dy * dy);
 
     // Label background
@@ -83,7 +79,6 @@ export default function MeasureDatums() {
     ctx.font = '11px monospace';
     const metrics = ctx.measureText(label);
     const padX = 6;
-    const padY = 4;
 
     const labelX = Math.min(cx + 10, plotBox.left + plotBox.width - metrics.width - padX * 2);
     const labelY = cy - 24;
@@ -102,15 +97,13 @@ export default function MeasureDatums() {
       <p style={{ margin: '0 0 8px', fontSize: 13, color: '#666' }}>
         Click to set a reference point, click again to clear. Move cursor to measure distance.
       </p>
-      <div onClick={handleClick} style={{ cursor: 'crosshair' }}>
-        <Chart width={800} height={400} data={data} onCursorDraw={onCursorDraw}>
-          <Scale id="x" auto ori={0} dir={1} time={false} />
-          <Scale id="y" auto ori={1} dir={1} />
-          <Axis scale="x" side={2} label="Sample" />
-          <Axis scale="y" side={3} label="Value" />
-          <Series group={0} index={0} yScale="y" stroke="#2980b9" width={2} label="Signal" />
-        </Chart>
-      </div>
+      <Chart width={800} height={400} data={data} onCursorDraw={onCursorDraw} onClick={handleClick}>
+        <Scale id="x" auto ori={0} dir={1} time={false} />
+        <Scale id="y" auto ori={1} dir={1} />
+        <Axis scale="x" side={2} label="Sample" />
+        <Axis scale="y" side={3} label="Value" />
+        <Series group={0} index={0} yScale="y" stroke="#2980b9" width={2} label="Signal" />
+      </Chart>
     </div>
   );
 }

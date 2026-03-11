@@ -18,6 +18,7 @@ import type { BandConfig } from '../types/bands';
 import { DirtyFlag } from '../types/common';
 import type { DrawContext, DrawCallback, CursorDrawCallback } from '../types/hooks';
 import { valToPos } from '../core/Scale';
+import type { EventCallbacks } from '../types/events';
 
 /** Build a DrawContext with valToX/valToY helpers bound to current scales. */
 function buildDrawContext(
@@ -92,6 +93,12 @@ export interface ChartStore {
   // Revision counter — incremented on visibility toggles to trigger subscriber re-renders
   revision: number;
 
+  // Event callbacks (synced from Chart props via refs)
+  eventCallbacks: EventCallbacks;
+
+  // Previous scale ranges for change detection
+  _prevScaleRanges: Map<string, { min: number; max: number }>;
+
   // Methods
   registerScale: (cfg: ScaleConfig) => void;
   unregisterScale: (id: string) => void;
@@ -139,6 +146,8 @@ export function createChartStore(): ChartStore {
     focusAlpha: 0.15,
     wheelZoom: false,
     revision: 0,
+    eventCallbacks: {},
+    _prevScaleRanges: new Map(),
 
     registerScale(cfg: ScaleConfig) {
       store.scaleConfigs = store.scaleConfigs.filter(s => s.id !== cfg.id);
@@ -438,6 +447,26 @@ export function createChartStore(): ChartStore {
 
       // 13. Notify subscribers (Legend, Tooltip, etc.)
       for (const fn of store.listeners) fn();
+
+      // 14. Fire onScaleChange for scales whose ranges changed
+      if (store._prevScaleRanges.size > 0 && store.eventCallbacks.onScaleChange != null) {
+        for (const scale of scaleManager.getAllScales()) {
+          if (scale.min == null || scale.max == null) continue;
+          const prev = store._prevScaleRanges.get(scale.id);
+          if (prev == null || prev.min !== scale.min || prev.max !== scale.max) {
+            store.eventCallbacks.onScaleChange(scale.id, scale.min, scale.max);
+          }
+        }
+      }
+
+      // Update previous scale ranges snapshot
+      store._prevScaleRanges.clear();
+      for (const scale of scaleManager.getAllScales()) {
+        if (scale.min != null && scale.max != null) {
+          store._prevScaleRanges.set(scale.id, { min: scale.min, max: scale.max });
+        }
+      }
+
     },
   };
 

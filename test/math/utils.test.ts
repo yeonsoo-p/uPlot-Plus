@@ -200,11 +200,8 @@ describe('clamp', () => {
 
 // ---- fmtNum ----
 describe('fmtNum', () => {
-  it('formats numbers', () => {
-    const result = fmtNum(1234);
-    expect(typeof result).toBe('string');
-    // Intl formats vary by locale, just check it contains digits
-    expect(result).toMatch(/1.*2.*3.*4/);
+  it('formats numbers with locale separators', () => {
+    expect(fmtNum(1234)).toBe('1,234');
   });
 });
 
@@ -231,9 +228,8 @@ describe('rangeNum', () => {
 
   it('adds padding to normal range', () => {
     const [mn, mx] = rangeNum(0, 10, 0.1, true);
-    // soft=0 with mode=3 means min stays at 0 when padded newMin <= softMin
-    expect(mn).toBeLessThanOrEqual(0);
-    expect(mx).toBeGreaterThan(10);
+    expect(mn).toBe(0);
+    expect(mx).toBe(11);
   });
 
   it('respects hard limits', () => {
@@ -248,8 +244,8 @@ describe('rangeNum', () => {
 
   it('handles equal min/max with padding', () => {
     const [mn, mx] = rangeNum(5, 5, 0.1);
-    expect(mn).toBeLessThan(5);
-    expect(mx).toBeGreaterThan(5);
+    expect(mn).toBe(0);
+    expect(mx).toBe(10);
   });
 });
 
@@ -313,5 +309,14 @@ describe('findIncr', () => {
     const [incr, space] = findIncr(0, 100, [1], 10, 1000);
     expect(incr).toBe(0);
     expect(space).toBe(0);
+  });
+
+  it('returns same increment for small dim changes near boundary', () => {
+    const incrs = [1, 2, 5, 10, 25, 50, 100];
+    // At dim=400, incr=25 gives foundSpace = 400*25/200 = 50px, exactly at minSpace=50
+    // At dim=399, without hysteresis it would drop below 50 and jump to incr=50
+    const [incr399] = findIncr(0, 200, incrs, 399, 50);
+    const [incr401] = findIncr(0, 200, incrs, 401, 50);
+    expect(incr399).toBe(incr401);
   });
 });

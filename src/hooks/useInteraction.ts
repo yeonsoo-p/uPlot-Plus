@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import type { ChartStore } from './useChartStore';
 import type { SelectState } from '../types/cursor';
-import { posToVal, invalidateScaleCache } from '../core/Scale';
+import type { ChartEventInfo, NearestPoint, SelectEventInfo } from '../types/events';
+import { posToVal, valToPos, invalidateScaleCache } from '../core/Scale';
 import { DirtyFlag } from '../types/common';
 
 interface CoordSource {
@@ -28,6 +29,8 @@ export function useInteraction(
     const selectState: SelectState = { show: false, left: 0, top: 0, width: 0, height: 0 };
     let pinchState: { dist: number; midX: number; midY: number } | null = null;
     let axisDrag: { scaleId: string; startY: number; startMin: number; startMax: number } | null = null;
+    // Track whether a drag occurred so click doesn't fire after drag-to-zoom
+    let didDrag = false;
 
     function getPlotCoords(e: CoordSource): { cx: number; cy: number } | null {
       const rect = el.getBoundingClientRect();
@@ -70,7 +73,102 @@ export function useInteraction(
       return null;
     }
 
-    function handleMove(e: CoordSource): void {
+    /** Build a ChartEventInfo from the current cursor state and a DOM event. */
+    function buildEventInfo(e: MouseEvent | TouchEvent, cx: number, cy: number): ChartEventInfo {
+      const cursor = store.cursorManager.state;
+      let point: NearestPoint | null = null;
+
+      if (cursor.activeGroup >= 0 && cursor.activeDataIdx >= 0) {
+        const group = store.dataStore.data[cursor.activeGroup];
+        if (group != null) {
+          const xVal = group.x[cursor.activeDataIdx];
+          const yData = group.series[cursor.activeSeriesIdx];
+          const yVal = yData != null ? yData[cursor.activeDataIdx] : undefined;
+
+          if (xVal != null && yVal != null) {
+            const plotBox = store.plotBox;
+
+            // Compute pixel positions of the snapped point
+            const xScaleKey = store.scaleManager.getGroupXScaleKey(cursor.activeGroup);
+            const xScale = xScaleKey != null ? store.scaleManager.getScale(xScaleKey) : undefined;
+            const seriesCfg = store.seriesConfigs.find(
+              s => s.group === cursor.activeGroup && s.index === cursor.activeSeriesIdx,
+            );
+            const yScale = seriesCfg != null ? store.scaleManager.getScale(seriesCfg.yScale) : undefined;
+
+            let pxX = cx;
+            let pxY = cy;
+            if (xScale?.min != null && xScale.max != null) {
+              pxX = valToPos(xVal, xScale, plotBox.width, plotBox.left) - plotBox.left;
+            }
+            if (yScale?.min != null && yScale.max != null) {
+              pxY = valToPos(yVal, yScale, plotBox.height, plotBox.top) - plotBox.top;
+            }
+
+            const dx = cx - pxX;
+            const dy = cy - pxY;
+
+            point = {
+              group: cursor.activeGroup,
+              seriesIdx: cursor.activeSeriesIdx,
+              dataIdx: cursor.activeDataIdx,
+              xVal,
+              yVal,
+              pxX,
+              pxY,
+              dist: Math.sqrt(dx * dx + dy * dy),
+            };
+          }
+        }
+      }
+
+      return { plotX: cx, plotY: cy, point, srcEvent: e };
+    }
+
+    /** Build a SelectEventInfo from a completed selection. */
+    function buildSelectInfo(sel: SelectState): SelectEventInfo {
+      const plotBox = store.plotBox;
+      const fracLeft = sel.left / plotBox.width;
+      const fracRight = (sel.left + sel.width) / plotBox.width;
+
+      const ranges: Record<string, { min: number; max: number }> = {};
+      for (const scale of store.scaleManager.getAllScales()) {
+        if (scale.ori !== 0) continue;
+        if (scale.min == null || scale.max == null) continue;
+
+        const minVal = posToVal(
+          plotBox.left + fracLeft * plotBox.width,
+          scale, plotBox.width, plotBox.left,
+        );
+        const maxVal = posToVal(
+          plotBox.left + fracRight * plotBox.width,
+          scale, plotBox.width, plotBox.left,
+        );
+
+        ranges[scale.id] = {
+          min: Math.min(minVal, maxVal),
+          max: Math.max(minVal, maxVal),
+        };
+      }
+
+      return { left: fracLeft, right: fracRight, ranges };
+    }
+
+    /** Fire onScaleChange for all x-scales that just changed. */
+    function fireScaleChange(): void {
+      const cb = store.eventCallbacks.onScaleChange;
+      if (cb == null) return;
+
+      for (const scale of store.scaleManager.getAllScales()) {
+        if (scale.min == null || scale.max == null) continue;
+        const prev = store._prevScaleRanges.get(scale.id);
+        if (prev == null || prev.min !== scale.min || prev.max !== scale.max) {
+          cb(scale.id, scale.min, scale.max);
+        }
+      }
+    }
+
+    function handleMove(e: CoordSource, domEvent?: MouseEvent | TouchEvent): void {
       // Handle y-axis drag
       if (axisDrag != null) {
         const rect = el.getBoundingClientRect();
@@ -132,6 +230,11 @@ export function useInteraction(
         }
       }
 
+      // Fire onCursorMove callback
+      if (domEvent != null && store.eventCallbacks.onCursorMove != null && isInPlot(cx, cy)) {
+        store.eventCallbacks.onCursorMove(buildEventInfo(domEvent, cx, cy));
+      }
+
       // Update selection during drag
       if (dragStart != null) {
         const startX = dragStart.x;
@@ -156,7 +259,7 @@ export function useInteraction(
     }
 
     function onMouseMove(e: MouseEvent): void {
-      handleMove(e);
+      handleMove(e, e);
     }
 
     function onMouseDown(e: MouseEvent): void {
@@ -184,6 +287,7 @@ export function useInteraction(
       if (!isInPlot(coords.cx, coords.cy)) return;
 
       dragStart = { x: coords.cx, y: coords.cy };
+      didDrag = false;
 
       // Reset selection
       selectState.show = false;
@@ -195,6 +299,7 @@ export function useInteraction(
     function handleUp(_e: CoordSource): void {
       // Handle axis drag end
       if (axisDrag != null) {
+        fireScaleChange();
         axisDrag = null;
         return;
       }
@@ -203,7 +308,21 @@ export function useInteraction(
 
       // Minimum drag width to trigger zoom (5 CSS pixels)
       if (selectState.width > 5) {
-        applyZoom(selectState);
+        didDrag = true;
+
+        // Fire onSelect callback — if it returns false, skip zoom
+        let shouldZoom = true;
+        if (store.eventCallbacks.onSelect != null) {
+          const selInfo = buildSelectInfo(selectState);
+          if (store.eventCallbacks.onSelect(selInfo) === false) {
+            shouldZoom = false;
+          }
+        }
+
+        if (shouldZoom) {
+          applyZoom(selectState);
+          fireScaleChange();
+        }
       }
 
       // Clear selection
@@ -217,6 +336,34 @@ export function useInteraction(
 
     function onMouseUp(e: MouseEvent): void {
       handleUp(e);
+    }
+
+    function onClick(e: MouseEvent): void {
+      if (didDrag) {
+        didDrag = false;
+        return;
+      }
+
+      const cb = store.eventCallbacks.onClick;
+      if (cb == null) return;
+
+      const coords = getPlotCoords(e);
+      if (coords == null) return;
+      if (!isInPlot(coords.cx, coords.cy)) return;
+
+      cb(buildEventInfo(e, coords.cx, coords.cy));
+    }
+
+    function onContextMenu(e: MouseEvent): void {
+      const cb = store.eventCallbacks.onContextMenu;
+      if (cb == null) return;
+
+      const coords = getPlotCoords(e);
+      if (coords == null) return;
+      if (!isInPlot(coords.cx, coords.cy)) return;
+
+      e.preventDefault();
+      cb(buildEventInfo(e, coords.cx, coords.cy));
     }
 
     function onMouseLeave(_e: MouseEvent): void {
@@ -238,9 +385,21 @@ export function useInteraction(
       }
 
       store.scheduleCursorRedraw();
+
+      store.eventCallbacks.onCursorLeave?.();
     }
 
-    function onDblClick(_e: MouseEvent): void {
+    function onDblClick(e: MouseEvent): void {
+      // Fire onDblClick callback — if it returns false, skip zoom reset
+      if (store.eventCallbacks.onDblClick != null) {
+        const coords = getPlotCoords(e);
+        if (coords != null && isInPlot(coords.cx, coords.cy)) {
+          if (store.eventCallbacks.onDblClick(buildEventInfo(e, coords.cx, coords.cy)) === false) {
+            return;
+          }
+        }
+      }
+
       // Restore each scale to its original declarative state from React props,
       // rather than blindly setting auto=true. This preserves auto={false} scales
       // (e.g., Heatmap, BoxWhisker) that have explicit min/max.
@@ -279,6 +438,7 @@ export function useInteraction(
 
       store.renderer.clearCache();
       store.scheduleRedraw();
+      fireScaleChange();
     }
 
     function applyZoom(sel: SelectState): void {
@@ -336,6 +496,7 @@ export function useInteraction(
       if (!isInPlot(coords.cx, coords.cy)) return;
 
       dragStart = { x: coords.cx, y: coords.cy };
+      didDrag = false;
     }
 
     function onTouchMove(e: TouchEvent): void {
@@ -370,6 +531,7 @@ export function useInteraction(
         pinchState.dist = newDist;
         store.renderer.clearCache();
         store.scheduleRedraw();
+        fireScaleChange();
         return;
       }
 
@@ -377,7 +539,7 @@ export function useInteraction(
       if (touch == null) return;
 
       // Reuse shared move logic directly instead of synthesizing a MouseEvent
-      handleMove(touch);
+      handleMove(touch, e);
 
       // Prevent scroll while dragging in chart
       if (dragStart != null) {
@@ -400,6 +562,8 @@ export function useInteraction(
     el.addEventListener('mousemove', onMouseMove);
     el.addEventListener('mousedown', onMouseDown);
     el.addEventListener('mouseup', onMouseUp);
+    el.addEventListener('click', onClick);
+    el.addEventListener('contextmenu', onContextMenu);
     el.addEventListener('mouseleave', onMouseLeave);
     el.addEventListener('dblclick', onDblClick);
     el.addEventListener('wheel', onWheel, { passive: false });
@@ -411,6 +575,8 @@ export function useInteraction(
       el.removeEventListener('mousemove', onMouseMove);
       el.removeEventListener('mousedown', onMouseDown);
       el.removeEventListener('mouseup', onMouseUp);
+      el.removeEventListener('click', onClick);
+      el.removeEventListener('contextmenu', onContextMenu);
       el.removeEventListener('mouseleave', onMouseLeave);
       el.removeEventListener('dblclick', onDblClick);
       el.removeEventListener('wheel', onWheel);

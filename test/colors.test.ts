@@ -53,22 +53,27 @@ describe('palette', () => {
     expect(colors).toHaveLength(5);
   });
 
-  it('returns valid HSL strings', () => {
+  it('returns exact HSL strings', () => {
     const colors = palette(3);
-    for (const c of colors) {
-      expect(c).toMatch(/^hsl\(/);
-    }
+    expect(colors).toEqual([
+      'hsl(0.0,65%,50%)',
+      'hsl(137.5,65%,50%)',
+      'hsl(275.0,65%,50%)',
+    ]);
   });
 
   it('generates distinct hues', () => {
     const colors = palette(4);
-    const hues = colors.map(c => parseFloat(c.replace('hsl(', '')));
-    const unique = new Set(hues.map(h => Math.round(h)));
-    expect(unique.size).toBe(4);
+    expect(colors).toEqual([
+      'hsl(0.0,65%,50%)',
+      'hsl(137.5,65%,50%)',
+      'hsl(275.0,65%,50%)',
+      'hsl(52.5,65%,50%)',
+    ]);
   });
 
   it('respects custom saturation and lightness', () => {
     const colors = palette(1, 80, 40);
-    expect(colors[0]).toMatch(/80%,40%/);
+    expect(colors[0]).toBe('hsl(0.0,80%,40%)');
   });
 });

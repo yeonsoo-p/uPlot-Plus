@@ -1,5 +1,6 @@
 import type { ChartData } from './data';
 import type { DrawCallback, CursorDrawCallback } from './hooks';
+import type { ChartEventInfo, SelectEventInfo, ScaleChangeCallback } from './events';
 
 /** Focus mode configuration */
 export interface FocusConfig {
@@ -37,4 +38,21 @@ export interface ChartProps {
   syncKey?: string;
   /** Cursor and interaction config */
   cursor?: CursorConfig;
+
+  // --- Event callbacks ---
+
+  /** Fires on click within the plot area, with resolved nearest point */
+  onClick?: (info: ChartEventInfo) => void;
+  /** Fires on right-click within the plot area */
+  onContextMenu?: (info: ChartEventInfo) => void;
+  /** Fires on double-click (before zoom reset) — return false to prevent reset */
+  onDblClick?: (info: ChartEventInfo) => boolean | void;
+  /** Fires when cursor moves over the plot */
+  onCursorMove?: (info: ChartEventInfo) => void;
+  /** Fires when cursor leaves the plot area */
+  onCursorLeave?: () => void;
+  /** Fires after a scale range changes (zoom, pan, or programmatic) */
+  onScaleChange?: ScaleChangeCallback;
+  /** Fires when drag selection completes (before zoom is applied) — return false to prevent zoom */
+  onSelect?: (sel: SelectEventInfo) => boolean | void;
 }

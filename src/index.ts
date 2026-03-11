@@ -44,6 +44,7 @@ export type { BandConfig } from './types/bands';
 export type { LegendConfig } from './types/legend';
 export type { TooltipProps, TooltipData, TooltipItem } from './types/tooltip';
 export type { DrawContext, DrawCallback, CursorDrawCallback } from './types/hooks';
+export type { ChartEventInfo, NearestPoint, SelectEventInfo, ScaleChangeCallback, SelectCallback, EventCallbacks } from './types/events';
 export type { AnnotationStyle } from './annotations';
 export type { ZoomRangerProps } from './components/ZoomRanger';
 export type { TimelineProps, TimelineLane, TimelineSegment } from './types/timeline';

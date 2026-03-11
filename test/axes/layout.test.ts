@@ -81,8 +81,7 @@ describe('axesCalc', () => {
     expect(axis._splits!.length).toBeGreaterThan(0);
     expect(axis._values).not.toBeNull();
     expect(axis._values!.length).toBe(axis._splits!.length);
-    // May or may not converge on first cycle
-    expect(typeof converged).toBe('boolean');
+    expect(converged).toBe(true);
   });
 
   it('hides axis when scale has no range', () => {
@@ -119,9 +118,9 @@ describe('calcAxesRects', () => {
     const plotBox = { left: 60, top: 0, width: 740, height: 550 };
     calcAxesRects([axisBottom, axisLeft], plotBox);
 
-    // Both axes should have positions set by calcAxesRects
-    expect(axisBottom._pos).toBeGreaterThanOrEqual(0);
-    expect(axisLeft._pos).toBeGreaterThanOrEqual(0);
+    // Bottom axis positioned at bottom of plot, left axis at left edge
+    expect(axisBottom._pos).toBe(550);
+    expect(axisLeft._pos).toBe(60);
   });
 });
 

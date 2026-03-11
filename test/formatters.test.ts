@@ -58,7 +58,7 @@ describe('fmtHourMin', () => {
     // 2024-01-01 14:30 UTC
     const ts = Date.UTC(2024, 0, 1, 14, 30) / 1000;
     const result = fmt([ts], 0, 0);
-    expect(result[0]).toMatch(/14:30/);
+    expect(result[0]).toBe('14:30');
   });
 });
 
@@ -68,15 +68,15 @@ describe('fmtMonthName', () => {
     const jan = Date.UTC(2024, 0, 15) / 1000;
     const jul = Date.UTC(2024, 6, 15) / 1000;
     const result = fmt([jan, jul], 0, 0);
-    expect(result[0]).toMatch(/Jan/);
-    expect(result[1]).toMatch(/Jul/);
+    expect(result[0]).toBe('Jan');
+    expect(result[1]).toBe('Jul');
   });
 
   it('supports long format', () => {
     const fmt = fmtMonthName({ utc: true, format: 'long' });
     const jan = Date.UTC(2024, 0, 15) / 1000;
     const result = fmt([jan], 0, 0);
-    expect(result[0]).toMatch(/January/);
+    expect(result[0]).toBe('January');
   });
 });
 
@@ -85,9 +85,7 @@ describe('fmtDateStr', () => {
     const fmt = fmtDateStr({ year: 'numeric', month: '2-digit', day: '2-digit', tz: 'UTC' });
     const ts = Date.UTC(2024, 5, 15) / 1000;
     const result = fmt([ts], 0, 0);
-    expect(result[0]).toMatch(/2024/);
-    expect(result[0]).toMatch(/06|6/);
-    expect(result[0]).toMatch(/15/);
+    expect(result[0]).toBe('06/15/2024');
   });
 });
 

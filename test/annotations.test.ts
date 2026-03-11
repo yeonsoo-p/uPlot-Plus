@@ -72,8 +72,8 @@ describe('drawHLine', () => {
 
     drawHLine(dc, yScale, 50, { stroke: 'blue', width: 3 });
 
-    // Check that strokeStyle and lineWidth were set before stroke
-    // (ctx is a plain object, so we check the assignments happened)
+    expect(ctx.strokeStyle).toBe('blue');
+    expect(ctx.lineWidth).toBe(3);
     expect(ctx.stroke).toHaveBeenCalled();
   });
 

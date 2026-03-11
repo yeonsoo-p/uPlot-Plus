@@ -13,7 +13,7 @@ Library code lives at the project root. The `uPlot/` and `uplot-wrappers/` direc
 │   │                  Sparkline, ResponsiveChart, annotations/{HLine,VLine,Region,AnnotationLabel}
 │   ├── core/          DataStore, ScaleManager, CursorManager, RenderScheduler, Scale
 │   ├── rendering/     CanvasRenderer, drawSeries, drawAxes, drawCursor, drawSelect
-│   ├── hooks/         useChart, useInteraction, useChartStore, useDrawHook, useStreamingData
+│   ├── hooks/         useChart, useDrawHook, useCursorDrawHook, useStreamingData (public); useInteraction, useChartStore (internal)
 │   ├── math/          utils, increments, stack, align
 │   ├── axes/          ticks, layout
 │   ├── paths/         linear, stepped, bars, monotoneCubic, catmullRom, points, candlestick
@@ -50,7 +50,7 @@ npm run test        # Vitest
 
 ## Features
 
-- **13 components**: Chart, Scale, Series, Axis, Band, Legend, Tooltip, ZoomRanger, Timeline, Sparkline, ResponsiveChart, plus annotation components (HLine, VLine, Region, AnnotationLabel)
+- **15 components**: Chart, Scale, Series, Axis, Band, Legend, Tooltip, ZoomRanger, Timeline, Sparkline, ResponsiveChart, HLine, VLine, Region, AnnotationLabel
 - **7 path builders**: linear (with pixel-level decimation), stepped, bars, monotoneCubic, catmullRom, points, candlestick
 - **Annotations**: declarative `<HLine>`, `<VLine>`, `<Region>`, `<AnnotationLabel>` components; also imperative drawHLine/drawVLine/drawLabel/drawRegion
 - **Axis formatters**: fmtCompact (K/M/B), fmtSuffix (°C, %), fmtHourMin, fmtMonthName, fmtDateStr, fmtLabels

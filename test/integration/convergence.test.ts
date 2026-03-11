@@ -52,6 +52,11 @@ describe('convergeSize integration', () => {
     const box2 = convergeSize(800, 600, makeAxes(), id => scales[id]);
 
     expect(box1).toEqual(box2);
+    expect(box1.width).toBeGreaterThan(0);
+    expect(box1.height).toBeGreaterThan(0);
+    expect(box1.left).toBeGreaterThan(0);
+    expect(box1.width).toBeLessThan(800);
+    expect(box1.height).toBeLessThan(600);
   });
 
   it('handles dual y-axes', () => {

@@ -18,10 +18,11 @@ describe('timeAxisSplits', () => {
     const min = 1700000000;
     const max = min + 7 * DAY;
     const splits = timeAxisSplits(min, max, DAY);
-    expect(splits.length).toBeGreaterThanOrEqual(6);
+    expect(splits.length).toBe(7);
     for (const s of splits) {
       expect(s).toBeGreaterThanOrEqual(min);
       expect(s).toBeLessThanOrEqual(max);
+      expect(s % DAY).toBe(0);
     }
   });
 

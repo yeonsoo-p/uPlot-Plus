@@ -8,7 +8,7 @@ High-performance React charting library built from scratch in TypeScript. Canvas
 - **Native React components** — declarative `<Chart>`, `<Series>`, `<Scale>`, `<Axis>` API
 - **Multi-x-axis support** — multiple data groups with independent x-ranges on one chart
 - **TypeScript-first** — strict types, full type exports, no `any`
-- **7 path builders** — line, step, bar, monotone cubic, Catmull-Rom, scatter, candlestick
+- **7 path builders** — linear, stepped, bars, monotone cubic, Catmull-Rom, points, candlestick
 - **Interactive** — wheel/touch zoom, drag-to-zoom, cursor snapping, series focus
 - **Cursor sync** — linked crosshairs and tooltips across multiple charts
 - **Small bundle** — ~18KB (5.7KB gzip), React 18+ peer dependency
@@ -75,6 +75,8 @@ function App() {
 | `<Region>` | Declarative shaded region annotation |
 | `<AnnotationLabel>` | Declarative text label at data coordinates |
 
+> Full props reference, usage examples, and demo links: [docs/COMPONENTS.md](docs/COMPONENTS.md)
+
 ## Data Model
 
 Data is organized as groups, each with its own x-values:
@@ -122,11 +124,81 @@ import { Series, bars } from 'uplot-plus';
 <Series group={0} index={0} yScale="y" paths={bars()} stroke="#3498db" fill="#3498db80" />
 ```
 
+## Event Callbacks
+
+React-idiomatic event handling — all callbacks receive resolved chart data (nearest point, data values, coordinates).
+
+```tsx
+import { Chart, Scale, Series, Axis } from 'uplot-plus';
+
+<Chart
+  data={data} width={800} height={400}
+  onClick={(info) => {
+    if (info.point) {
+      console.log(`Clicked series ${info.point.seriesIdx} at y=${info.point.yVal}`);
+    }
+  }}
+  onContextMenu={(info) => {
+    // Right-click with resolved nearest point
+    showContextMenu(info.srcEvent, info.point);
+  }}
+  onDblClick={(info) => {
+    // Return false to prevent default zoom reset
+    return false;
+  }}
+  onSelect={(sel) => {
+    // Intercept drag selection — fetch detail data instead of zooming
+    fetchData(sel.ranges['x'].min, sel.ranges['x'].max);
+    return false; // prevent zoom
+  }}
+  onScaleChange={(scaleId, min, max) => {
+    console.log(`Scale ${scaleId} changed: [${min}, ${max}]`);
+  }}
+  onCursorMove={(info) => { /* fires on every mouse move */ }}
+  onCursorLeave={() => { /* cursor left the plot */ }}
+>
+  <Scale id="x" auto ori={0} dir={1} />
+  <Scale id="y" auto ori={1} dir={1} />
+  <Axis scale="x" side={2} />
+  <Axis scale="y" side={3} />
+  <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Series A" />
+</Chart>
+```
+
+### Controlled Scales
+
+Control zoom and pan declaratively through React state — no imperative refs needed:
+
+```tsx
+import { useState, useCallback } from 'react';
+import { Chart, Scale, Series, Axis } from 'uplot-plus';
+
+function ZoomableChart({ data }) {
+  const [xRange, setXRange] = useState<[number, number] | null>(null);
+
+  const onScaleChange = useCallback((id: string, min: number, max: number) => {
+    if (id === 'x') setXRange([min, max]);
+  }, []);
+
+  return (
+    <>
+      <button onClick={() => setXRange(null)}>Reset Zoom</button>
+      <Chart data={data} width={800} height={400} onScaleChange={onScaleChange}>
+        <Scale id="x" ori={0} dir={1}
+          auto={xRange == null} min={xRange?.[0]} max={xRange?.[1]} />
+        <Scale id="y" auto ori={1} dir={1} />
+        {/* ... axes, series */}
+      </Chart>
+    </>
+  );
+}
+```
+
 ## Hooks
 
 ### `useChart()`
 
-Access the chart store from any child of `<Chart>`:
+Access the chart store from a child component of `<Chart>`. This is an advanced API for building custom chart sub-components that need direct store access — for most use cases, prefer event callbacks and controlled Scale props.
 
 ```tsx
 import { useChart } from 'uplot-plus';
@@ -139,7 +211,7 @@ function CustomControl() {
 
 ### `useDrawHook()` / `useCursorDrawHook()`
 
-Register custom Canvas 2D draw callbacks for the persistent layer or cursor overlay:
+Register custom Canvas 2D draw callbacks from child components. For most cases, prefer the `onDraw` / `onCursorDraw` props on `<Chart>` — these hooks are useful when building reusable chart sub-components.
 
 ```tsx
 import { useDrawHook } from 'uplot-plus';
@@ -235,7 +307,7 @@ import { HLine, VLine, Region, AnnotationLabel } from 'uplot-plus';
 </Chart>
 ```
 
-Imperative helpers are also available for custom draw hooks:
+Imperative helpers are available for advanced draw hooks that need programmatic control:
 
 ```tsx
 import { drawHLine, drawVLine, drawLabel, drawRegion } from 'uplot-plus';
@@ -251,182 +323,6 @@ import { valToPos, posToVal } from 'uplot-plus';
 const px = valToPos(dataValue, scale, dimension, offset);
 const val = posToVal(pixelPos, scale, dimension, offset);
 ```
-
-## Examples
-
-### Legend and Tooltip
-
-```tsx
-import { Chart, Scale, Series, Axis, Legend, Tooltip } from 'uplot-plus';
-
-<Chart width={800} height={400} data={data}>
-  <Scale id="x" auto ori={0} dir={1} />
-  <Scale id="y" auto ori={1} dir={1} />
-  <Axis scale="x" side={2} />
-  <Axis scale="y" side={3} />
-  <Series group={0} index={0} yScale="y" stroke="red" label="Revenue" />
-  <Series group={0} index={1} yScale="y" stroke="blue" label="Costs" />
-  <Legend position="bottom" />
-  <Tooltip />
-</Chart>
-```
-
-### Synced Charts
-
-```tsx
-<Chart width={800} height={200} data={data1} syncKey="sync1">
-  {/* ... scales, axes, series */}
-  <Tooltip />
-</Chart>
-
-<Chart width={800} height={200} data={data2} syncKey="sync1">
-  {/* ... scales, axes, series */}
-  <Tooltip />
-</Chart>
-```
-
-### ZoomRanger
-
-```tsx
-import { Chart, ZoomRanger } from 'uplot-plus';
-
-const [range, setRange] = useState<[number, number] | null>(null);
-
-<ZoomRanger
-  width={800}
-  height={80}
-  data={data}
-  onRangeChange={(min, max) => setRange([min, max])}
-/>
-
-<Chart width={800} height={300} data={data}>
-  {/* detail chart */}
-</Chart>
-```
-
-### Bands (Confidence Intervals)
-
-```tsx
-import { Band } from 'uplot-plus';
-
-<Chart data={data}>
-  <Series group={0} index={0} yScale="y" stroke="blue" label="Upper" />
-  <Series group={0} index={1} yScale="y" stroke="blue" label="Lower" />
-  <Band series={[0, 1]} group={0} fill="rgba(100,150,255,0.2)" />
-</Chart>
-```
-
-### Sparkline
-
-```tsx
-import { Sparkline, bars } from 'uplot-plus';
-
-// Line sparkline
-<Sparkline data={priceData} stroke="#03a9f4" fill="#b3e5fc" />
-
-// Bar sparkline
-<Sparkline data={volumeData} width={120} height={28} paths={bars()} fillTo={0} stroke="#2980b9" />
-```
-
-### Responsive Chart
-
-```tsx
-import { ResponsiveChart, Scale, Series, Axis } from 'uplot-plus';
-
-// Fills parent container, maintains 16:9 aspect ratio
-<div style={{ width: '100%' }}>
-  <ResponsiveChart data={data} aspectRatio={16/9}>
-    <Scale id="x" auto ori={0} dir={1} />
-    <Scale id="y" auto ori={1} dir={1} />
-    <Axis scale="x" side={2} />
-    <Axis scale="y" side={3} />
-    <Series group={0} index={0} yScale="y" stroke="red" />
-  </ResponsiveChart>
-</div>
-```
-
-### Custom Tooltip
-
-```tsx
-<Tooltip>
-  {(data) => (
-    <div style={{ background: '#fff', padding: 8, borderRadius: 4 }}>
-      <strong>{data.xLabel}</strong>
-      {data.items.map(item => (
-        <div key={item.label} style={{ color: item.color }}>
-          {item.label}: {item.value?.toFixed(2)}
-        </div>
-      ))}
-    </div>
-  )}
-</Tooltip>
-```
-
-## Chart Props Reference
-
-### `<Chart>`
-
-| Prop | Type | Description |
-|------|------|-------------|
-| `width` | `number` | Chart width in CSS pixels (required) |
-| `height` | `number` | Chart height in CSS pixels (required) |
-| `data` | `ChartData` | Chart data (required) |
-| `children` | `ReactNode` | Scale, Series, Axis, Legend, etc. |
-| `className` | `string` | CSS class name |
-| `pxRatio` | `number` | Device pixel ratio (default: `devicePixelRatio`) |
-| `syncKey` | `string` | Key to sync cursor across charts |
-| `cursor` | `CursorConfig` | Cursor/interaction config |
-| `onDraw` | `DrawCallback` | Custom draw on persistent layer |
-| `onCursorDraw` | `CursorDrawCallback` | Custom draw on cursor overlay |
-
-### `<Scale>`
-
-| Prop | Type | Description |
-|------|------|-------------|
-| `id` | `string` | Unique scale identifier (required) |
-| `auto` | `boolean` | Auto-range from data |
-| `ori` | `0 \| 1` | 0 = horizontal (x), 1 = vertical (y) |
-| `dir` | `1 \| -1` | 1 = normal, -1 = reversed |
-| `distr` | `1\|2\|3\|4` | 1=linear, 2=ordinal, 3=log, 4=asinh |
-| `log` | `number` | Log base when `distr=3` |
-| `min` / `max` | `number \| null` | Fixed range limits |
-| `time` | `boolean` | Time-based scale |
-| `range` | `RangeConfig` | Padding and soft/hard limits |
-
-### `<Series>`
-
-| Prop | Type | Description |
-|------|------|-------------|
-| `group` | `number` | Data group index (required) |
-| `index` | `number` | Series index within group (required) |
-| `yScale` | `string` | Y-axis scale key (required) |
-| `stroke` | `string \| GradientConfig` | Line color |
-| `fill` | `string \| GradientConfig` | Fill color |
-| `width` | `number` | Stroke width in CSS pixels |
-| `paths` | `PathBuilder` | Path builder function |
-| `label` | `string` | Legend/tooltip label |
-| `show` | `boolean` | Visibility (default: true) |
-| `spanGaps` | `boolean` | Connect across null gaps |
-| `points` | `PointsConfig` | Point marker configuration |
-| `dash` | `number[]` | Dash pattern |
-
-### `<Axis>`
-
-| Prop | Type | Description |
-|------|------|-------------|
-| `scale` | `string` | Scale key (required) |
-| `side` | `0\|1\|2\|3` | 0=top, 1=right, 2=bottom, 3=left (required) |
-| `label` | `string` | Axis label text |
-| `show` | `boolean` | Visibility (default: true) |
-| `space` | `number` | Min space between ticks (CSS px) |
-| `size` | `number` | Axis size (height or width) |
-| `rotate` | `number` | Tick label rotation in degrees |
-| `values` | `function` | Custom tick label formatter |
-| `splits` | `function` | Custom tick position generator |
-| `grid` | `GridConfig` | Grid line config |
-| `ticks` | `TickConfig` | Tick mark config |
-
-For full type definitions, see the exported types from `uplot-plus`.
 
 ## Development
 
