@@ -3,7 +3,7 @@ import type { ChartStore } from './useChartStore';
 import type { SelectState } from '../types/cursor';
 import type { ChartEventInfo, NearestPoint, SelectEventInfo } from '../types/events';
 import { posToVal, valToPos, invalidateScaleCache } from '../core/Scale';
-import { DirtyFlag } from '../types/common';
+import { Side, Orientation, sideOrientation, DirtyFlag } from '../types/common';
 
 interface CoordSource {
   clientX: number;
@@ -45,7 +45,7 @@ export function useInteraction(
       return cx >= 0 && cx <= plotBox.width && cy >= 0 && cy <= plotBox.height;
     }
 
-    function hitTestAxis(clientX: number, clientY: number): { scaleId: string; ori: number } | null {
+    function hitTestAxis(clientX: number, clientY: number): { scaleId: string; ori: Orientation } | null {
       const rect = el.getBoundingClientRect();
       const localX = clientX - rect.left;
       const localY = clientY - rect.top;
@@ -60,13 +60,13 @@ export function useInteraction(
         const inVert = localY >= plotBox.top && localY <= plotBox.top + plotBox.height;
         const inHoriz = localX >= plotBox.left && localX <= plotBox.left + plotBox.width;
         const inAxis =
-          (side === 3 && localX < plotBox.left && inVert) ||
-          (side === 1 && localX > plotBox.left + plotBox.width && inVert) ||
-          (side === 0 && localY < plotBox.top && inHoriz) ||
-          (side === 2 && localY > plotBox.top + plotBox.height && inHoriz);
+          (side === Side.Left && localX < plotBox.left && inVert) ||
+          (side === Side.Right && localX > plotBox.left + plotBox.width && inVert) ||
+          (side === Side.Top && localY < plotBox.top && inHoriz) ||
+          (side === Side.Bottom && localY > plotBox.top + plotBox.height && inHoriz);
 
         if (inAxis) {
-          const ori = (side === 0 || side === 2) ? 0 : 1;
+          const ori = sideOrientation(side);
           return { scaleId: cfg.scale, ori };
         }
       }
@@ -133,7 +133,7 @@ export function useInteraction(
 
       const ranges: Record<string, { min: number; max: number }> = {};
       for (const scale of store.scaleManager.getAllScales()) {
-        if (scale.ori !== 0) continue;
+        if (scale.ori !== Orientation.Horizontal) continue;
         if (scale.min == null || scale.max == null) continue;
 
         const minVal = posToVal(
@@ -267,7 +267,7 @@ export function useInteraction(
 
       // Check for axis gutter hit
       const axisHit = hitTestAxis(e.clientX, e.clientY);
-      if (axisHit != null && axisHit.ori === 1) {
+      if (axisHit != null && axisHit.ori === Orientation.Vertical) {
         const scale = store.scaleManager.getScale(axisHit.scaleId);
         if (scale != null && scale.min != null && scale.max != null) {
           const rect = el.getBoundingClientRect();
@@ -423,7 +423,7 @@ export function useInteraction(
       const plotBox = store.plotBox;
 
       for (const scale of store.scaleManager.getAllScales()) {
-        if (scale.ori !== 0) continue;
+        if (scale.ori !== Orientation.Horizontal) continue;
         if (scale.min == null || scale.max == null) continue;
 
         const cursorVal = posToVal(coords.cx + plotBox.left, scale, plotBox.width, plotBox.left);
@@ -447,7 +447,7 @@ export function useInteraction(
       const fracRight = (sel.left + sel.width) / plotBox.width;
 
       for (const scale of store.scaleManager.getAllScales()) {
-        if (scale.ori !== 0) continue;
+        if (scale.ori !== Orientation.Horizontal) continue;
         if (scale.min == null || scale.max == null) continue;
 
         const newMin = posToVal(
@@ -515,7 +515,7 @@ export function useInteraction(
         const midCx = pinchState.midX - rect.left - plotBox.left;
 
         for (const scale of store.scaleManager.getAllScales()) {
-          if (scale.ori !== 0) continue;
+          if (scale.ori !== Orientation.Horizontal) continue;
           if (scale.min == null || scale.max == null) continue;
 
           const cursorVal = posToVal(midCx + plotBox.left, scale, plotBox.width, plotBox.left);

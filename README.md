@@ -44,10 +44,10 @@ const data = [
 function App() {
   return (
     <Chart width={800} height={400} data={data}>
-      <Scale id="x" auto ori={0} dir={1} />
-      <Scale id="y" auto ori={1} dir={1} />
-      <Axis scale="x" side={2} label="X-Axis" />
-      <Axis scale="y" side={3} label="Y-Axis" />
+      <Scale id="x" />
+      <Scale id="y" />
+      <Axis scale="x" label="X-Axis" />
+      <Axis scale="y" label="Y-Axis" />
       <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Series A" />
       <Series group={0} index={1} yScale="y" stroke="#3498db" width={2} label="Series B" />
     </Chart>
@@ -157,10 +157,10 @@ import { Chart, Scale, Series, Axis } from 'uplot-plus';
   onCursorMove={(info) => { /* fires on every mouse move */ }}
   onCursorLeave={() => { /* cursor left the plot */ }}
 >
-  <Scale id="x" auto ori={0} dir={1} />
-  <Scale id="y" auto ori={1} dir={1} />
-  <Axis scale="x" side={2} />
-  <Axis scale="y" side={3} />
+  <Scale id="x" />
+  <Scale id="y" />
+  <Axis scale="x" />
+  <Axis scale="y" />
   <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Series A" />
 </Chart>
 ```
@@ -184,9 +184,9 @@ function ZoomableChart({ data }) {
     <>
       <button onClick={() => setXRange(null)}>Reset Zoom</button>
       <Chart data={data} width={800} height={400} onScaleChange={onScaleChange}>
-        <Scale id="x" ori={0} dir={1}
+        <Scale id="x"
           auto={xRange == null} min={xRange?.[0]} max={xRange?.[1]} />
-        <Scale id="y" auto ori={1} dir={1} />
+        <Scale id="y" />
         {/* ... axes, series */}
       </Chart>
     </>
@@ -246,12 +246,12 @@ Pre-built formatters for common axis label patterns:
 ```tsx
 import { fmtCompact, fmtSuffix, fmtHourMin, fmtMonthName, fmtLabels } from 'uplot-plus';
 
-<Axis scale="y" side={3} values={fmtCompact()} />           // 1.2K, 3.5M
-<Axis scale="y" side={3} values={fmtSuffix('%')} />         // 42%
-<Axis scale="y" side={3} values={fmtSuffix('°C', 1)} />    // 23.5°C
-<Axis scale="x" side={2} values={fmtHourMin({ utc: true })} /> // 14:30
-<Axis scale="x" side={2} values={fmtMonthName()} />         // Jan, Feb, ...
-<Axis scale="x" side={2} values={fmtLabels(['Q1','Q2','Q3','Q4'])} />
+<Axis scale="y" values={fmtCompact()} />           // 1.2K, 3.5M
+<Axis scale="y" values={fmtSuffix('%')} />         // 42%
+<Axis scale="y" values={fmtSuffix('°C', 1)} />    // 23.5°C
+<Axis scale="x" values={fmtHourMin({ utc: true })} /> // 14:30
+<Axis scale="x" values={fmtMonthName()} />         // Jan, Feb, ...
+<Axis scale="x" values={fmtLabels(['Q1','Q2','Q3','Q4'])} />
 ```
 
 ## Color Utilities

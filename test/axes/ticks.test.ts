@@ -8,6 +8,7 @@ import {
   createAxisState,
 } from '@/axes/ticks';
 import type { AxisConfig } from '@/types/axes';
+import { Side } from '@/types';
 
 // ---- numAxisSplits ----
 describe('numAxisSplits', () => {
@@ -103,26 +104,26 @@ describe('logAxisSplits', () => {
 // ---- getIncrSpace ----
 describe('getIncrSpace', () => {
   it('returns [0, 0] for zero dimension', () => {
-    const cfg: AxisConfig = { scale: 'y', side: 3 };
+    const cfg: AxisConfig = { scale: 'y', side: Side.Left };
     expect(getIncrSpace(cfg, 0, 100, 0)).toEqual([0, 0]);
   });
 
   it('vertical axis uses 30px spacing', () => {
-    const cfg: AxisConfig = { scale: 'y', side: 1 };
+    const cfg: AxisConfig = { scale: 'y', side: Side.Right };
     const [incr, space] = getIncrSpace(cfg, 0, 100, 300);
     expect(incr).toBeGreaterThan(0);
     expect(space).toBeGreaterThanOrEqual(30);
   });
 
   it('horizontal axis estimates space from labels', () => {
-    const cfg: AxisConfig = { scale: 'x', side: 2 };
+    const cfg: AxisConfig = { scale: 'x', side: Side.Bottom };
     const [incr, space] = getIncrSpace(cfg, 0, 100, 500);
     expect(incr).toBeGreaterThan(0);
     expect(space).toBeGreaterThanOrEqual(50);
   });
 
   it('respects custom space', () => {
-    const cfg: AxisConfig = { scale: 'y', side: 1, space: 60 };
+    const cfg: AxisConfig = { scale: 'y', side: Side.Right, space: 60 };
     const [_incr, space] = getIncrSpace(cfg, 0, 100, 300);
     expect(space).toBeGreaterThanOrEqual(60);
   });
@@ -131,31 +132,31 @@ describe('getIncrSpace', () => {
 // ---- computeAxisSize ----
 describe('computeAxisSize', () => {
   it('returns fixed size when specified', () => {
-    const cfg: AxisConfig = { scale: 'y', side: 1, size: 80 };
+    const cfg: AxisConfig = { scale: 'y', side: Side.Right, size: 80 };
     expect(computeAxisSize(cfg, ['1', '2'], 1)).toBe(80);
   });
 
   it('vertical axis adapts to label width', () => {
-    const cfg: AxisConfig = { scale: 'y', side: 1 };
+    const cfg: AxisConfig = { scale: 'y', side: Side.Right };
     const narrow = computeAxisSize(cfg, ['1', '2', '3'], 1);
     const wide = computeAxisSize(cfg, ['1,000,000', '2,000,000'], 1);
     expect(wide).toBeGreaterThan(narrow);
   });
 
   it('minimum size is 50', () => {
-    const cfg: AxisConfig = { scale: 'y', side: 1 };
+    const cfg: AxisConfig = { scale: 'y', side: Side.Right };
     expect(computeAxisSize(cfg, ['1'], 1)).toBeGreaterThanOrEqual(50);
   });
 
   it('horizontal axis returns consistent height', () => {
-    const cfg: AxisConfig = { scale: 'x', side: 2 };
+    const cfg: AxisConfig = { scale: 'x', side: Side.Bottom };
     const size = computeAxisSize(cfg, ['any', 'labels'], 1);
     expect(size).toBeGreaterThanOrEqual(50);
   });
 
   it('accounts for hidden ticks', () => {
-    const cfg: AxisConfig = { scale: 'y', side: 1, ticks: { show: false } };
-    const withTicks: AxisConfig = { scale: 'y', side: 1, ticks: { show: true, size: 10 } };
+    const cfg: AxisConfig = { scale: 'y', side: Side.Right, ticks: { show: false } };
+    const withTicks: AxisConfig = { scale: 'y', side: Side.Right, ticks: { show: true, size: 10 } };
     const sizeNoTicks = computeAxisSize(cfg, ['100'], 1);
     const sizeWithTicks = computeAxisSize(withTicks, ['100'], 1);
     expect(sizeWithTicks).toBeGreaterThanOrEqual(sizeNoTicks);
@@ -165,7 +166,7 @@ describe('computeAxisSize', () => {
 // ---- createAxisState ----
 describe('createAxisState', () => {
   it('creates state with defaults', () => {
-    const cfg: AxisConfig = { scale: 'y', side: 1 };
+    const cfg: AxisConfig = { scale: 'y', side: Side.Right };
     const state = createAxisState(cfg);
     expect(state.config).toBe(cfg);
     expect(state._show).toBe(true);
@@ -175,7 +176,7 @@ describe('createAxisState', () => {
   });
 
   it('hidden axis', () => {
-    const state = createAxisState({ scale: 'y', side: 1, show: false });
+    const state = createAxisState({ scale: 'y', side: Side.Right, show: false });
     expect(state._show).toBe(false);
   });
 });

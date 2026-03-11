@@ -44,10 +44,10 @@ export function Sparkline({
   return (
     <div style={{ pointerEvents: 'none' }} className={className}>
       <Chart width={width} height={height} data={data}>
-        <Scale id="x" auto ori={0} dir={1} time={false} />
-        <Scale id="y" auto ori={1} dir={1} />
-        <Axis scale="x" side={2} show={false} />
-        <Axis scale="y" side={3} show={false} />
+        <Scale id="x" />
+        <Scale id="y" />
+        <Axis scale="x" show={false} />
+        <Axis scale="y" show={false} />
         <Series
           group={0}
           index={0}

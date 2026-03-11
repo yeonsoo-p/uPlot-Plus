@@ -22,11 +22,11 @@ export default function ZoomTouch() {
         Use two-finger pinch to zoom on touch devices. Drag to zoom on desktop. Double-tap to reset.
       </p>
       <Chart width={800} height={400} data={data} cursor={{ wheelZoom: true }}>
-        <Scale id="x" ori={0} dir={1} auto />
-        <Scale id="y" ori={1} dir={1} auto />
+        <Scale id="x"  />
+        <Scale id="y"  />
         <Series group={0} index={0} yScale="y" stroke="#e24d42" width={2} label="Signal" />
-        <Axis scale="x" side={2} />
-        <Axis scale="y" side={3} />
+        <Axis scale="x" />
+        <Axis scale="y" />
       </Chart>
     </div>
   );

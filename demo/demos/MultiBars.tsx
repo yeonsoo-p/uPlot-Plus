@@ -46,10 +46,10 @@ export default function MultiBars() {
         Grouped bar chart: 3 product lines shown side-by-side per quarter.
       </p>
       <Chart width={800} height={400} data={data}>
-        <Scale id="x" auto ori={0} dir={1} time={false} />
-        <Scale id="y" auto ori={1} dir={1} />
-        <Axis scale="x" side={2} label="Quarter" values={fmtQuarter} />
-        <Axis scale="y" side={3} label="Revenue" values={fmtK} />
+        <Scale id="x" />
+        <Scale id="y"  />
+        <Axis scale="x" label="Quarter" values={fmtQuarter} />
+        <Axis scale="y" label="Revenue" values={fmtK} />
         <Series
           group={0} index={0} yScale="y"
           stroke="#2980b9" fill="rgba(41,128,185,0.75)" width={0}

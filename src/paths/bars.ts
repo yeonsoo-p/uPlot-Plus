@@ -1,5 +1,6 @@
 import type { SeriesPaths, PathBuilder, PathBuilderOpts } from './types';
 import type { ScaleState } from '../types';
+import { Orientation, Direction } from '../types';
 import { valToPos } from '../core/Scale';
 
 /**
@@ -20,7 +21,7 @@ export function bars(): PathBuilder {
     yOff: number,
     idx0: number,
     idx1: number,
-    dir: 1 | -1,
+    dir: Direction,
     pxRound: (v: number) => number,
     opts?: PathBuilderOpts,
   ): SeriesPaths => {
@@ -64,9 +65,9 @@ export function bars(): PathBuilder {
     const fillToY = pixelForY(fillToVal);
 
     const stroke = new Path2D();
-    const isHorizontal = scaleX.ori === 0;
+    const isHorizontal = scaleX.ori === Orientation.Horizontal;
 
-    for (let i = dir === 1 ? idx0 : idx1; i >= idx0 && i <= idx1; i += dir) {
+    for (let i = dir === Direction.Forward ? idx0 : idx1; i >= idx0 && i <= idx1; i += dir) {
       const yVal = dataY[i];
       if (yVal == null) continue;
 

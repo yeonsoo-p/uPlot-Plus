@@ -81,10 +81,10 @@ export default function CandlestickOHLC() {
 
   return (
     <Chart width={800} height={400} data={data} onDraw={onDraw}>
-      <Scale id="x" auto ori={0} dir={1} time={false} />
-      <Scale id="y" auto ori={1} dir={1} />
-      <Axis scale="x" side={2} label="Day" />
-      <Axis scale="y" side={3} label="Price" />
+      <Scale id="x" />
+      <Scale id="y"  />
+      <Axis scale="x" label="Day" />
+      <Axis scale="y" label="Price" />
       <Series group={0} index={0} yScale="y" show={false} label="Open" />
       <Series group={0} index={1} yScale="y" show={false} label="High" />
       <Series group={0} index={2} yScale="y" show={false} label="Low" />

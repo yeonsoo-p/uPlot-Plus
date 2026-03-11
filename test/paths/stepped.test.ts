@@ -2,10 +2,11 @@ import { describe, it, expect } from 'vitest';
 import { stepped } from '@/paths/stepped';
 import { createScaleState } from '@/core/Scale';
 import type { ScaleState } from '@/types';
+import { Orientation, Direction } from '@/types';
 import { round } from '@/math/utils';
 
-function makeScale(id: string, min: number, max: number, ori: 0 | 1 = 0): ScaleState {
-  return { ...createScaleState({ id }), min, max, ori, dir: 1 };
+function makeScale(id: string, min: number, max: number, ori: Orientation = Orientation.Horizontal): ScaleState {
+  return { ...createScaleState({ id }), min, max, ori, dir: Direction.Forward };
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -24,7 +25,7 @@ const pxRound = (v: number) => round(v);
 const dataX = [0, 1, 2, 3, 4];
 const dataY: (number | null)[] = [10, 20, 15, 30, 25];
 const scaleX = makeScale('x', 0, 4);
-const scaleY: ScaleState = { ...makeScale('y', 0, 30), ori: 1, dir: 1 };
+const scaleY: ScaleState = { ...makeScale('y', 0, 30), ori: Orientation.Vertical, dir: Direction.Forward };
 
 describe('stepped path builder', () => {
   const builder = stepped();
@@ -41,7 +42,7 @@ describe('stepped path builder', () => {
 
   it('align=1 produces horizontal-then-vertical steps (staircase pattern)', () => {
     const sx = makeScale('x', 0, 2);
-    const sy: ScaleState = { ...makeScale('y', 0, 10), ori: 1, dir: 1 };
+    const sy: ScaleState = { ...makeScale('y', 0, 10), ori: Orientation.Vertical, dir: Direction.Forward };
     const result = builder([0, 1, 2], [0, 10, 0], sx, sy, 200, 100, 0, 0, 0, 2, 1, pxRound, { align: 1 });
 
     const lineToPoints = getLineToCalls(result.stroke);
@@ -55,7 +56,7 @@ describe('stepped path builder', () => {
 
   it('align=-1 produces vertical-then-horizontal steps', () => {
     const sx = makeScale('x', 0, 2);
-    const sy: ScaleState = { ...makeScale('y', 0, 10), ori: 1, dir: 1 };
+    const sy: ScaleState = { ...makeScale('y', 0, 10), ori: Orientation.Vertical, dir: Direction.Forward };
     const result = builder([0, 1, 2], [0, 10, 0], sx, sy, 200, 100, 0, 0, 0, 2, 1, pxRound, { align: -1 });
 
     const lineToPoints = getLineToCalls(result.stroke);
@@ -68,7 +69,7 @@ describe('stepped path builder', () => {
 
   it('align=0 adds midpoint steps (more lineTo calls than align=1)', () => {
     const sx = makeScale('x', 0, 2);
-    const sy: ScaleState = { ...makeScale('y', 0, 10), ori: 1, dir: 1 };
+    const sy: ScaleState = { ...makeScale('y', 0, 10), ori: Orientation.Vertical, dir: Direction.Forward };
     const resultMid = builder([0, 1, 2], [0, 10, 0], sx, sy, 200, 100, 0, 0, 0, 2, 1, pxRound, { align: 0 });
     const resultAfter = builder([0, 1, 2], [0, 10, 0], sx, sy, 200, 100, 0, 0, 0, 2, 1, pxRound, { align: 1 });
 

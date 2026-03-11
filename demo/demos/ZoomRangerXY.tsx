@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback } from 'react';
-import { Chart, Scale, Series, Axis, ZoomRanger } from '../../src';
+import { Chart, Scale, Series, Axis, ZoomRanger, Side } from '../../src';
 import type { ChartData } from '../../src';
 
 function generateData(): ChartData {
@@ -27,12 +27,12 @@ export default function ZoomRangerXYDemo() {
     <div>
       <h4 style={{ margin: '0 0 8px' }}>Detail view (controlled by ranger below)</h4>
       <Chart width={800} height={300} data={data} cursor={{ wheelZoom: true }}>
-        <Scale id="x" ori={0} dir={1} auto={range == null} min={range?.[0]} max={range?.[1]} />
-        <Scale id="y" auto ori={1} dir={1} />
-        <Scale id="y2" auto ori={1} dir={1} />
-        <Axis scale="x" side={2} />
-        <Axis scale="y" side={3} label="Signal A" />
-        <Axis scale="y2" side={1} label="Signal B" />
+        <Scale id="x" auto={range == null} min={range?.[0]} max={range?.[1]} />
+        <Scale id="y"  />
+        <Scale id="y2"  />
+        <Axis scale="x" />
+        <Axis scale="y" label="Signal A" />
+        <Axis scale="y2" side={Side.Right} label="Signal B" />
         <Series group={0} index={0} yScale="y" stroke="#4caf50" label="Signal A" />
         <Series group={0} index={1} yScale="y2" stroke="#9c27b0" label="Signal B" />
       </Chart>

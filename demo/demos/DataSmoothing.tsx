@@ -40,10 +40,10 @@ export default function DataSmoothing() {
 
   return (
     <Chart width={800} height={400} data={data}>
-      <Scale id="x" auto ori={0} dir={1} time={false} />
-      <Scale id="y" auto ori={1} dir={1} />
-      <Axis scale="x" side={2} label="Sample" />
-      <Axis scale="y" side={3} label="Value" />
+      <Scale id="x" />
+      <Scale id="y"  />
+      <Axis scale="x" label="Sample" />
+      <Axis scale="y" label="Value" />
       <Series
         group={0}
         index={0}

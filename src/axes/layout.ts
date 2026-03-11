@@ -1,5 +1,6 @@
 import type { ScaleState, BBox } from '../types';
 import type { AxisState } from '../types/axes';
+import { Side, Orientation, Distribution, sideOrientation } from '../types';
 import { ceil } from '../math/utils';
 import {
   getIncrSpace,
@@ -52,8 +53,8 @@ export function axesCalc(
     }
 
     const side = config.side;
-    const ori = side % 2; // 0=horizontal (top/bottom), 1=vertical (left/right)
-    const fullDim = ori === 0 ? plotWidCss : plotHgtCss;
+    const ori = sideOrientation(side);
+    const fullDim = ori === Orientation.Horizontal ? plotWidCss : plotHgtCss;
 
     const { min, max } = scale;
 
@@ -79,10 +80,10 @@ export function axesCalc(
       axis._splits = config.splits(min, max, _incr, _space);
     } else if (scale.time) {
       axis._splits = timeAxisSplits(min, max, _incr);
-    } else if (scale.distr === 3) {
+    } else if (scale.distr === Distribution.Log) {
       axis._splits = logAxisSplits(min, max, scale.log);
     } else {
-      const forceMin = scale.distr === 2;
+      const forceMin = scale.distr === Distribution.Ordinal;
       axis._splits = numAxisSplits(min, max, _incr, _space, forceMin);
     }
 
@@ -91,7 +92,7 @@ export function axesCalc(
       axis._values = config.values(axis._splits, _space, _incr);
     } else if (scale.time) {
       axis._values = timeAxisVals(axis._splits, _incr);
-    } else if (scale.distr === 3) {
+    } else if (scale.distr === Distribution.Log) {
       // For log scales, only label power-of-base values; intermediate ticks still drawn as grid
       const filter = logAxisValFilter(axis._splits, scale.log);
       const allVals = numAxisVals(axis._splits);
@@ -101,7 +102,7 @@ export function axesCalc(
     }
 
     // Rotating of labels only supported on bottom x-axis
-    axis._rotate = side === 2 ? (config.rotate ?? 0) : 0;
+    axis._rotate = side === Side.Bottom ? (config.rotate ?? 0) : 0;
 
     // Compute size
     const oldSize = axis._size;
@@ -134,7 +135,7 @@ export function calcPlotRect(
       continue;
 
     const side = axis.config.side;
-    const isVt = side % 2 === 1;
+    const isVt = sideOrientation(side) === Orientation.Vertical;
     const labelSize = axis.config.label != null ? (axis.config.labelSize ?? 20) : 0;
     const fullSize = axis._size + labelSize;
 
@@ -142,13 +143,13 @@ export function calcPlotRect(
       if (isVt) {
         plotWidCss -= fullSize;
 
-        if (side === 3) {
+        if (side === Side.Left) {
           plotLftCss += fullSize;
         }
       } else {
         plotHgtCss -= fullSize;
 
-        if (side === 0) {
+        if (side === Side.Top) {
           plotTopCss += fullSize;
         }
       }
@@ -175,12 +176,12 @@ export function calcAxesRects(axisStates: AxisState[], plotBox: BBox): void {
   let off2 = plotBox.top + plotBox.height;         // bottom edge, increments outward
   let off3 = plotBox.left;                         // left edge, decrements outward
 
-  function incrOffset(side: number, size: number): number {
+  function incrOffset(side: Side, size: number): number {
     switch (side) {
-      case 0: off0 -= size; return off0 + size;
-      case 1: { const pos = off1; off1 += size; return pos; }
-      case 2: { const pos = off2; off2 += size; return pos; }
-      case 3: off3 -= size; return off3 + size;
+      case Side.Top:    off0 -= size; return off0 + size;
+      case Side.Right:  { const pos = off1; off1 += size; return pos; }
+      case Side.Bottom: { const pos = off2; off2 += size; return pos; }
+      case Side.Left:   off3 -= size; return off3 + size;
       default: return 0;
     }
   }

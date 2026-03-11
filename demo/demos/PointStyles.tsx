@@ -29,10 +29,10 @@ export default function PointStyles() {
 
   return (
     <Chart width={800} height={400} data={data}>
-      <Scale id="x" auto ori={0} dir={1} time={false} />
-      <Scale id="y" auto ori={1} dir={1} />
-      <Axis scale="x" side={2} />
-      <Axis scale="y" side={3} />
+      <Scale id="x" />
+      <Scale id="y"  />
+      <Axis scale="x" />
+      <Axis scale="y" />
       {/* Line only (default) */}
       <Series group={0} index={0} yScale="y" stroke="#27ae60" width={2} label="Line only" />
       {/* Line + points */}

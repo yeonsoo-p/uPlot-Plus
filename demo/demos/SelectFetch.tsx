@@ -29,7 +29,7 @@ export default function SelectFetch() {
 
     // Simulate a network fetch for higher-resolution data in the selected range
     setTimeout(() => {
-      setData(generateData(xRange.min, xRange.max, 400));
+      setData(generateData(0, 100, 400));
       setLoading(false);
     }, 500);
 
@@ -66,12 +66,13 @@ export default function SelectFetch() {
         data={data}
         cursor={{ wheelZoom: true }}
         onSelect={onSelect}
+        onDblClick={() => false}
         onScaleChange={onScaleChange}
       >
-        <Scale id="x" auto ori={0} dir={1} />
-        <Scale id="y" auto ori={1} dir={1} />
-        <Axis scale="x" side={2} label="X" />
-        <Axis scale="y" side={3} label="Value" />
+        <Scale id="x"  />
+        <Scale id="y"  />
+        <Axis scale="x" label="X" />
+        <Axis scale="y" label="Value" />
         <Series group={0} index={0} yScale="y" stroke="#2980b9" width={2} label="Signal" />
         <Legend />
       </Chart>

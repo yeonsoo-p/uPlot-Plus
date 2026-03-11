@@ -26,19 +26,19 @@ export default function SyncCursor() {
       </p>
       <div style={{ marginBottom: 16 }}>
         <Chart width={800} height={200} data={data1} syncKey="demo-sync">
-          <Scale id="x" auto ori={0} dir={1} time={false} />
-          <Scale id="y" auto ori={1} dir={1} />
-          <Axis scale="x" side={2} label="Time" />
-          <Axis scale="y" side={3} label="CPU" values={fmtPct} />
+          <Scale id="x" />
+          <Scale id="y"  />
+          <Axis scale="x" label="Time" />
+          <Axis scale="y" label="CPU" values={fmtPct} />
           <Series group={0} index={0} yScale="y" stroke="#e74c3c" fill="rgba(231,76,60,0.1)" width={2} label="CPU %" />
           <Legend />
         </Chart>
       </div>
       <Chart width={800} height={200} data={data2} syncKey="demo-sync">
-        <Scale id="x" auto ori={0} dir={1} time={false} />
-        <Scale id="y" auto ori={1} dir={1} />
-        <Axis scale="x" side={2} label="Time" />
-        <Axis scale="y" side={3} label="Memory" values={fmtPct} />
+        <Scale id="x" />
+        <Scale id="y"  />
+        <Axis scale="x" label="Time" />
+        <Axis scale="y" label="Memory" values={fmtPct} />
         <Series group={0} index={0} yScale="y" stroke="#3498db" fill="rgba(52,152,219,0.1)" width={2} label="Memory %" />
         <Legend />
       </Chart>

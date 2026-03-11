@@ -14,10 +14,10 @@ export default function SteppedLines() {
 
   return (
     <Chart width={800} height={400} data={data}>
-      <Scale id="x" auto ori={0} dir={1} time={false} />
-      <Scale id="y" auto ori={1} dir={1} />
-      <Axis scale="x" side={2} label="Index" />
-      <Axis scale="y" side={3} label="Value" />
+      <Scale id="x" />
+      <Scale id="y"  />
+      <Axis scale="x" label="Index" />
+      <Axis scale="y" label="Value" />
       <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Step After (default)" paths={stepped(1)} />
       <Series group={0} index={1} yScale="y" stroke="#3498db" width={2} label="Step Before" paths={stepped(-1)} />
       <Series group={0} index={2} yScale="y" stroke="#2ecc71" width={2} label="Mid Step" paths={stepped(0)} />

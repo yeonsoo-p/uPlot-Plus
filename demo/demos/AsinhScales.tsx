@@ -1,5 +1,5 @@
 import React from 'react';
-import { Chart, Scale, Series, Axis } from '../../src';
+import { Chart, Scale, Series, Axis, Distribution } from '../../src';
 import type { ChartData } from '../../src';
 
 function generateData(): ChartData {
@@ -24,10 +24,10 @@ export default function AsinhScales() {
 
   return (
     <Chart width={800} height={400} data={data}>
-      <Scale id="x" auto ori={0} dir={1} time={false} />
-      <Scale id="y" auto ori={1} dir={1} distr={4} asinh={1} />
-      <Axis scale="x" side={2} label="Sample" />
-      <Axis scale="y" side={3} label="Value (asinh)" values={fmtVal} />
+      <Scale id="x" />
+      <Scale id="y"  distr={Distribution.Asinh} asinh={1} />
+      <Axis scale="x" label="Sample" />
+      <Axis scale="y" label="Value (asinh)" values={fmtVal} />
       <Series group={0} index={0} yScale="y" stroke="#8e44ad" fill="rgba(142,68,173,0.1)" width={2} label="Symmetric Data" />
     </Chart>
   );

@@ -1,5 +1,6 @@
 import type { SeriesPaths, PathBuilder, PathBuilderOpts } from './types';
 import type { ScaleState } from '../types';
+import { Orientation, Direction } from '../types';
 import { valToPos } from '../core/Scale';
 import { nonNullIdxs } from '../math/utils';
 import { lineToH, lineToV, findGaps, clipGaps } from './utils';
@@ -22,7 +23,7 @@ export function stepped(defaultAlign?: -1 | 0 | 1): PathBuilder {
     yOff: number,
     idx0: number,
     idx1: number,
-    dir: 1 | -1,
+    dir: Direction,
     pxRound: (v: number) => number,
     opts?: PathBuilderOpts,
   ): SeriesPaths => {
@@ -38,14 +39,14 @@ export function stepped(defaultAlign?: -1 | 0 | 1): PathBuilder {
     const pixelForX = (val: number) => pxRound(valToPos(val, scaleX, xDim, xOff));
     const pixelForY = (val: number) => pxRound(valToPos(val, scaleY, yDim, yOff));
 
-    const lineTo = scaleX.ori === 0 ? lineToH : lineToV;
+    const lineTo = scaleX.ori === Orientation.Horizontal ? lineToH : lineToV;
 
     const _paths: SeriesPaths = { stroke: new Path2D(), fill: null, clip: null, band: null, gaps: null };
     const stroke = _paths.stroke;
 
     let hasGap = false;
 
-    const startIdx = dir === 1 ? idx0 : idx1;
+    const startIdx = dir === Direction.Forward ? idx0 : idx1;
     let prevYPos = pixelForY(dataY[startIdx] as number);
     let prevXPos = pixelForX(dataX[startIdx] as number);
 
@@ -90,7 +91,7 @@ export function stepped(defaultAlign?: -1 | 0 | 1): PathBuilder {
 
       let frX = xOff;
       let toX = xOff + xDim;
-      if (dir === -1) [toX, frX] = [frX, toX];
+      if (dir === Direction.Backward) [toX, frX] = [frX, toX];
 
       lineTo(fill, toX, fillToY);
       lineTo(fill, frX, fillToY);

@@ -1,4 +1,5 @@
 import type { ScaleState } from '../types';
+import type { Direction } from '../types';
 
 /** Result of a path builder */
 export interface SeriesPaths {
@@ -41,7 +42,7 @@ export type PathBuilder = (
   yOff: number,
   idx0: number,
   idx1: number,
-  dir: 1 | -1,
+  dir: Direction,
   pxRound: (v: number) => number,
   opts?: PathBuilderOpts,
 ) => SeriesPaths;

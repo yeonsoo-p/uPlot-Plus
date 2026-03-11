@@ -40,10 +40,10 @@ export default function ScatterPlot() {
 
   return (
     <Chart width={800} height={400} data={data} cursor={{ wheelZoom: true }}>
-      <Scale id="x" auto ori={0} dir={1} time={false} />
-      <Scale id="y" auto ori={1} dir={1} />
-      <Axis scale="x" side={2} label="X" />
-      <Axis scale="y" side={3} label="Y" />
+      <Scale id="x" />
+      <Scale id="y"  />
+      <Axis scale="x" label="X" />
+      <Axis scale="y" label="Y" />
       <Series
         group={0}
         index={0}

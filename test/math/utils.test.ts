@@ -19,6 +19,7 @@ import {
   numIntDigits,
   findIncr,
 } from '@/math/utils';
+import { SortOrder } from '@/types';
 
 // ---- closestIdx ----
 describe('closestIdx', () => {
@@ -91,11 +92,11 @@ describe('getMinMax', () => {
   });
 
   it('ascending sorted', () => {
-    expect(getMinMax([1, 2, 3, 4, 5], 0, 4, 1)).toEqual([1, 5]);
+    expect(getMinMax([1, 2, 3, 4, 5], 0, 4, SortOrder.Ascending)).toEqual([1, 5]);
   });
 
   it('descending sorted', () => {
-    expect(getMinMax([5, 4, 3, 2, 1], 0, 4, -1)).toEqual([1, 5]);
+    expect(getMinMax([5, 4, 3, 2, 1], 0, 4, SortOrder.Descending)).toEqual([1, 5]);
   });
 
   it('handles nulls in unsorted', () => {
@@ -113,7 +114,7 @@ describe('getMinMax', () => {
   });
 
   it('log mode excludes non-positive', () => {
-    expect(getMinMax([-1, 0, 2, 3], 0, 3, 0, true)).toEqual([2, 3]);
+    expect(getMinMax([-1, 0, 2, 3], 0, 3, SortOrder.Unsorted, true)).toEqual([2, 3]);
   });
 
   it('respects index range', () => {
@@ -318,5 +319,15 @@ describe('findIncr', () => {
     const [incr399] = findIncr(0, 200, incrs, 399, 50);
     const [incr401] = findIncr(0, 200, incrs, 401, 50);
     expect(incr399).toBe(incr401);
+  });
+
+  it('returns same increment for wider dim variation (dual y-axis case)', () => {
+    // Simulates two y-axes: plot width can vary ~20px between convergence cycles
+    const incrs = [1, 2, 2.5, 5, 10, 20, 25, 50, 100];
+    const [incr680] = findIncr(0, 240, incrs, 680, 60);
+    const [incr700] = findIncr(0, 240, incrs, 700, 60);
+    const [incr720] = findIncr(0, 240, incrs, 720, 60);
+    expect(incr680).toBe(incr700);
+    expect(incr700).toBe(incr720);
   });
 });

@@ -25,10 +25,10 @@ export default function PathGapClip() {
         Same data with null gaps. Red line shows gaps (default). Blue line uses <code>spanGaps</code> to connect across nulls.
       </p>
       <Chart width={800} height={400} data={data}>
-        <Scale id="x" auto ori={0} dir={1} time={false} />
-        <Scale id="y" auto ori={1} dir={1} />
-        <Axis scale="x" side={2} label="Index" />
-        <Axis scale="y" side={3} label="Value" />
+        <Scale id="x" />
+        <Scale id="y"  />
+        <Axis scale="x" label="Index" />
+        <Axis scale="y" label="Value" />
         <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="With Gaps (default)" />
         <Series group={0} index={1} yScale="y" stroke="#3498db" width={2} label="spanGaps = true" spanGaps />
         <Legend />

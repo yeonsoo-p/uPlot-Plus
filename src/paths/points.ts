@@ -1,5 +1,6 @@
 import type { SeriesPaths, PathBuilder, PathBuilderOpts } from './types';
 import type { ScaleState } from '../types';
+import { Orientation, Direction } from '../types';
 import { valToPos } from '../core/Scale';
 
 /**
@@ -21,7 +22,7 @@ export function points(ptSize = 4): PathBuilder {
     yOff: number,
     idx0: number,
     idx1: number,
-    dir: 1 | -1,
+    dir: Direction,
     pxRound: (v: number) => number,
     _opts?: PathBuilderOpts,
   ): SeriesPaths => {
@@ -30,9 +31,9 @@ export function points(ptSize = 4): PathBuilder {
 
     const rad = ptSize / 2;
     const fill = new Path2D();
-    const isHoriz = scaleX.ori === 0;
+    const isHoriz = scaleX.ori === Orientation.Horizontal;
 
-    for (let i = dir === 1 ? idx0 : idx1; i >= idx0 && i <= idx1; i += dir) {
+    for (let i = dir === Direction.Forward ? idx0 : idx1; i >= idx0 && i <= idx1; i += dir) {
       const yVal = dataY[i];
       if (yVal == null) continue;
 

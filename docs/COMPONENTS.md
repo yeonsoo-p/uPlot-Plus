@@ -87,10 +87,10 @@ Root container. Creates two canvas layers (persistent data + cursor overlay), in
 import { Chart, Scale, Series, Axis } from 'uplot-plus';
 
 <Chart width={800} height={400} data={data}>
-  <Scale id="x" auto ori={0} dir={1} />
-  <Scale id="y" auto ori={1} dir={1} />
-  <Axis scale="x" side={2} label="X-Axis" />
-  <Axis scale="y" side={3} label="Y-Axis" />
+  <Scale id="x" />
+  <Scale id="y" />
+  <Axis scale="x" label="X-Axis" />
+  <Axis scale="y" label="Y-Axis" />
   <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Series A" />
 </Chart>
 ```
@@ -106,15 +106,15 @@ Registers a scale with the chart store. Scales define how data values map to pix
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `id` | `string` | — | Unique scale identifier **(required)** |
-| `auto` | `boolean` | — | Auto-range from data |
-| `ori` | `0 \| 1` | — | 0 = horizontal (x), 1 = vertical (y) |
-| `dir` | `1 \| -1` | `1` | 1 = normal, -1 = reversed |
-| `distr` | `1 \| 2 \| 3 \| 4` | `1` | 1=linear, 2=ordinal, 3=log, 4=asinh |
-| `log` | `number` | `10` | Log base when `distr=3` |
-| `asinh` | `number` | `1` | Asinh linear threshold when `distr=4` |
+| `auto` | `boolean` | `true` | Auto-range from data |
+| `ori` | `Orientation` | `Horizontal` for `"x"`, `Vertical` otherwise | Scale orientation |
+| `dir` | `Direction` | `Forward` | `Forward` = normal, `Backward` = reversed |
+| `distr` | `Distribution` | `Linear` | Scale distribution (see table below) |
+| `log` | `number` | `10` | Log base when `distr={Distribution.Log}` |
+| `asinh` | `number` | `1` | Asinh linear threshold when `distr={Distribution.Asinh}` |
 | `min` | `number \| null` | — | Fixed min (overrides auto) |
 | `max` | `number \| null` | — | Fixed max (overrides auto) |
-| `time` | `boolean` | — | Time-based scale (unix timestamps) |
+| `time` | `boolean` | `false` | Time-based scale (unix timestamps) |
 | `range` | `RangeConfig` | — | Auto-range padding/bounds |
 
 **`RangeConfig`:**
@@ -134,22 +134,22 @@ interface RangePart {
 
 **Distribution types:**
 
-| `distr` | Type | Use case |
-|---------|------|----------|
-| `1` | Linear | Default. Equal spacing. |
-| `2` | Ordinal | Categorical data (equal spacing by index). |
-| `3` | Log | Exponential data. Set `log` for base (default 10). |
-| `4` | Asinh | Data spanning negative-to-positive with linear region near zero. |
+| Value | Type | Use case |
+|-------|------|----------|
+| `Distribution.Linear` | Linear | Default. Equal spacing. |
+| `Distribution.Ordinal` | Ordinal | Categorical data (equal spacing by index). |
+| `Distribution.Log` | Log | Exponential data. Set `log` for base (default 10). |
+| `Distribution.Asinh` | Asinh | Data spanning negative-to-positive with linear region near zero. |
 
 ```tsx
-// Linear y-scale with auto-ranging
-<Scale id="y" auto ori={1} dir={1} />
+// Linear y-scale with auto-ranging (all defaults)
+<Scale id="y" />
 
 // Log scale (base 10)
-<Scale id="y" auto ori={1} dir={1} distr={3} log={10} />
+<Scale id="y" distr={Distribution.Log} log={10} />
 
 // Fixed range with soft limits
-<Scale id="y" auto ori={1} dir={1} range={{ min: { soft: 0, mode: 1 } }} />
+<Scale id="y" range={{ min: { soft: 0, mode: 1 } }} />
 ```
 
 **Demos:** `log-scales`, `log-scales-2`, `asinh-scales`, `multiple-scales`, `dependent-scales`, `scale-direction`, `custom-scales`, `scale-padding`, `soft-minmax`, `nice-scale`, `sync-y-zero`.
@@ -178,7 +178,7 @@ Registers a data series with the chart store. Each series references a `(group, 
 | `join` | `CanvasLineJoin` | — | Line join style |
 | `pxAlign` | `number` | `1` | Pixel alignment (0=none, 1=round) |
 | `spanGaps` | `boolean` | `false` | Connect across null gaps |
-| `sorted` | `1 \| -1 \| 0` | — | 1=asc, -1=desc, 0=unsorted |
+| `sorted` | `SortOrder` | — | `Ascending`, `Descending`, or `Unsorted` |
 | `fillTo` | `number \| (min, max) => number` | — | Fill target value |
 
 **`PointsConfig`:**
@@ -245,7 +245,7 @@ Registers an axis with the chart store. Axes render tick marks, labels, and grid
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `scale` | `string` | — | Scale key **(required)** |
-| `side` | `0 \| 1 \| 2 \| 3` | — | 0=top, 1=right, 2=bottom, 3=left **(required)** |
+| `side` | `Side` | `Bottom` for `"x"`, `Left` otherwise | `Side.Top`, `Side.Right`, `Side.Bottom`, `Side.Left` |
 | `show` | `boolean` | `true` | Visibility |
 | `label` | `string` | — | Axis label text |
 | `labelFont` | `string` | — | Label font |
@@ -279,17 +279,17 @@ Use the built-in **axis value formatters** for common patterns:
 ```tsx
 import { Axis, fmtCompact, fmtSuffix, fmtHourMin, fmtMonthName, fmtLabels } from 'uplot-plus';
 
-<Axis scale="y" side={3} values={fmtCompact()} />            // 1.2K, 3.5M
-<Axis scale="y" side={3} values={fmtSuffix('%')} />          // 42%
-<Axis scale="y" side={3} values={fmtSuffix('°C', 1)} />     // 23.5°C
-<Axis scale="x" side={2} values={fmtHourMin({ utc: true })} /> // 14:30
-<Axis scale="x" side={2} values={fmtMonthName()} />          // Jan, Feb, ...
-<Axis scale="x" side={2} values={fmtLabels(['Q1','Q2','Q3','Q4'])} />
+<Axis scale="y" values={fmtCompact()} />            // 1.2K, 3.5M
+<Axis scale="y" values={fmtSuffix('%')} />          // 42%
+<Axis scale="y" values={fmtSuffix('°C', 1)} />     // 23.5°C
+<Axis scale="x" values={fmtHourMin({ utc: true })} /> // 14:30
+<Axis scale="x" values={fmtMonthName()} />          // Jan, Feb, ...
+<Axis scale="x" values={fmtLabels(['Q1','Q2','Q3','Q4'])} />
 ```
 
 ```tsx
 // Right axis with no grid, custom stroke color
-<Axis scale="humid" side={1} label="Humidity" values={fmtSuffix('%')} stroke="#3498db" grid={{ show: false }} />
+<Axis scale="humid" side={Side.Right} label="Humidity" values={fmtSuffix('%')} stroke="#3498db" grid={{ show: false }} />
 ```
 
 **Demos:** `axis-control`, `custom-axis-values`, `axis-autosize`, `axis-indicators`, `time-series`, `multiple-scales`, `log-scales`, `months-time-series`.
@@ -311,10 +311,10 @@ Fills the region between two series within the same group. Renderless — return
 import { Band } from 'uplot-plus';
 
 <Chart data={data}>
-  <Scale id="x" auto ori={0} dir={1} />
-  <Scale id="y" auto ori={1} dir={1} />
-  <Axis scale="x" side={2} />
-  <Axis scale="y" side={3} />
+  <Scale id="x" />
+  <Scale id="y" />
+  <Axis scale="x" />
+  <Axis scale="y" />
   <Series group={0} index={0} yScale="y" stroke="blue" label="Upper" />
   <Series group={0} index={1} yScale="y" stroke="blue" label="Lower" />
   <Band series={[0, 1]} group={0} fill="rgba(100,150,255,0.2)" />
@@ -494,10 +494,10 @@ Text label at data coordinates.
 import { HLine, VLine, Region, AnnotationLabel } from 'uplot-plus';
 
 <Chart width={800} height={400} data={data}>
-  <Scale id="x" auto ori={0} dir={1} />
-  <Scale id="y" ori={1} dir={1} auto={false} min={10} max={90} />
-  <Axis scale="x" side={2} />
-  <Axis scale="y" side={3} />
+  <Scale id="x" />
+  <Scale id="y" auto={false} min={10} max={90} />
+  <Axis scale="x" />
+  <Axis scale="y" />
   <Series group={0} index={0} yScale="y" stroke="#2980b9" width={2} />
   <Region yMin={65} yMax={90} yScale="y" fill="rgba(231, 76, 60, 0.08)" />
   <HLine value={65} yScale="y" stroke="#e74c3c" width={2} dash={[6, 4]} label="Threshold: 65" />
@@ -554,8 +554,8 @@ const lanes = [
 ];
 
 <Chart width={800} height={200} data={[{ x: [0, 24], series: [] }]}>
-  <Scale id="x" auto ori={0} dir={1} />
-  <Axis scale="x" side={2} label="Hour" />
+  <Scale id="x" />
+  <Axis scale="x" label="Hour" />
   <Timeline lanes={lanes} laneHeight={30} gap={4} />
 </Chart>
 ```
@@ -600,10 +600,10 @@ const [range, setRange] = useState<[number, number] | null>(null);
 />
 
 <Chart width={800} height={300} data={data}>
-  <Scale id="x" auto ori={0} dir={1} min={range?.[0]} max={range?.[1]} />
-  <Scale id="y" auto ori={1} dir={1} />
-  <Axis scale="x" side={2} />
-  <Axis scale="y" side={3} />
+  <Scale id="x" min={range?.[0]} max={range?.[1]} />
+  <Scale id="y" />
+  <Axis scale="x" />
+  <Axis scale="y" />
   <Series group={0} index={0} yScale="y" stroke="#3498db" />
 </Chart>
 ```
@@ -670,10 +670,10 @@ import { ResponsiveChart, Scale, Series, Axis } from 'uplot-plus';
 // Fills parent, maintains 16:9
 <div style={{ width: '100%' }}>
   <ResponsiveChart data={data} aspectRatio={16/9}>
-    <Scale id="x" auto ori={0} dir={1} />
-    <Scale id="y" auto ori={1} dir={1} />
-    <Axis scale="x" side={2} />
-    <Axis scale="y" side={3} />
+    <Scale id="x" />
+    <Scale id="y" />
+    <Axis scale="x" />
+    <Axis scale="y" />
     <Series group={0} index={0} yScale="y" stroke="red" />
   </ResponsiveChart>
 </div>

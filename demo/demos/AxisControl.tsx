@@ -20,10 +20,10 @@ export default function AxisControl() {
 
   return (
     <Chart width={800} height={400} data={data}>
-      <Scale id="x" auto ori={0} dir={1} time={false} />
-      <Scale id="y" ori={1} dir={1} auto={false} min={-50} max={50} />
-      <Axis scale="x" side={2} label="Sample Index" />
-      <Axis scale="y" side={3} label="Amplitude" labelSize={20} space={50} />
+      <Scale id="x" />
+      <Scale id="y" auto={false} min={-50} max={50} />
+      <Axis scale="x" label="Sample Index" />
+      <Axis scale="y" label="Amplitude" labelSize={20} space={50} />
       <Series group={0} index={0} yScale="y" stroke="#8e44ad" width={1} label="Signal" />
     </Chart>
   );

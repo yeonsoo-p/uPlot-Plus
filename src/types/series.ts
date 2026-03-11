@@ -31,7 +31,7 @@ export interface SeriesConfig {
   width?: number;
   /** Opacity 0-1 */
   alpha?: number;
-  /** Whether data is sorted: 1=asc, -1=desc, 0=unsorted */
+  /** Whether data is sorted */
   sorted?: SortOrder;
   /** Whether to connect across null gaps */
   spanGaps?: boolean;

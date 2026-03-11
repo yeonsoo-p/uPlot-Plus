@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { DataStore } from '@/core/DataStore';
 import type { ScaleState, ChartData } from '@/types';
+import { SortOrder } from '@/types';
 import { createScaleState } from '@/core/Scale';
 
 function makeScale(min: number | null, max: number | null): ScaleState {
@@ -109,26 +110,26 @@ describe('DataStore', () => {
   describe('getCachedMinMax', () => {
     it('computes and caches min/max', () => {
       store.setData(sampleData);
-      const [mn, mx] = store.getCachedMinMax(0, 0, 0, 9, 0, false);
+      const [mn, mx] = store.getCachedMinMax(0, 0, 0, 9, SortOrder.Unsorted, false);
       expect(mn).toBe(10);
       expect(mx).toBe(100);
 
       // Second call should hit cache (same result)
-      const [mn2, mx2] = store.getCachedMinMax(0, 0, 0, 9, 0, false);
+      const [mn2, mx2] = store.getCachedMinMax(0, 0, 0, 9, SortOrder.Unsorted, false);
       expect(mn2).toBe(mn);
       expect(mx2).toBe(mx);
     });
 
     it('handles series with nulls', () => {
       store.setData(sampleData);
-      const [mn, mx] = store.getCachedMinMax(0, 1, 0, 9, 0, false);
+      const [mn, mx] = store.getCachedMinMax(0, 1, 0, 9, SortOrder.Unsorted, false);
       expect(mn).toBe(5);
       expect(mx).toBe(45);
     });
 
     it('returns inf/-inf for missing group', () => {
       store.setData(sampleData);
-      const [mn, mx] = store.getCachedMinMax(99, 0, 0, 0, 0, false);
+      const [mn, mx] = store.getCachedMinMax(99, 0, 0, 0, SortOrder.Unsorted, false);
       expect(mn).toBe(Infinity);
       expect(mx).toBe(-Infinity);
     });
@@ -136,7 +137,7 @@ describe('DataStore', () => {
     it('clears cache when windows update — recomputes for same range', () => {
       store.setData(sampleData);
       // Compute min/max for range [0, 4]
-      const [mn1, mx1] = store.getCachedMinMax(0, 0, 0, 4, 0, false);
+      const [mn1, mx1] = store.getCachedMinMax(0, 0, 0, 4, SortOrder.Unsorted, false);
       expect(mn1).toBe(10);
       expect(mx1).toBe(50);
 
@@ -144,7 +145,7 @@ describe('DataStore', () => {
       store.updateWindows(() => makeScale(1, 10));
 
       // Recompute for the SAME range — verifies cache was actually cleared and recomputed
-      const [mn2, mx2] = store.getCachedMinMax(0, 0, 0, 4, 0, false);
+      const [mn2, mx2] = store.getCachedMinMax(0, 0, 0, 4, SortOrder.Unsorted, false);
       expect(mn2).toBe(10);
       expect(mx2).toBe(50);
     });
@@ -158,8 +159,8 @@ describe('DataStore', () => {
       );
 
       // Cache min/max for both groups
-      store.getCachedMinMax(0, 0, 0, 3, 0, false);
-      store.getCachedMinMax(1, 0, 0, 3, 0, false);
+      store.getCachedMinMax(0, 0, 0, 3, SortOrder.Unsorted, false);
+      store.getCachedMinMax(1, 0, 0, 3, SortOrder.Unsorted, false);
 
       // Pan only group 0 (new window)
       store.updateWindows((gi: number) =>
@@ -168,7 +169,7 @@ describe('DataStore', () => {
 
       // Group 1's cache should still be valid (not cleared)
       // We can verify by checking the result is still correct
-      const [mn, mx] = store.getCachedMinMax(1, 0, 0, 3, 0, false);
+      const [mn, mx] = store.getCachedMinMax(1, 0, 0, 3, SortOrder.Unsorted, false);
       expect(mn).toBe(100);
       expect(mx).toBe(400);
     });
@@ -176,12 +177,12 @@ describe('DataStore', () => {
     it('cache returns correct results for different ranges', () => {
       store.setData(sampleData);
       // Full range
-      const [mnFull, mxFull] = store.getCachedMinMax(0, 0, 0, 9, 0, false);
+      const [mnFull, mxFull] = store.getCachedMinMax(0, 0, 0, 9, SortOrder.Unsorted, false);
       expect(mnFull).toBe(10);
       expect(mxFull).toBe(100);
 
       // Narrower range [2, 5] → values [30, 40, 50, 60]
-      const [mnNarrow, mxNarrow] = store.getCachedMinMax(0, 0, 2, 5, 0, false);
+      const [mnNarrow, mxNarrow] = store.getCachedMinMax(0, 0, 2, 5, SortOrder.Unsorted, false);
       expect(mnNarrow).toBe(30);
       expect(mxNarrow).toBe(60);
     });
@@ -209,7 +210,7 @@ describe('DataStore', () => {
       store.appendData(0, [4], [[999]]);
 
       // Block tree should reflect new max
-      const [mn, mx] = store.getCachedMinMax(0, 0, 0, 3, 0, false);
+      const [mn, mx] = store.getCachedMinMax(0, 0, 0, 3, SortOrder.Unsorted, false);
       expect(mn).toBe(10);
       expect(mx).toBe(999);
     });
@@ -218,14 +219,14 @@ describe('DataStore', () => {
       store.setData(multiGroupData);
 
       // Cache both groups
-      store.getCachedMinMax(0, 0, 0, 3, 0, false);
-      store.getCachedMinMax(1, 0, 0, 3, 0, false);
+      store.getCachedMinMax(0, 0, 0, 3, SortOrder.Unsorted, false);
+      store.getCachedMinMax(1, 0, 0, 3, SortOrder.Unsorted, false);
 
       // Append to group 0 only
       store.appendData(0, [4], [[50]]);
 
       // Group 1 cache should still work
-      const [mn1, mx1] = store.getCachedMinMax(1, 0, 0, 3, 0, false);
+      const [mn1, mx1] = store.getCachedMinMax(1, 0, 0, 3, SortOrder.Unsorted, false);
       expect(mn1).toBe(100);
       expect(mx1).toBe(400);
     });

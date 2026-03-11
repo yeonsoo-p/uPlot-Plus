@@ -2,9 +2,10 @@ import { describe, it, expect } from 'vitest';
 import { CursorManager } from '@/core/CursorManager';
 import { createScaleState, valToPos } from '@/core/Scale';
 import type { ScaleState, ChartData, BBox } from '@/types';
+import { Orientation, Direction } from '@/types';
 import type { SeriesConfig } from '@/types/series';
 
-function makeScale(id: string, min: number, max: number, ori: 0 | 1 = 0): ScaleState {
+function makeScale(id: string, min: number, max: number, ori: Orientation = Orientation.Horizontal): ScaleState {
   return { ...createScaleState({ id }), min, max, ori };
 }
 
@@ -28,7 +29,7 @@ describe('CursorManager snapping', () => {
 
   const scales: Record<string, ScaleState> = {
     x: makeScale('x', 0, 100),
-    y: { ...makeScale('y', 0, 100), ori: 1 as const, dir: 1 as const },
+    y: { ...makeScale('y', 0, 100), ori: Orientation.Vertical, dir: Direction.Forward },
   };
 
   const getScale = (id: string) => scales[id];

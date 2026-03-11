@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { ScaleManager } from '@/core/ScaleManager';
 import { DataStore } from '@/core/DataStore';
 import type { ChartData } from '@/types';
+import { Distribution } from '@/types';
 
 describe('ScaleManager', () => {
   let mgr: ScaleManager;
@@ -54,7 +55,7 @@ describe('ScaleManager', () => {
     });
 
     it('invalidates cache', () => {
-      mgr.addScale({ id: 'x', distr: 3, min: 1, max: 100 });
+      mgr.addScale({ id: 'x', distr: Distribution.Log, min: 1, max: 100 });
       mgr.setRange('x', 10, 1000);
       const s = mgr.getScale('x');
       expect(s!._min).toBeNull();
@@ -120,7 +121,7 @@ describe('ScaleManager', () => {
 
     it('handles log y-scale', () => {
       mgr.addScale({ id: 'x' });
-      mgr.addScale({ id: 'y', distr: 3, log: 10 });
+      mgr.addScale({ id: 'y', distr: Distribution.Log, log: 10 });
       mgr.setGroupXScale(0, 'x');
 
       const logData: ChartData = [

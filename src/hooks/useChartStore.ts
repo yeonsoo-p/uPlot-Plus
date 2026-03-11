@@ -1,6 +1,6 @@
 import { useRef } from 'react';
-import type { ScaleConfig, SeriesConfig, AxisConfig, BBox } from '../types';
-import type { AxisState } from '../types/axes';
+import type { ScaleConfig, SeriesConfig, BBox } from '../types';
+import type { AxisConfig, AxisState } from '../types/axes';
 import type { SelectState } from '../types/cursor';
 import { ScaleManager } from '../core/ScaleManager';
 import { DataStore } from '../core/DataStore';

@@ -1,4 +1,4 @@
-import type { Distribution, Orientation, Direction } from './common';
+import type { Orientation, Direction, Distribution } from './common';
 
 /** Configuration for a scale */
 export interface ScaleConfig {
@@ -20,7 +20,7 @@ export interface ScaleConfig {
   max?: number | null;
   /** Direction */
   dir?: Direction;
-  /** Orientation: 0=horizontal (x), 1=vertical (y) */
+  /** Orientation: Horizontal (x), Vertical (y) */
   ori?: Orientation;
   /** Range configuration for auto-ranging */
   range?: RangeConfig;

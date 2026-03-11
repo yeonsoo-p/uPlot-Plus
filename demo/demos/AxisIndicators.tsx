@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis } from '../../src';
+import { Chart, Scale, Series, Axis, Side } from '../../src';
 import type { ChartData } from '../../src';
 
 export default function AxisIndicators() {
@@ -16,13 +16,13 @@ export default function AxisIndicators() {
         Each axis has different grid, tick, and border styles with custom colors, widths, and dash patterns.
       </p>
       <Chart width={800} height={400} data={data}>
-        <Scale id="x" auto ori={0} dir={1} time={false} />
-        <Scale id="y" auto ori={1} dir={1} />
+        <Scale id="x" />
+        <Scale id="y"  />
 
         {/* Bottom x-axis: blue grid dashed, red ticks, green border */}
         <Axis
           scale="x"
-          side={2}
+          side={Side.Bottom}
           label="X Axis (bottom)"
           grid={{ show: true, stroke: '#3498db', width: 1, dash: [4, 4] }}
           ticks={{ show: true, stroke: '#e74c3c', width: 2, size: 8 }}
@@ -32,7 +32,7 @@ export default function AxisIndicators() {
         {/* Top x-axis: dotted grid, no ticks, thick border */}
         <Axis
           scale="x"
-          side={0}
+          side={Side.Top}
           label="X Axis (top)"
           grid={{ show: true, stroke: 'rgba(155, 89, 182, 0.3)', width: 1, dash: [2, 6] }}
           ticks={{ show: false }}
@@ -42,7 +42,7 @@ export default function AxisIndicators() {
         {/* Left y-axis: solid grid, dash ticks, dashed border */}
         <Axis
           scale="y"
-          side={3}
+         
           label="Y Axis (left)"
           grid={{ show: true, stroke: 'rgba(230, 126, 34, 0.3)', width: 1 }}
           ticks={{ show: true, stroke: '#e67e22', width: 1, size: 6, dash: [3, 3] }}
@@ -52,7 +52,7 @@ export default function AxisIndicators() {
         {/* Right y-axis: no grid, thick ticks, solid border */}
         <Axis
           scale="y"
-          side={1}
+          side={Side.Right}
           label="Y Axis (right)"
           grid={{ show: false }}
           ticks={{ show: true, stroke: '#c0392b', width: 3, size: 10 }}

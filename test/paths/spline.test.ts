@@ -4,10 +4,11 @@ import { catmullRom } from '@/paths/catmullRom';
 import { points } from '@/paths/points';
 import { createScaleState } from '@/core/Scale';
 import type { ScaleState } from '@/types';
+import { Orientation, Direction } from '@/types';
 import { round } from '@/math/utils';
 
-function makeScale(id: string, min: number, max: number, ori: 0 | 1 = 0): ScaleState {
-  return { ...createScaleState({ id }), min, max, ori, dir: 1 };
+function makeScale(id: string, min: number, max: number, ori: Orientation = Orientation.Horizontal): ScaleState {
+  return { ...createScaleState({ id }), min, max, ori, dir: Direction.Forward };
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -20,7 +21,7 @@ const pxRound = (v: number) => round(v);
 const dataX = [0, 1, 2, 3, 4, 5];
 const dataY: (number | null)[] = [10, 40, 20, 60, 30, 50];
 const scaleX = makeScale('x', 0, 5);
-const scaleY: ScaleState = { ...makeScale('y', 0, 60), ori: 1, dir: 1 };
+const scaleY: ScaleState = { ...makeScale('y', 0, 60), ori: Orientation.Vertical, dir: Direction.Forward };
 
 describe('monotoneCubic path builder', () => {
   const builder = monotoneCubic();

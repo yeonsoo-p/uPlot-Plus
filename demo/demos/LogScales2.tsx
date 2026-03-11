@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis, Legend } from '../../src';
+import { Chart, Scale, Series, Axis, Legend, Distribution } from '../../src';
 import type { ChartData } from '../../src';
 
 export default function LogScales2() {
@@ -31,20 +31,20 @@ export default function LogScales2() {
       <div style={{ marginBottom: 16 }}>
         <h4 style={{ margin: '0 0 4px' }}>Log base 10</h4>
         <Chart width={800} height={220} data={data}>
-          <Scale id="x" auto ori={0} dir={1} time={false} />
-          <Scale id="y" auto ori={1} dir={1} distr={3} log={10} />
-          <Axis scale="x" side={2} />
-          <Axis scale="y" side={3} label="Value (log10)" values={fmtLog10} />
+          <Scale id="x" />
+          <Scale id="y"  distr={Distribution.Log} log={10} />
+          <Axis scale="x" />
+          <Axis scale="y" label="Value (log10)" values={fmtLog10} />
           <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Base 10" />
         </Chart>
       </div>
       <div>
         <h4 style={{ margin: '0 0 4px' }}>Log base 2</h4>
         <Chart width={800} height={220} data={data}>
-          <Scale id="x" auto ori={0} dir={1} time={false} />
-          <Scale id="y" auto ori={1} dir={1} distr={3} log={2} />
-          <Axis scale="x" side={2} />
-          <Axis scale="y" side={3} label="Value (log2)" values={fmtLog2} />
+          <Scale id="x" />
+          <Scale id="y"  distr={Distribution.Log} log={2} />
+          <Axis scale="x" />
+          <Axis scale="y" label="Value (log2)" values={fmtLog2} />
           <Series group={0} index={0} yScale="y" stroke="#2980b9" width={2} label="Base 2" />
         </Chart>
       </div>

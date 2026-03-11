@@ -11,10 +11,10 @@ function MiniChart({ title, data }: { title: string; data: ChartData }) {
     <div style={{ display: 'inline-block', marginRight: 16, marginBottom: 16, verticalAlign: 'top' }}>
       <h4 style={{ fontSize: 13, marginBottom: 4, color: '#555' }}>{title}</h4>
       <Chart width={240} height={180} data={data}>
-        <Scale id="x" auto ori={0} dir={1} time={false} />
-        <Scale id="y" auto ori={1} dir={1} />
-        <Axis scale="x" side={2} />
-        <Axis scale="y" side={3} />
+        <Scale id="x" />
+        <Scale id="y"  />
+        <Axis scale="x" />
+        <Axis scale="y" />
         <Series group={0} index={0} yScale="y" stroke="#2980b9" width={2}
           points={{ show: true, size: 6, fill: '#2980b9' }} />
       </Chart>

@@ -50,10 +50,10 @@ export default function GridOverSeries() {
       <div style={{ marginBottom: 16 }}>
         <h4 style={{ fontSize: 13, color: '#555', marginBottom: 4 }}>Default (grid behind series)</h4>
         <Chart width={800} height={200} data={data}>
-          <Scale id="x" auto ori={0} dir={1} time={false} />
-          <Scale id="y" auto ori={1} dir={1} />
-          <Axis scale="x" side={2} />
-          <Axis scale="y" side={3} />
+          <Scale id="x" />
+          <Scale id="y"  />
+          <Axis scale="x" />
+          <Axis scale="y" />
           <Series group={0} index={0} yScale="y" stroke="#e74c3c" fill="rgba(231,76,60,0.3)" width={2} label="Series A" />
           <Series group={0} index={1} yScale="y" stroke="#3498db" fill="rgba(52,152,219,0.3)" width={2} label="Series B" />
         </Chart>
@@ -61,10 +61,10 @@ export default function GridOverSeries() {
       <div>
         <h4 style={{ fontSize: 13, color: '#555', marginBottom: 4 }}>Grid over series (via onDraw hook)</h4>
         <Chart width={800} height={200} data={data} onDraw={gridOverlay}>
-          <Scale id="x" auto ori={0} dir={1} time={false} />
-          <Scale id="y" auto ori={1} dir={1} />
-          <Axis scale="x" side={2} grid={{ show: false }} />
-          <Axis scale="y" side={3} grid={{ show: false }} />
+          <Scale id="x" />
+          <Scale id="y"  />
+          <Axis scale="x" grid={{ show: false }} />
+          <Axis scale="y" grid={{ show: false }} />
           <Series group={0} index={0} yScale="y" stroke="#e74c3c" fill="rgba(231,76,60,0.3)" width={2} label="Series A" />
           <Series group={0} index={1} yScale="y" stroke="#3498db" fill="rgba(52,152,219,0.3)" width={2} label="Series B" />
         </Chart>

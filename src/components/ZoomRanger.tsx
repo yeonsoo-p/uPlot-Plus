@@ -163,10 +163,10 @@ export function ZoomRanger({
   return (
     <div className={className} style={{ position: 'relative', width, height }}>
       <Chart width={width} height={height} data={data}>
-        <Scale id="x" auto ori={0} dir={1} />
-        <Scale id="y" auto ori={1} dir={1} />
-        <Axis scale="x" side={2} show={false} />
-        <Axis scale="y" side={3} show={false} />
+        <Scale id="x" />
+        <Scale id="y" />
+        <Axis scale="x" show={false} />
+        <Axis scale="y" show={false} />
         {Array.from({ length: seriesCount }, (_, i) => (
           <Series
             key={i}

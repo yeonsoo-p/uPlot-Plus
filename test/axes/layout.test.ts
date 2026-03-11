@@ -2,10 +2,11 @@ import { describe, it, expect } from 'vitest';
 import { axesCalc, calcPlotRect, calcAxesRects, convergeSize } from '@/axes/layout';
 import { createAxisState } from '@/axes/ticks';
 import type { ScaleState } from '@/types';
+import { Distribution, Side } from '@/types';
 import type { AxisState } from '@/types/axes';
 import { createScaleState } from '@/core/Scale';
 
-function makeScale(min: number, max: number, distr: 1 | 2 | 3 | 4 = 1): ScaleState {
+function makeScale(min: number, max: number, distr: Distribution = Distribution.Linear): ScaleState {
   return { ...createScaleState({ id: 'test', distr }), min, max };
 }
 
@@ -22,7 +23,7 @@ describe('calcPlotRect', () => {
 
   it('bottom x-axis reduces height', () => {
     const axes: AxisState[] = [
-      { ...createAxisState({ scale: 'x', side: 2 }), _show: true, _size: 50 },
+      { ...createAxisState({ scale: 'x', side: Side.Bottom }), _show: true, _size: 50 },
     ];
     const box = calcPlotRect(800, 600, axes);
     expect(box.height).toBe(550);
@@ -31,7 +32,7 @@ describe('calcPlotRect', () => {
 
   it('left y-axis reduces width and shifts left', () => {
     const axes: AxisState[] = [
-      { ...createAxisState({ scale: 'y', side: 3 }), _show: true, _size: 60 },
+      { ...createAxisState({ scale: 'y', side: Side.Left }), _show: true, _size: 60 },
     ];
     const box = calcPlotRect(800, 600, axes);
     expect(box.width).toBe(740);
@@ -40,10 +41,10 @@ describe('calcPlotRect', () => {
 
   it('axes on all four sides', () => {
     const axes: AxisState[] = [
-      { ...createAxisState({ scale: 'a', side: 0 }), _show: true, _size: 30 },
-      { ...createAxisState({ scale: 'b', side: 1 }), _show: true, _size: 40 },
-      { ...createAxisState({ scale: 'c', side: 2 }), _show: true, _size: 50 },
-      { ...createAxisState({ scale: 'd', side: 3 }), _show: true, _size: 60 },
+      { ...createAxisState({ scale: 'a', side: Side.Top }), _show: true, _size: 30 },
+      { ...createAxisState({ scale: 'b', side: Side.Right }), _show: true, _size: 40 },
+      { ...createAxisState({ scale: 'c', side: Side.Bottom }), _show: true, _size: 50 },
+      { ...createAxisState({ scale: 'd', side: Side.Left }), _show: true, _size: 60 },
     ];
     const box = calcPlotRect(800, 600, axes);
     expect(box.left).toBe(60);
@@ -54,7 +55,7 @@ describe('calcPlotRect', () => {
 
   it('hidden axes ignored', () => {
     const axes: AxisState[] = [
-      { ...createAxisState({ scale: 'y', side: 3 }), _show: false, _size: 60 },
+      { ...createAxisState({ scale: 'y', side: Side.Left }), _show: false, _size: 60 },
     ];
     const box = calcPlotRect(800, 600, axes);
     expect(box.width).toBe(800);
@@ -62,8 +63,8 @@ describe('calcPlotRect', () => {
 
   it('never goes negative', () => {
     const axes: AxisState[] = [
-      { ...createAxisState({ scale: 'a', side: 3 }), _show: true, _size: 500 },
-      { ...createAxisState({ scale: 'b', side: 1 }), _show: true, _size: 500 },
+      { ...createAxisState({ scale: 'a', side: Side.Left }), _show: true, _size: 500 },
+      { ...createAxisState({ scale: 'b', side: Side.Right }), _show: true, _size: 500 },
     ];
     const box = calcPlotRect(800, 600, axes);
     expect(box.width).toBeGreaterThanOrEqual(0);
@@ -73,7 +74,7 @@ describe('calcPlotRect', () => {
 // ---- axesCalc ----
 describe('axesCalc', () => {
   it('computes splits and values for numeric axis', () => {
-    const axis = createAxisState({ scale: 'y', side: 3 });
+    const axis = createAxisState({ scale: 'y', side: Side.Left });
     const scale = makeScale(0, 100);
     const converged = axesCalc([axis], makeGetScale({ y: scale }), 600, 400, 1);
 
@@ -85,15 +86,15 @@ describe('axesCalc', () => {
   });
 
   it('hides axis when scale has no range', () => {
-    const axis = createAxisState({ scale: 'y', side: 3 });
+    const axis = createAxisState({ scale: 'y', side: Side.Left });
     const scale = createScaleState({ id: 'y' }); // min/max null
     axesCalc([axis], makeGetScale({ y: scale }), 600, 400, 1);
     expect(axis._show).toBe(false);
   });
 
   it('uses logAxisSplits for log scale', () => {
-    const axis = createAxisState({ scale: 'y', side: 3 });
-    const scale = makeScale(1, 1000, 3);
+    const axis = createAxisState({ scale: 'y', side: Side.Left });
+    const scale = makeScale(1, 1000, Distribution.Log);
     axesCalc([axis], makeGetScale({ y: scale }), 600, 400, 1);
 
     expect(axis._splits).not.toBeNull();
@@ -107,11 +108,11 @@ describe('axesCalc', () => {
 // ---- calcAxesRects ----
 describe('calcAxesRects', () => {
   it('positions axes from plot edges outward', () => {
-    const axisBottom = createAxisState({ scale: 'x', side: 2 });
+    const axisBottom = createAxisState({ scale: 'x', side: Side.Bottom });
     axisBottom._show = true;
     axisBottom._size = 50;
 
-    const axisLeft = createAxisState({ scale: 'y', side: 3 });
+    const axisLeft = createAxisState({ scale: 'y', side: Side.Left });
     axisLeft._show = true;
     axisLeft._size = 60;
 
@@ -128,8 +129,8 @@ describe('calcAxesRects', () => {
 describe('convergeSize', () => {
   it('converges within 3 cycles', () => {
     const axes = [
-      createAxisState({ scale: 'x', side: 2 }),
-      createAxisState({ scale: 'y', side: 3 }),
+      createAxisState({ scale: 'x', side: Side.Bottom }),
+      createAxisState({ scale: 'y', side: Side.Left }),
     ];
     const scales = {
       x: makeScale(0, 100),
@@ -145,7 +146,7 @@ describe('convergeSize', () => {
 
   it('resets _size to 0 at start (regression: hover stability)', () => {
     const axes = [
-      createAxisState({ scale: 'y', side: 3 }),
+      createAxisState({ scale: 'y', side: Side.Left }),
     ];
     // Simulate previous redraw leaving _size = 50
     axes[0]!._size = 50;
@@ -163,8 +164,8 @@ describe('convergeSize', () => {
 
   it('calculates axis positions', () => {
     const axes = [
-      createAxisState({ scale: 'x', side: 2 }),
-      createAxisState({ scale: 'y', side: 3 }),
+      createAxisState({ scale: 'x', side: Side.Bottom }),
+      createAxisState({ scale: 'y', side: Side.Left }),
     ];
     const scales = {
       x: makeScale(0, 100),

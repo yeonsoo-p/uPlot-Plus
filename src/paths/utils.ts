@@ -1,4 +1,5 @@
 import type { ScaleState } from '../types';
+import { Orientation, Direction } from '../types';
 import { valToPos, posToVal } from '../core/Scale';
 
 /** Line-to for horizontal orientation */
@@ -29,17 +30,17 @@ export function findGaps(
   dataY: ArrayLike<number | null>,
   idx0: number,
   idx1: number,
-  dir: 1 | -1,
+  dir: Direction,
   pixelForX: (val: number) => number,
 ): [number, number][] {
   const gaps: [number, number][] = [];
   let gapStart = -1;
 
-  const start = dir === 1 ? idx0 : idx1;
-  const end = dir === 1 ? idx1 : idx0;
+  const start = dir === Direction.Forward ? idx0 : idx1;
+  const end = dir === Direction.Forward ? idx1 : idx0;
   const step = dir;
 
-  for (let i = start; dir === 1 ? i <= end : i >= end; i += step) {
+  for (let i = start; dir === Direction.Forward ? i <= end : i >= end; i += step) {
     if (dataY[i] === null || dataY[i] === undefined) {
       if (gapStart === -1) {
         // Use the previous non-null point's x pixel as gap start.
@@ -67,7 +68,7 @@ export function findGaps(
  */
 export function clipGaps(
   gaps: [number, number][],
-  ori: 0 | 1,
+  ori: Orientation,
   xOff: number,
   yOff: number,
   xDim: number,
@@ -75,14 +76,14 @@ export function clipGaps(
 ): Path2D {
   const clip = new Path2D();
 
-  let prevEnd = ori === 0 ? xOff : yOff;
-  const dimEnd = ori === 0 ? xOff + xDim : yOff + yDim;
-  const crossOff = ori === 0 ? yOff : xOff;
-  const crossDim = ori === 0 ? yDim : xDim;
+  let prevEnd = ori === Orientation.Horizontal ? xOff : yOff;
+  const dimEnd = ori === Orientation.Horizontal ? xOff + xDim : yOff + yDim;
+  const crossOff = ori === Orientation.Horizontal ? yOff : xOff;
+  const crossDim = ori === Orientation.Horizontal ? yDim : xDim;
 
   for (const [gapStart, gapEnd] of gaps) {
     if (gapStart > prevEnd) {
-      if (ori === 0)
+      if (ori === Orientation.Horizontal)
         clip.rect(prevEnd, crossOff, gapStart - prevEnd, crossDim);
       else
         clip.rect(crossOff, prevEnd, crossDim, gapStart - prevEnd);
@@ -91,7 +92,7 @@ export function clipGaps(
   }
 
   if (prevEnd < dimEnd) {
-    if (ori === 0)
+    if (ori === Orientation.Horizontal)
       clip.rect(prevEnd, crossOff, dimEnd - prevEnd, crossDim);
     else
       clip.rect(crossOff, prevEnd, crossDim, dimEnd - prevEnd);

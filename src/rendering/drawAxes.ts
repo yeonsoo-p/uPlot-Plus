@@ -1,5 +1,6 @@
 import type { ScaleState, BBox } from '../types';
 import type { AxisState } from '../types/axes';
+import { Side, Orientation, sideOrientation } from '../types';
 import { valToPos } from '../core/Scale';
 import { round, PI } from '../math/utils';
 
@@ -22,8 +23,8 @@ function drawOrthoLines(
   ctx: CanvasRenderingContext2D,
   offs: number[],
   filts: (string | null)[],
-  ori: number,
-  side: number,
+  ori: Orientation,
+  side: Side,
   pos0: number,
   len: number,
   width: number,
@@ -46,9 +47,9 @@ function drawOrthoLines(
   let y0 = 0;
   let x1 = 0;
   let y1 = 0;
-  const pos1 = pos0 + (side === 0 || side === 3 ? -len : len);
+  const pos1 = pos0 + (side === Side.Top || side === Side.Left ? -len : len);
 
-  if (ori === 0) {
+  if (ori === Orientation.Horizontal) {
     y0 = pos0;
     y1 = pos1;
   } else {
@@ -58,7 +59,7 @@ function drawOrthoLines(
 
   for (let i = 0; i < offs.length; i++) {
     if (filts[i] != null) {
-      if (ori === 0) {
+      if (ori === Orientation.Horizontal) {
         x0 = x1 = offs[i] ?? 0;
       } else {
         y0 = y1 = offs[i] ?? 0;
@@ -96,7 +97,7 @@ export function drawAxesGrid(
 
     const config = axis.config;
     const side = config.side;
-    const ori = side % 2;
+    const ori = sideOrientation(side);
 
     const scale = getScale(config.scale);
     if (!scale || scale.min == null || scale.max == null)
@@ -104,7 +105,7 @@ export function drawAxesGrid(
 
     const fillStyle = config.stroke ?? '#000';
 
-    const shiftDir = side === 0 || side === 3 ? -1 : 1;
+    const shiftDir = side === Side.Top || side === Side.Left ? -1 : 1;
 
     const splits = axis._splits;
     const values = axis._values;
@@ -112,8 +113,8 @@ export function drawAxesGrid(
     if (!splits || !values || axis._space === 0)
       continue;
 
-    const plotDim = ori === 0 ? plotBox.width : plotBox.height;
-    const plotOff = ori === 0 ? plotBox.left : plotBox.top;
+    const plotDim = ori === Orientation.Horizontal ? plotBox.width : plotBox.height;
+    const plotOff = ori === Orientation.Horizontal ? plotBox.left : plotBox.top;
 
     // Compute pixel positions for each split
     const canOffs = splits.map(val => round(valToPos(val, scale, plotDim, plotOff) * pxRatio));
@@ -128,8 +129,8 @@ export function drawAxesGrid(
       const gridWidth = round((grid?.width ?? 2) * pxRatio);
       const gridDash = (grid?.dash ?? []).map(d => d * pxRatio);
 
-      const gridPos = ori === 0 ? plotTop : plotLft;
-      const gridLen = ori === 0 ? plotHgt : plotWid;
+      const gridPos = ori === Orientation.Horizontal ? plotTop : plotLft;
+      const gridLen = ori === Orientation.Horizontal ? plotHgt : plotWid;
 
       drawOrthoLines(ctx, canOffs, filts, ori, 2, gridPos, gridLen, gridWidth, gridStroke, gridDash, pxRatio);
     }
@@ -157,8 +158,8 @@ export function drawAxesGrid(
       const finalPos = basePos + shiftAmt;
 
       const font = scaleFontPx(config.font ?? '12px system-ui, sans-serif', pxRatio);
-      const textAlign: CanvasTextAlign = ori === 0 ? 'center' : (side === 3 ? RIGHT : LEFT) as CanvasTextAlign;
-      const textBaseline: CanvasTextBaseline = ori === 0 ? (side === 2 ? TOP : BOTTOM) as CanvasTextBaseline : 'middle';
+      const textAlign: CanvasTextAlign = ori === Orientation.Horizontal ? 'center' : (side === Side.Left ? RIGHT : LEFT) as CanvasTextAlign;
+      const textBaseline: CanvasTextBaseline = ori === Orientation.Horizontal ? (side === Side.Bottom ? TOP : BOTTOM) as CanvasTextBaseline : 'middle';
 
       ctx.font = font;
       ctx.fillStyle = fillStyle;
@@ -182,8 +183,8 @@ export function drawAxesGrid(
           ctx.fillText(val, 0, 0);
           ctx.restore();
         } else {
-          const x = ori === 0 ? off : finalPos;
-          const y = ori === 0 ? finalPos : off;
+          const x = ori === Orientation.Horizontal ? off : finalPos;
+          const y = ori === Orientation.Horizontal ? finalPos : off;
           ctx.fillText(val, x, y);
         }
       }
@@ -196,18 +197,18 @@ export function drawAxesGrid(
       ctx.font = labelFont;
       ctx.fillStyle = fillStyle;
       ctx.textAlign = 'center';
-      ctx.textBaseline = side === 2 ? TOP as CanvasTextBaseline : BOTTOM as CanvasTextBaseline;
+      ctx.textBaseline = side === Side.Bottom ? TOP as CanvasTextBaseline : BOTTOM as CanvasTextBaseline;
 
       const baseLpos = round((axis._lpos + (config.labelGap ?? 0) * shiftDir) * pxRatio);
 
-      if (ori === 1) {
+      if (ori === Orientation.Vertical) {
         // Vertical axis label (rotated)
         ctx.save();
         ctx.translate(
           baseLpos,
           round((plotTop + plotHgt / 2)),
         );
-        ctx.rotate((side === 3 ? -PI : PI) / 2);
+        ctx.rotate((side === Side.Left ? -PI : PI) / 2);
         ctx.fillText(config.label, 0, 0);
         ctx.restore();
       } else {
@@ -231,7 +232,7 @@ export function drawAxesGrid(
 
       ctx.beginPath();
 
-      if (ori === 0) {
+      if (ori === Orientation.Horizontal) {
         ctx.moveTo(plotLft, borderPos);
         ctx.lineTo(plotLft + plotWid, borderPos);
       } else {

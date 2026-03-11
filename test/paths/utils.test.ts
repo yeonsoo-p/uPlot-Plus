@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { findGaps, clipGaps, lineToH, lineToV } from '@/paths/utils';
 import { createScaleState, valToPos } from '@/core/Scale';
+import { Orientation } from '@/types';
 
 /** Helper to extract recorded calls from Path2D mock */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -82,7 +83,7 @@ describe('findGaps', () => {
 describe('clipGaps', () => {
   it('creates clip rects excluding gap regions for horizontal', () => {
     const gaps: [number, number][] = [[100, 200]];
-    const clip = clipGaps(gaps, 0, 0, 0, 500, 300);
+    const clip = clipGaps(gaps, Orientation.Horizontal, 0, 0, 500, 300);
     const calls = getCalls(clip);
     // Should create 2 rects: [0..100] and [200..500]
     const rects = calls.filter((c: string[]) => c[0] === 'rect');
@@ -95,7 +96,7 @@ describe('clipGaps', () => {
 
   it('creates clip rects for vertical orientation', () => {
     const gaps: [number, number][] = [[50, 150]];
-    const clip = clipGaps(gaps, 1, 0, 0, 300, 500);
+    const clip = clipGaps(gaps, Orientation.Vertical, 0, 0, 300, 500);
     const calls = getCalls(clip);
     const rects = calls.filter((c: string[]) => c[0] === 'rect');
     expect(rects.length).toBe(2);
@@ -106,7 +107,7 @@ describe('clipGaps', () => {
   });
 
   it('handles empty gaps array — single rect covering full area', () => {
-    const clip = clipGaps([], 0, 0, 0, 500, 300);
+    const clip = clipGaps([], Orientation.Horizontal, 0, 0, 500, 300);
     const calls = getCalls(clip);
     const rects = calls.filter((c: string[]) => c[0] === 'rect');
     // No gaps → one rect covering the entire dimension
@@ -116,7 +117,7 @@ describe('clipGaps', () => {
 
   it('handles multiple gaps', () => {
     const gaps: [number, number][] = [[50, 100], [200, 250], [400, 450]];
-    const clip = clipGaps(gaps, 0, 0, 0, 500, 300);
+    const clip = clipGaps(gaps, Orientation.Horizontal, 0, 0, 500, 300);
     const calls = getCalls(clip);
     const rects = calls.filter((c: string[]) => c[0] === 'rect');
     // 3 gaps → 4 visible rects: [0,50], [100,200], [250,400], [450,500]

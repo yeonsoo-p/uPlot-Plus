@@ -1,5 +1,5 @@
 import React from 'react';
-import { Chart, Scale, Series, Axis } from '../../src';
+import { Chart, Scale, Series, Axis, Direction, Side } from '../../src';
 import type { ChartData } from '../../src';
 
 function generateData(): ChartData {
@@ -19,12 +19,12 @@ export default function ScaleDirection() {
 
   return (
     <Chart width={800} height={400} data={data}>
-      <Scale id="x" auto ori={0} dir={1} time={false} />
-      <Scale id="depth" auto ori={1} dir={-1} />
-      <Scale id="temp" auto ori={1} dir={1} />
-      <Axis scale="x" side={2} label="Sample" />
-      <Axis scale="depth" side={3} label="Depth (inverted)" values={fmtDepth} stroke="#2980b9" />
-      <Axis scale="temp" side={1} label="Temperature (°C)" stroke="#e67e22" grid={{ show: false }} />
+      <Scale id="x" />
+      <Scale id="depth"  dir={Direction.Backward} />
+      <Scale id="temp"  />
+      <Axis scale="x" label="Sample" />
+      <Axis scale="depth" label="Depth (inverted)" values={fmtDepth} stroke="#2980b9" />
+      <Axis scale="temp" side={Side.Right} label="Temperature (°C)" stroke="#e67e22" grid={{ show: false }} />
       <Series group={0} index={0} yScale="depth" stroke="#2980b9" width={2} label="Density" />
       <Series group={0} index={1} yScale="temp" stroke="#e67e22" width={2} label="Temperature" />
     </Chart>

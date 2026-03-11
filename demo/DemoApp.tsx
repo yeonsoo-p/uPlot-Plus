@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { demos } from './demos';
+import { demos, getDemoSource } from './demos';
+import { SourceHighlight } from './SourceHighlight';
 
 function getHashDemo(): string {
   const hash = window.location.hash.slice(1);
@@ -9,6 +10,7 @@ function getHashDemo(): string {
 export function DemoApp() {
   const [activeId, setActiveId] = useState(getHashDemo);
   const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set());
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
     const onHash = () => setActiveId(getHashDemo());
@@ -29,6 +31,19 @@ export function DemoApp() {
     return cats;
   }, []);
 
+  const filteredCategories = useMemo(() => {
+    if (!search.trim()) return categories;
+    const q = search.toLowerCase();
+    return categories
+      .map(cat => ({
+        ...cat,
+        items: cat.items.filter(
+          d => d.title.toLowerCase().includes(q) || d.description.toLowerCase().includes(q)
+        ),
+      }))
+      .filter(cat => cat.items.length > 0);
+  }, [categories, search]);
+
   const toggleCategory = (name: string) => {
     setCollapsed(prev => {
       const next = new Set(prev);
@@ -40,16 +55,31 @@ export function DemoApp() {
 
   const active = demos.find(d => d.id === activeId) ?? demos[0];
   const Component = active.component;
+  const source = getDemoSource(active);
 
   return (
     <div className="demo-app">
       <nav className="sidebar">
         <h1>uPlot+ Demos</h1>
+        <div className="sidebar-search-wrap">
+          <input
+            className="sidebar-search"
+            type="text"
+            placeholder="Search demos..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+          {search && (
+            <button className="sidebar-search-clear" onClick={() => setSearch('')}>
+              &times;
+            </button>
+          )}
+        </div>
         <div className="sidebar-controls">
           <button onClick={() => setCollapsed(new Set())}>Expand All</button>
           <button onClick={() => setCollapsed(new Set(categories.map(c => c.name)))}>Collapse All</button>
         </div>
-        {categories.map(cat => (
+        {filteredCategories.map(cat => (
           <div key={cat.name} className="sidebar-group">
             <button
               className={`sidebar-category${collapsed.has(cat.name) ? ' collapsed' : ''}`}
@@ -78,7 +108,12 @@ export function DemoApp() {
         <div className="demo-card">
           <h2>{active.title}</h2>
           <p className="demo-description">{active.description}</p>
-          <Component />
+          <div className="demo-layout">
+            <div className="demo-chart">
+              <Component />
+            </div>
+            {source && <SourceHighlight source={source} />}
+          </div>
         </div>
       </main>
     </div>

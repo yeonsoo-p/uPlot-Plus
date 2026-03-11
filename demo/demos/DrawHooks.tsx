@@ -40,10 +40,10 @@ export default function DrawHooks() {
 
   return (
     <Chart width={800} height={400} data={data} onCursorDraw={onCursorDraw}>
-      <Scale id="x" auto ori={0} dir={1} time={false} />
-      <Scale id="y" ori={1} dir={1} auto={false} min={10} max={90} />
-      <Axis scale="x" side={2} label="Sample" />
-      <Axis scale="y" side={3} label="Value" />
+      <Scale id="x" />
+      <Scale id="y" auto={false} min={10} max={90} />
+      <Axis scale="x" label="Sample" />
+      <Axis scale="y" label="Value" />
       <Series group={0} index={0} yScale="y" stroke="#2980b9" width={2} label="Signal" />
       <Region yMin={65} yMax={90} yScale="y" fill="rgba(231, 76, 60, 0.08)" />
       <HLine value={65} yScale="y" stroke="#e74c3c" width={2} dash={[6, 4]} label="Threshold: 65" />

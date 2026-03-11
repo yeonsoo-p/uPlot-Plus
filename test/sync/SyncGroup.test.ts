@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { getSyncGroup, SyncGroup } from '@/sync/SyncGroup';
 import { createChartStore } from '@/hooks/useChartStore';
 import type { ChartStore } from '@/hooks/useChartStore';
+import { Orientation, Direction } from '@/types';
 
 function makeStoreWithData(xValues: number[]): ChartStore {
   const store = createChartStore();
@@ -10,7 +11,7 @@ function makeStoreWithData(xValues: number[]): ChartStore {
   store.plotBox = { left: 10, top: 10, width: 380, height: 280 };
 
   store.dataStore.setData([{ x: xValues, series: [[...xValues.map(x => x * 2)]] }]);
-  store.registerScale({ id: 'x', ori: 0, dir: 1, auto: true });
+  store.registerScale({ id: 'x', ori: Orientation.Horizontal, dir: Direction.Forward, auto: true });
   store.scaleManager.setGroupXScale(0, 'x');
 
   // Set scale range

@@ -73,6 +73,9 @@ export { drawHLine, drawVLine, drawLabel, drawRegion } from './annotations';
 // Scale utilities (for advanced draw hooks that need raw access)
 export { valToPos, posToVal } from './core/Scale';
 
+// Enums
+export { Side, Orientation, Direction, Distribution, SortOrder, sideOrientation } from './types';
+
 // Axis value formatters
 export { fmtCompact, fmtSuffix, fmtHourMin, fmtMonthName, fmtDateStr, fmtLabels } from './formatters';
 export type { AxisValueFormatter } from './formatters';

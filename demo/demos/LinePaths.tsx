@@ -17,10 +17,10 @@ export default function LinePaths() {
         All path builder types rendering the same data for comparison.
       </p>
       <Chart width={800} height={500} data={data}>
-        <Scale id="x" auto ori={0} dir={1} time={false} />
-        <Scale id="y" auto ori={1} dir={1} />
-        <Axis scale="x" side={2} label="Index" />
-        <Axis scale="y" side={3} label="Value" />
+        <Scale id="x" />
+        <Scale id="y"  />
+        <Axis scale="x" label="Index" />
+        <Axis scale="y" label="Value" />
         <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="linear" paths={linear()} />
         <Series group={0} index={1} yScale="y" stroke="#3498db" width={2} label="monotoneCubic" paths={monotoneCubic()} />
         <Series group={0} index={2} yScale="y" stroke="#2ecc71" width={2} label="catmullRom" paths={catmullRom()} />

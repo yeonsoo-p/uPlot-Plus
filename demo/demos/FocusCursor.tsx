@@ -33,8 +33,8 @@ export default function FocusCursor() {
       data={data}
       cursor={{ focus: { alpha: 0.15 } }}
     >
-      <Scale id="x" ori={0} dir={1} auto />
-      <Scale id="y" ori={1} dir={1} auto />
+      <Scale id="x"  />
+      <Scale id="y"  />
       {colors.map((color, i) => (
         <Series
           key={i}
@@ -46,8 +46,8 @@ export default function FocusCursor() {
           width={2}
         />
       ))}
-      <Axis scale="x" side={2} />
-      <Axis scale="y" side={3} />
+      <Axis scale="x" />
+      <Axis scale="y" />
       <Legend />
     </Chart>
   );

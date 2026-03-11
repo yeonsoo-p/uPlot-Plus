@@ -64,11 +64,11 @@ export default function EventCallbacks() {
           onContextMenu={onContextMenu}
           onScaleChange={onScaleChange}
         >
-          <Scale id="x" ori={0} dir={1} time={false}
+          <Scale id="x"
             auto={xRange == null} min={xRange?.[0]} max={xRange?.[1]} />
-          <Scale id="y" auto ori={1} dir={1} />
-          <Axis scale="x" side={2} label="Sample" />
-          <Axis scale="y" side={3} label="Value" />
+          <Scale id="y"  />
+          <Axis scale="x" label="Sample" />
+          <Axis scale="y" label="Value" />
           <Series group={0} index={0} yScale="y" stroke="#2980b9" width={2} label="Signal A" />
           <Series group={0} index={1} yScale="y" stroke="#e67e22" width={2} label="Signal B" />
           <Legend />

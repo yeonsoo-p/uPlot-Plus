@@ -1,5 +1,5 @@
 import React from 'react';
-import { Chart, Scale, Series, Axis, fmtSuffix } from '../../src';
+import { Chart, Scale, Series, Axis, fmtSuffix, Side } from '../../src';
 import type { ChartData } from '../../src';
 
 function generateData(): ChartData {
@@ -22,12 +22,12 @@ export default function MultipleScales() {
 
   return (
     <Chart width={800} height={400} data={data}>
-      <Scale id="x" auto ori={0} dir={1} time={false} />
-      <Scale id="temp" auto ori={1} dir={1} />
-      <Scale id="humid" auto ori={1} dir={1} />
-      <Axis scale="x" side={2} label="Sample" />
-      <Axis scale="temp" side={3} label="Temperature" values={fmtSuffix('°C', 1)} stroke="#e74c3c" />
-      <Axis scale="humid" side={1} label="Humidity" values={fmtSuffix('%')} stroke="#3498db" grid={{ show: false }} />
+      <Scale id="x" />
+      <Scale id="temp"  />
+      <Scale id="humid"  />
+      <Axis scale="x" label="Sample" />
+      <Axis scale="temp" label="Temperature" values={fmtSuffix('°C', 1)} stroke="#e74c3c" />
+      <Axis scale="humid" side={Side.Right} label="Humidity" values={fmtSuffix('%')} stroke="#3498db" grid={{ show: false }} />
       <Series group={0} index={0} yScale="temp" stroke="#e74c3c" width={2} label="Temperature" />
       <Series group={0} index={1} yScale="humid" stroke="#3498db" width={2} label="Humidity" />
     </Chart>

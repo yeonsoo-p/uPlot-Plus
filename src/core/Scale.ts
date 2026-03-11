@@ -1,4 +1,5 @@
 import type { ScaleConfig, ScaleState } from '../types';
+import { Orientation, Direction, Distribution } from '../types';
 import { log10, log2, sinh, asinh } from '../math/utils';
 
 /** Create a ScaleState from config with defaults */
@@ -7,11 +8,11 @@ export function createScaleState(cfg: ScaleConfig): ScaleState {
     id: cfg.id,
     min: cfg.min ?? null,
     max: cfg.max ?? null,
-    distr: cfg.distr ?? 1,
+    distr: cfg.distr ?? Distribution.Linear,
     log: cfg.log ?? 10,
     asinh: cfg.asinh ?? 1,
-    ori: cfg.ori ?? 0,
-    dir: cfg.dir ?? 1,
+    ori: cfg.ori ?? (cfg.id === 'x' ? Orientation.Horizontal : Orientation.Vertical),
+    dir: cfg.dir ?? Direction.Forward,
     time: cfg.time ?? false,
     auto: cfg.auto ?? true,
     range: cfg.range ?? null,
@@ -31,10 +32,10 @@ function getTransformedMin(scale: ScaleState): number {
   if (scale._min != null) return scale._min;
   const { min, distr } = scale;
   if (min == null) return 0;
-  if (distr === 3) {
+  if (distr === Distribution.Log) {
     const safeMin = min > 0 ? min : 1e-10;
     scale._min = (scale.log === 10 ? log10 : log2)(safeMin);
-  } else if (distr === 4) {
+  } else if (distr === Distribution.Asinh) {
     scale._min = asinh(min, scale.asinh);
   } else {
     scale._min = min;
@@ -47,10 +48,10 @@ function getTransformedMax(scale: ScaleState): number {
   if (scale._max != null) return scale._max;
   const { max, distr } = scale;
   if (max == null) return 0;
-  if (distr === 3) {
+  if (distr === Distribution.Log) {
     const safeMax = max > 0 ? max : 1e-10;
     scale._max = (scale.log === 10 ? log10 : log2)(safeMax);
-  } else if (distr === 4) {
+  } else if (distr === Distribution.Asinh) {
     scale._max = asinh(max, scale.asinh);
   } else {
     scale._max = max;
@@ -72,17 +73,17 @@ export function valToPct(val: number, scale: ScaleState): number {
 
   const { distr } = scale;
 
-  if (distr === 3) {
+  if (distr === Distribution.Log) {
     const logFn = scale.log === 10 ? log10 : log2;
     const safeVal = val > 0 ? val : 1e-10;
     return (logFn(safeVal) - tMin) / range;
   }
 
-  if (distr === 4) {
+  if (distr === Distribution.Asinh) {
     return (asinh(val, scale.asinh) - tMin) / range;
   }
 
-  // Linear (distr 1) and ordinal (distr 2)
+  // Linear and ordinal
   return (val - tMin) / range;
 }
 
@@ -99,11 +100,11 @@ export function pctToVal(pct: number, scale: ScaleState): number {
 
   const { distr } = scale;
 
-  if (distr === 3) {
+  if (distr === Distribution.Log) {
     return Math.pow(scale.log, tMin + pct * (tMax - tMin));
   }
 
-  if (distr === 4) {
+  if (distr === Distribution.Asinh) {
     return sinh(tMin + pct * (tMax - tMin), scale.asinh);
   }
 
@@ -117,12 +118,12 @@ export function valToPos(val: number, scale: ScaleState, dim: number, off: numbe
   const pct = valToPct(val, scale);
   let pos: number;
 
-  if (scale.ori === 0) {
-    // Horizontal: left-to-right when dir=1
-    pos = scale.dir === 1 ? pct : 1 - pct;
+  if (scale.ori === Orientation.Horizontal) {
+    // Horizontal: left-to-right when dir=Fwd
+    pos = scale.dir === Direction.Forward ? pct : 1 - pct;
   } else {
-    // Vertical: bottom-to-top when dir=1 (canvas Y is inverted)
-    pos = scale.dir === 1 ? 1 - pct : pct;
+    // Vertical: bottom-to-top when dir=Fwd (canvas Y is inverted)
+    pos = scale.dir === Direction.Forward ? 1 - pct : pct;
   }
 
   return off + pos * dim;
@@ -134,11 +135,11 @@ export function valToPos(val: number, scale: ScaleState, dim: number, off: numbe
 export function posToVal(pos: number, scale: ScaleState, dim: number, off: number): number {
   let pct = (pos - off) / dim;
 
-  if (scale.ori === 0) {
-    if (scale.dir === -1) pct = 1 - pct;
+  if (scale.ori === Orientation.Horizontal) {
+    if (scale.dir === Direction.Backward) pct = 1 - pct;
   } else {
     // Vertical: invert by default (canvas Y grows downward)
-    if (scale.dir !== -1) pct = 1 - pct;
+    if (scale.dir !== Direction.Backward) pct = 1 - pct;
   }
 
   return pctToVal(pct, scale);

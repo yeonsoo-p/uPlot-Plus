@@ -1,4 +1,5 @@
 import type { AxisConfig, AxisState } from '../types/axes';
+import { Orientation, sideOrientation } from '../types';
 import {
   roundDec,
   incrRoundUp,
@@ -202,7 +203,7 @@ export function getIncrSpace(
   if (fullDim <= 0)
     return [0, 0];
 
-  const isVertical = axis.side % 2 === 1;
+  const isVertical = sideOrientation(axis.side) === Orientation.Vertical;
   // Y-axis: vertical spacing based on font height + gap (~30px, matching uPlot yAxisOpts.space).
   // X-axis: horizontal spacing based on label width estimate.
   const minSpace = axis.space ?? (isVertical ? 30 : estimateMinSpace(min, max));
@@ -231,7 +232,7 @@ export function computeAxisSize(
   const gap = axis.gap ?? 5;
   const fontSize = 12;
 
-  const isVertical = axis.side % 2 === 1;
+  const isVertical = sideOrientation(axis.side) === Orientation.Vertical;
 
   if (isVertical && _values != null) {
     // Estimate max label width from character count

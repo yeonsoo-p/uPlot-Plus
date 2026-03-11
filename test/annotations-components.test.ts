@@ -2,10 +2,11 @@ import { describe, it, expect, vi } from 'vitest';
 import { drawHLine, drawVLine, drawRegion } from '@/annotations';
 import type { DrawContext } from '@/types/hooks';
 import type { ScaleState } from '@/types';
+import { Distribution } from '@/types';
 
 /** Minimal scale state for testing */
 function makeScale(min: number, max: number): ScaleState {
-  return { min, max, distr: 1, log: 10, clamp: false, asinh: 1 };
+  return { min, max, distr: Distribution.Linear, log: 10, clamp: false, asinh: 1 };
 }
 
 function makeDC(overrides?: Partial<DrawContext>): DrawContext {

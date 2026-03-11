@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Axis, Timeline } from '../../src';
+import { Chart, Scale, Axis, Timeline, Side } from '../../src';
 import type { ChartData, TimelineLane } from '../../src';
 
 export default function TimelineDiscreteDemo() {
@@ -55,18 +55,18 @@ export default function TimelineDiscreteDemo() {
 
   return (
     <Chart width={900} height={200} data={data}>
-      <Scale id="x" auto ori={0} dir={1} />
-      <Scale id="y" auto ori={1} dir={1} />
+      <Scale id="x"  />
+      <Scale id="y"  />
       <Axis
         scale="x"
-        side={2}
+        side={Side.Bottom}
         label="Time of Day"
         values={(splits: number[]) => splits.map(v => {
           const h = Math.floor(v / 3600);
           return `${h.toString().padStart(2, '0')}:00`;
         })}
       />
-      <Axis scale="y" side={3} show={false} size={80} />
+      <Axis scale="y" show={false} size={80} />
       <Timeline lanes={lanes} laneHeight={28} gap={4} scaleId="x" />
     </Chart>
   );

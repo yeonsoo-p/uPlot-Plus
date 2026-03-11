@@ -29,30 +29,30 @@ export default function NiceScale() {
       <div style={{ marginBottom: 16 }}>
         <h4 style={{ margin: '0 0 4px' }}>Small range (~2-20)</h4>
         <Chart width={800} height={180} data={data1}>
-          <Scale id="x" auto ori={0} dir={1} time={false} />
-          <Scale id="y" auto ori={1} dir={1} />
-          <Axis scale="x" side={2} />
-          <Axis scale="y" side={3} />
+          <Scale id="x" />
+          <Scale id="y"  />
+          <Axis scale="x" />
+          <Axis scale="y" />
           <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Small" />
         </Chart>
       </div>
       <div style={{ marginBottom: 16 }}>
         <h4 style={{ margin: '0 0 4px' }}>Medium range (~3700-6200)</h4>
         <Chart width={800} height={180} data={data2}>
-          <Scale id="x" auto ori={0} dir={1} time={false} />
-          <Scale id="y" auto ori={1} dir={1} />
-          <Axis scale="x" side={2} />
-          <Axis scale="y" side={3} />
+          <Scale id="x" />
+          <Scale id="y"  />
+          <Axis scale="x" />
+          <Axis scale="y" />
           <Series group={0} index={0} yScale="y" stroke="#2980b9" width={2} label="Medium" />
         </Chart>
       </div>
       <div>
         <h4 style={{ margin: '0 0 4px' }}>Tiny range (~0.004-0.056)</h4>
         <Chart width={800} height={180} data={data3}>
-          <Scale id="x" auto ori={0} dir={1} time={false} />
-          <Scale id="y" auto ori={1} dir={1} />
-          <Axis scale="x" side={2} />
-          <Axis scale="y" side={3} />
+          <Scale id="x" />
+          <Scale id="y"  />
+          <Axis scale="x" />
+          <Axis scale="y" />
           <Series group={0} index={0} yScale="y" stroke="#27ae60" width={2} label="Tiny" />
         </Chart>
       </div>

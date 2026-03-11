@@ -1,3 +1,5 @@
+import { SortOrder } from '../types';
+
 // Math shortcuts
 const M = Math;
 export const PI = M.PI;
@@ -82,7 +84,7 @@ export function getMinMax(
   data: ArrayLike<number | null>,
   _i0: number,
   _i1: number,
-  sorted: 0 | 1 | -1 = 0,
+  sorted: SortOrder = SortOrder.Unsorted,
   log = false,
 ): [number, number] {
   const getEdgeIdxs = log ? positiveIdxs : nonNullIdxs;
@@ -94,10 +96,10 @@ export function getMinMax(
   let _max = data[i0] ?? -inf;
 
   if (i0 > -1) {
-    if (sorted === 1) {
+    if (sorted === SortOrder.Ascending) {
       _min = data[i0] ?? inf;
       _max = data[i1] ?? -inf;
-    } else if (sorted === -1) {
+    } else if (sorted === SortOrder.Descending) {
       _min = data[i1] ?? inf;
       _max = data[i0] ?? -inf;
     } else {
@@ -389,7 +391,7 @@ export function findIncr(
   const intDigits = max(numIntDigits(minVal), numIntDigits(maxVal));
   const delta = maxVal - minVal;
 
-  let incrIdx = closestIdx((minSpace / dim) * delta, incrs as ArrayLike<number>);
+  let incrIdx = max(0, closestIdx((minSpace / dim) * delta, incrs as ArrayLike<number>) - 1);
 
   do {
     const foundIncr = incrs[incrIdx] ?? 0;

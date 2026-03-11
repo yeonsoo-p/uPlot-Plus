@@ -1,18 +1,19 @@
 import { describe, it, expect, vi } from 'vitest';
 import { drawHLine, drawVLine, drawLabel, drawRegion } from '@/annotations';
 import type { ScaleState } from '@/types';
+import { Distribution, Orientation, Direction } from '@/types';
 import type { DrawContext } from '@/types/hooks';
 
-function makeScale(id: string, min: number, max: number, ori: 0 | 1 = 0): ScaleState {
+function makeScale(id: string, min: number, max: number, ori: Orientation = Orientation.Horizontal): ScaleState {
   return {
     id,
     min,
     max,
-    distr: 1,
+    distr: Distribution.Linear,
     log: 10,
     asinh: 1,
     ori,
-    dir: 1,
+    dir: Direction.Forward,
     time: false,
     auto: false,
     range: null,
@@ -56,7 +57,7 @@ function makeDC() {
 describe('drawHLine', () => {
   it('draws a horizontal line across full plot width', () => {
     const { dc, ctx } = makeDC();
-    const yScale = makeScale('y', 0, 100, 1);
+    const yScale = makeScale('y', 0, 100, Orientation.Vertical);
 
     drawHLine(dc, yScale, 50);
 
@@ -68,7 +69,7 @@ describe('drawHLine', () => {
 
   it('applies custom stroke style', () => {
     const { dc, ctx } = makeDC();
-    const yScale = makeScale('y', 0, 100, 1);
+    const yScale = makeScale('y', 0, 100, Orientation.Vertical);
 
     drawHLine(dc, yScale, 50, { stroke: 'blue', width: 3 });
 
@@ -79,7 +80,7 @@ describe('drawHLine', () => {
 
   it('sets dash pattern when provided', () => {
     const { dc, ctx } = makeDC();
-    const yScale = makeScale('y', 0, 100, 1);
+    const yScale = makeScale('y', 0, 100, Orientation.Vertical);
 
     drawHLine(dc, yScale, 50, { dash: [5, 5] });
 
@@ -105,7 +106,7 @@ describe('drawLabel', () => {
   it('renders text at data coordinates', () => {
     const { dc, ctx } = makeDC();
     const xScale = makeScale('x', 0, 100);
-    const yScale = makeScale('y', 0, 100, 1);
+    const yScale = makeScale('y', 0, 100, Orientation.Vertical);
 
     drawLabel(dc, xScale, yScale, 50, 50, 'Test Label');
 
@@ -117,7 +118,7 @@ describe('drawLabel', () => {
   it('applies custom font and fill', () => {
     const { dc, ctx } = makeDC();
     const xScale = makeScale('x', 0, 100);
-    const yScale = makeScale('y', 0, 100, 1);
+    const yScale = makeScale('y', 0, 100, Orientation.Vertical);
 
     drawLabel(dc, xScale, yScale, 50, 50, 'Hi', { font: '16px monospace', fill: 'green' });
 
@@ -128,7 +129,7 @@ describe('drawLabel', () => {
 describe('drawRegion', () => {
   it('fills a rect between two y-values', () => {
     const { dc, ctx } = makeDC();
-    const yScale = makeScale('y', 0, 100, 1);
+    const yScale = makeScale('y', 0, 100, Orientation.Vertical);
 
     drawRegion(dc, yScale, 20, 80);
 
@@ -137,7 +138,7 @@ describe('drawRegion', () => {
 
   it('draws a stroke border when stroke style provided', () => {
     const { dc, ctx } = makeDC();
-    const yScale = makeScale('y', 0, 100, 1);
+    const yScale = makeScale('y', 0, 100, Orientation.Vertical);
 
     drawRegion(dc, yScale, 20, 80, { stroke: '#ccc', fill: 'rgba(0,0,0,0.1)' });
 
@@ -147,7 +148,7 @@ describe('drawRegion', () => {
 
   it('does not stroke when no stroke style', () => {
     const { dc, ctx } = makeDC();
-    const yScale = makeScale('y', 0, 100, 1);
+    const yScale = makeScale('y', 0, 100, Orientation.Vertical);
 
     drawRegion(dc, yScale, 20, 80);
 

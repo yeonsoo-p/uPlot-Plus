@@ -24,10 +24,10 @@ export default function ScrollSync() {
         {LABELS.map((label, i) => (
           <div key={label} style={{ marginBottom: 12 }}>
             <Chart width={760} height={150} data={datasets[i]!} syncKey="scroll">
-              <Scale id="x" auto ori={0} dir={1} time={false} />
-              <Scale id="y" auto ori={1} dir={1} />
-              <Axis scale="x" side={2} />
-              <Axis scale="y" side={3} label={label} />
+              <Scale id="x" />
+              <Scale id="y"  />
+              <Axis scale="x" />
+              <Axis scale="y" label={label} />
               <Series group={0} index={0} yScale="y" stroke={COLORS[i]!} width={2} label={label} />
               <Legend />
             </Chart>

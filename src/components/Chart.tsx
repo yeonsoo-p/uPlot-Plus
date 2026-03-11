@@ -104,8 +104,6 @@ export function Chart({
     if (!store.scaleManager.getScale(xScaleKey)) {
       store.registerScale({
         id: xScaleKey,
-        ori: 0,
-        dir: 1,
         auto: true,
       });
     }

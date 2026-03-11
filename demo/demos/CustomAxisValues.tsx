@@ -31,10 +31,10 @@ export default function CustomAxisValues() {
 
   return (
     <Chart width={800} height={400} data={data}>
-      <Scale id="x" auto ori={0} dir={1} time={false} />
-      <Scale id="y" auto ori={1} dir={1} />
-      <Axis scale="x" side={2} label="Time of Day" values={fmtTime} space={80} />
-      <Axis scale="y" side={3} label="Throughput" values={fmtMBs} />
+      <Scale id="x" />
+      <Scale id="y"  />
+      <Axis scale="x" label="Time of Day" values={fmtTime} space={80} />
+      <Axis scale="y" label="Throughput" values={fmtMBs} />
       <Series group={0} index={0} yScale="y" stroke="#2980b9" fill="rgba(41,128,185,0.1)" width={2} label="Throughput" />
     </Chart>
   );

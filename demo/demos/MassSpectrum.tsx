@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis, bars } from '../../src';
+import { Chart, Scale, Series, Axis, bars, Distribution } from '../../src';
 import type { ChartData } from '../../src';
 
 function generateMassSpecData(): ChartData {
@@ -63,10 +63,10 @@ export default function MassSpectrum() {
 
   return (
     <Chart width={800} height={400} data={data}>
-      <Scale id="x" auto ori={0} dir={1} time={false} />
-      <Scale id="y" auto ori={1} dir={1} distr={3} log={10} />
-      <Axis scale="x" side={2} label="m/z" values={fmtMz} />
-      <Axis scale="y" side={3} label="Intensity" values={fmtIntensity} />
+      <Scale id="x" />
+      <Scale id="y"  distr={Distribution.Log} log={10} />
+      <Axis scale="x" label="m/z" values={fmtMz} />
+      <Axis scale="y" label="Intensity" values={fmtIntensity} />
       <Series
         group={0}
         index={0}

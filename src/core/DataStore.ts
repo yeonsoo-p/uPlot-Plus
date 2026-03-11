@@ -1,5 +1,6 @@
 import type { ChartData } from '../types';
 import type { ScaleState } from '../types';
+import { SortOrder } from '../types';
 import { closestIdx, getMinMax } from '../math/utils';
 import { BlockMinMaxTree } from './BlockMinMax';
 
@@ -115,7 +116,7 @@ export class DataStore {
     index: number,
     i0: number,
     i1: number,
-    sorted: 0 | 1 | -1,
+    sorted: SortOrder,
     isLog: boolean,
   ): [number, number] {
     let groupCache = this.minMaxCache.get(group);
@@ -138,7 +139,7 @@ export class DataStore {
 
     // Use block tree for unsorted, non-log data (the common case)
     // Sorted data and log scales need special handling in getMinMax
-    const tree = (!isLog && sorted === 0) ? this.blockTrees.get(`${group}:${index}`) : undefined;
+    const tree = (!isLog && sorted === SortOrder.Unsorted) ? this.blockTrees.get(`${group}:${index}`) : undefined;
     if (tree) {
       result = tree.rangeMinMax(i0, i1);
     } else {

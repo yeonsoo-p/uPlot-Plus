@@ -25,10 +25,10 @@ export default function HighLowBands() {
 
   return (
     <Chart width={800} height={400} data={data}>
-      <Scale id="x" auto ori={0} dir={1} time={false} />
-      <Scale id="y" auto ori={1} dir={1} />
-      <Axis scale="x" side={2} label="Sample" />
-      <Axis scale="y" side={3} label="Value" />
+      <Scale id="x" />
+      <Scale id="y"  />
+      <Axis scale="x" label="Sample" />
+      <Axis scale="y" label="Value" />
       <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Mean" />
       <Series group={0} index={1} yScale="y" stroke="rgba(52,152,219,0.3)" width={1} label="Upper" dash={[4, 4]} />
       <Series group={0} index={2} yScale="y" stroke="rgba(52,152,219,0.3)" width={1} label="Lower" dash={[4, 4]} />

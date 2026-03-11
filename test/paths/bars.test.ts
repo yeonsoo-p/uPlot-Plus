@@ -2,10 +2,11 @@ import { describe, it, expect } from 'vitest';
 import { bars } from '@/paths/bars';
 import { createScaleState } from '@/core/Scale';
 import type { ScaleState } from '@/types';
+import { Orientation, Direction } from '@/types';
 import { round } from '@/math/utils';
 
-function makeScale(id: string, min: number, max: number, ori: 0 | 1 = 0): ScaleState {
-  return { ...createScaleState({ id }), min, max, ori, dir: 1 };
+function makeScale(id: string, min: number, max: number, ori: Orientation = Orientation.Horizontal): ScaleState {
+  return { ...createScaleState({ id }), min, max, ori, dir: Direction.Forward };
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -17,7 +18,7 @@ function getCalls(path: Path2D): any[] {
 const pxRound = (v: number) => round(v);
 const dataX = [0, 1, 2, 3, 4];
 const scaleX = makeScale('x', 0, 4);
-const scaleY: ScaleState = { ...makeScale('y', 0, 100), ori: 1, dir: 1 };
+const scaleY: ScaleState = { ...makeScale('y', 0, 100), ori: Orientation.Vertical, dir: Direction.Forward };
 
 describe('bars path builder', () => {
   const builder = bars();
@@ -70,7 +71,7 @@ describe('bars path builder', () => {
   });
 
   it('handles negative values — bars extend in both directions from baseline', () => {
-    const scaleYNeg: ScaleState = { ...makeScale('y', -50, 50), ori: 1, dir: 1 };
+    const scaleYNeg: ScaleState = { ...makeScale('y', -50, 50), ori: Orientation.Vertical, dir: Direction.Forward };
     const dataY: (number | null)[] = [10, -20, 30, -40, 50];
     const result = builder(dataX, dataY, scaleX, scaleYNeg, 400, 300, 0, 0, 0, 4, 1, pxRound);
     const rects = getCalls(result.stroke).filter((c: string[]) => c[0] === 'rect');

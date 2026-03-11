@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { drawCandlesticks } from '@/paths/candlestick';
 import type { ScaleState } from '@/types';
+import { Distribution, Orientation, Direction } from '@/types';
 import type { DrawContext } from '@/types/hooks';
 
 function makeScale(id: string, min: number, max: number): ScaleState {
@@ -8,11 +9,11 @@ function makeScale(id: string, min: number, max: number): ScaleState {
     id,
     min,
     max,
-    distr: 1,
+    distr: Distribution.Linear,
     log: 10,
     asinh: 1,
-    ori: id === 'x' ? 0 : 1,
-    dir: 1,
+    ori: id === 'x' ? Orientation.Horizontal : Orientation.Vertical,
+    dir: Direction.Forward,
     time: false,
     auto: false,
     range: null,

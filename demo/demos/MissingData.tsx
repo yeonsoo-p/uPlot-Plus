@@ -1,5 +1,5 @@
 import React from 'react';
-import { Chart, Scale, Series, Axis } from '../../src';
+import { Chart, Scale, Series, Axis, Side } from '../../src';
 import type { ChartData } from '../../src';
 
 function generateData(): ChartData {
@@ -31,12 +31,12 @@ export default function MissingData() {
 
   return (
     <Chart width={800} height={400} data={data}>
-      <Scale id="x" auto ori={0} dir={1} />
-      <Scale id="pct" auto ori={1} dir={1} />
-      <Scale id="mb" auto ori={1} dir={1} />
-      <Axis scale="x" side={2} />
-      <Axis scale="pct" side={3} values={fmtPct} />
-      <Axis scale="mb" side={1} values={fmtMB} grid={{ show: false }} />
+      <Scale id="x"  />
+      <Scale id="pct"  />
+      <Scale id="mb"  />
+      <Axis scale="x" />
+      <Axis scale="pct" values={fmtPct} />
+      <Axis scale="mb" side={Side.Right} values={fmtMB} grid={{ show: false }} />
       <Series group={0} index={0} yScale="pct" stroke="red" fill="rgba(255,0,0,0.05)" width={2} label="CPU" />
       <Series group={0} index={1} yScale="pct" stroke="blue" fill="rgba(0,0,255,0.05)" width={2} label="RAM" />
       <Series group={0} index={2} yScale="mb" stroke="green" fill="rgba(0,255,0,0.05)" width={2} label="TCP Out" />

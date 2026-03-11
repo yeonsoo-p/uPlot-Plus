@@ -18,20 +18,45 @@ export interface Range {
   max: number;
 }
 
-/** Side constants: 0=top, 1=right, 2=bottom, 3=left */
-export type Side = 0 | 1 | 2 | 3;
+/** Side of chart: Top=0, Right=1, Bottom=2, Left=3 */
+export const enum Side {
+  Top    = 0,
+  Right  = 1,
+  Bottom = 2,
+  Left   = 3,
+}
 
-/** Orientation: 0=horizontal, 1=vertical */
-export type Orientation = 0 | 1;
+/** Orientation: Horizontal=0 (top/bottom), Vertical=1 (left/right) */
+export const enum Orientation {
+  Horizontal = 0,
+  Vertical   = 1,
+}
 
-/** Direction: 1=left-to-right/bottom-to-top, -1=reverse */
-export type Direction = 1 | -1;
+/** Direction: Forward=1 (L→R / B→T), Backward=-1 (R→L / T→B) */
+export const enum Direction {
+  Forward  =  1,
+  Backward = -1,
+}
 
-/** Distribution type: 1=linear, 2=ordinal, 3=log, 4=asinh */
-export type Distribution = 1 | 2 | 3 | 4;
+/** Distribution type for scales */
+export const enum Distribution {
+  Linear  = 1,
+  Ordinal = 2,
+  Log     = 3,
+  Asinh   = 4,
+}
 
-/** Sort order: 1=ascending, -1=descending, 0=unsorted */
-export type SortOrder = 1 | -1 | 0;
+/** Sort order for series data */
+export const enum SortOrder {
+  Ascending  =  1,
+  Descending = -1,
+  Unsorted   =  0,
+}
+
+/** Derive orientation from side: top/bottom → Horizontal, left/right → Vertical */
+export function sideOrientation(side: Side): Orientation {
+  return (side % 2) as Orientation;
+}
 
 /** Pixel rounding function */
 export type PxRound = (v: number) => number;

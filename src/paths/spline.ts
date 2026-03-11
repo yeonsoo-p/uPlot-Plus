@@ -1,5 +1,6 @@
 import type { SeriesPaths, PathBuilder, PathBuilderOpts } from './types';
 import type { ScaleState } from '../types';
+import { Orientation, Direction } from '../types';
 import { valToPos } from '../core/Scale';
 import { nonNullIdxs } from '../math/utils';
 import { lineToH, lineToV, findGaps, clipGaps } from './utils';
@@ -22,7 +23,7 @@ export function splineInterp(
     yOff: number,
     idx0: number,
     idx1: number,
-    dir: 1 | -1,
+    dir: Direction,
     pxRound: (v: number) => number,
     opts?: PathBuilderOpts,
   ): SeriesPaths => {
@@ -37,13 +38,13 @@ export function splineInterp(
     const pixelForX = (val: number) => pxRound(valToPos(val, scaleX, xDim, xOff));
     const pixelForY = (val: number) => pxRound(valToPos(val, scaleY, yDim, yOff));
 
-    const lineTo = scaleX.ori === 0 ? lineToH : lineToV;
+    const lineTo = scaleX.ori === Orientation.Horizontal ? lineToH : lineToV;
 
     const xCoords: number[] = [];
     const yCoords: number[] = [];
     let hasGap = false;
 
-    for (let i = dir === 1 ? idx0 : idx1; i >= idx0 && i <= idx1; i += dir) {
+    for (let i = dir === Direction.Forward ? idx0 : idx1; i >= idx0 && i <= idx1; i += dir) {
       const yVal = dataY[i];
 
       if (yVal != null) {
@@ -54,7 +55,7 @@ export function splineInterp(
       }
     }
 
-    const isHoriz = scaleX.ori === 0;
+    const isHoriz = scaleX.ori === Orientation.Horizontal;
     const stroke = interp(xCoords, yCoords, isHoriz, pxRound);
 
     const _paths: SeriesPaths = {
@@ -73,7 +74,7 @@ export function splineInterp(
 
       let frX = xOff;
       let toX = xOff + xDim;
-      if (dir === -1) [toX, frX] = [frX, toX];
+      if (dir === Direction.Backward) [toX, frX] = [frX, toX];
 
       lineTo(fill, toX, fillToY);
       lineTo(fill, frX, fillToY);

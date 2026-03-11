@@ -42,10 +42,10 @@ export default function TimeseriesDiscrete() {
         Discrete status values (0=OK, 1=WARN, 2=CRIT) over time using stepped interpolation.
       </p>
       <Chart width={800} height={300} data={data}>
-        <Scale id="x" auto ori={0} dir={1} />
-        <Scale id="y" ori={1} dir={1} min={-0.5} max={2.5} />
-        <Axis scale="x" side={2} label="Time" values={fmtTime} />
-        <Axis scale="y" side={3} label="Status" values={fmtStatus} />
+        <Scale id="x"  />
+        <Scale id="y" min={-0.5} max={2.5} />
+        <Axis scale="x" label="Time" values={fmtTime} />
+        <Axis scale="y" label="Status" values={fmtStatus} />
         <Series
           group={0}
           index={0}

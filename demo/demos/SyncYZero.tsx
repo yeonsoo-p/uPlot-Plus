@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis, Legend } from '../../src';
+import { Chart, Scale, Series, Axis, Legend, Side } from '../../src';
 import type { ChartData } from '../../src';
 
 export default function SyncYZero() {
@@ -17,12 +17,12 @@ export default function SyncYZero() {
         Two y-scales both pinned to zero with <code>min=0</code>. Different magnitudes but both start at zero.
       </p>
       <Chart width={800} height={400} data={data}>
-        <Scale id="x" auto ori={0} dir={1} time={false} />
-        <Scale id="y1" auto ori={1} dir={1} min={0} />
-        <Scale id="y2" auto ori={1} dir={1} min={0} />
-        <Axis scale="x" side={2} label="Index" />
-        <Axis scale="y1" side={3} label="Small (0-80)" stroke="#e74c3c" />
-        <Axis scale="y2" side={1} label="Large (0-600)" stroke="#3498db" />
+        <Scale id="x" />
+        <Scale id="y1"  min={0} />
+        <Scale id="y2"  min={0} />
+        <Axis scale="x" label="Index" />
+        <Axis scale="y1" label="Small (0-80)" stroke="#e74c3c" />
+        <Axis scale="y2" side={Side.Right} label="Large (0-600)" stroke="#3498db" />
         <Series group={0} index={0} yScale="y1" stroke="#e74c3c" width={2} label="Small Scale" />
         <Series group={0} index={1} yScale="y2" stroke="#3498db" width={2} label="Large Scale" />
         <Legend />

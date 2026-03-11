@@ -24,19 +24,19 @@ export default function CursorBind() {
       </p>
       <div style={{ marginBottom: 16 }}>
         <Chart width={800} height={200} data={data1} syncKey="bind">
-          <Scale id="x" auto ori={0} dir={1} time={false} />
-          <Scale id="y" auto ori={1} dir={1} />
-          <Axis scale="x" side={2} label="Index" />
-          <Axis scale="y" side={3} label="Temperature" />
+          <Scale id="x" />
+          <Scale id="y"  />
+          <Axis scale="x" label="Index" />
+          <Axis scale="y" label="Temperature" />
           <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Temp (C)" />
           <Legend />
         </Chart>
       </div>
       <Chart width={800} height={200} data={data2} syncKey="bind">
-        <Scale id="x" auto ori={0} dir={1} time={false} />
-        <Scale id="y" auto ori={1} dir={1} />
-        <Axis scale="x" side={2} label="Index" />
-        <Axis scale="y" side={3} label="Humidity" />
+        <Scale id="x" />
+        <Scale id="y"  />
+        <Axis scale="x" label="Index" />
+        <Axis scale="y" label="Humidity" />
         <Series group={0} index={0} yScale="y" stroke="#3498db" width={2} label="Humidity (%)" />
         <Legend />
       </Chart>

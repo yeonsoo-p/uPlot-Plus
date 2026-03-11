@@ -32,10 +32,10 @@ export default function TimezonesDST() {
         Note the time jump around March 10 at 2:00 AM.
       </p>
       <Chart width={800} height={400} data={data}>
-        <Scale id="x" auto ori={0} dir={1} />
-        <Scale id="y" auto ori={1} dir={1} />
-        <Axis scale="x" side={2} label="Date/Time" values={fmtDateTime} rotate={-45} />
-        <Axis scale="y" side={3} label="Temperature (C)" />
+        <Scale id="x"  />
+        <Scale id="y"  />
+        <Axis scale="x" label="Date/Time" values={fmtDateTime} rotate={-45} />
+        <Axis scale="y" label="Temperature (C)" />
         <Series group={0} index={0} yScale="y" stroke="#e67e22" width={2} label="Temp" />
         <Legend />
       </Chart>

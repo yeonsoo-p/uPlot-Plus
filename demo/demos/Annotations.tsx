@@ -18,10 +18,10 @@ export default function Annotations() {
         Declarative annotation components: horizontal lines, vertical markers, shaded regions, and labels.
       </p>
       <Chart width={800} height={400} data={data}>
-        <Scale id="x" auto ori={0} dir={1} time={false} />
-        <Scale id="y" ori={1} dir={1} auto={false} min={10} max={90} />
-        <Axis scale="x" side={2} label="Sample" />
-        <Axis scale="y" side={3} label="Value" />
+        <Scale id="x" />
+        <Scale id="y" auto={false} min={10} max={90} />
+        <Axis scale="x" label="Sample" />
+        <Axis scale="y" label="Value" />
         <Series group={0} index={0} yScale="y" stroke="#2c3e50" width={2} label="Signal" />
 
         {/* Shaded region between y=40 and y=60 */}

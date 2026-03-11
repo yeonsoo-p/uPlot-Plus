@@ -8,6 +8,7 @@ import {
   posToVal,
 } from '@/core/Scale';
 import type { ScaleState } from '@/types';
+import { Distribution, Orientation, Direction } from '@/types';
 
 function makeLinearScale(min: number, max: number, opts?: Partial<ScaleState>): ScaleState {
   return { ...createScaleState({ id: 'test' }), min, max, ...opts };
@@ -18,10 +19,10 @@ describe('createScaleState', () => {
   it('applies defaults', () => {
     const s = createScaleState({ id: 'x' });
     expect(s.id).toBe('x');
-    expect(s.distr).toBe(1);
+    expect(s.distr).toBe(Distribution.Linear);
     expect(s.log).toBe(10);
-    expect(s.ori).toBe(0);
-    expect(s.dir).toBe(1);
+    expect(s.ori).toBe(Orientation.Horizontal);
+    expect(s.dir).toBe(Direction.Forward);
     expect(s.auto).toBe(true);
     expect(s.time).toBe(false);
     expect(s.min).toBeNull();
@@ -31,8 +32,8 @@ describe('createScaleState', () => {
   });
 
   it('respects provided values', () => {
-    const s = createScaleState({ id: 'y', distr: 3, log: 2, min: 1, max: 100 });
-    expect(s.distr).toBe(3);
+    const s = createScaleState({ id: 'y', distr: Distribution.Log, log: 2, min: 1, max: 100 });
+    expect(s.distr).toBe(Distribution.Log);
     expect(s.log).toBe(2);
     expect(s.min).toBe(1);
     expect(s.max).toBe(100);
@@ -52,7 +53,7 @@ describe('invalidateScaleCache', () => {
 
 // ---- valToPct / pctToVal round-trips ----
 describe('valToPct / pctToVal', () => {
-  describe('linear (distr=1)', () => {
+  describe('linear (distr=Linear)', () => {
     const scale = makeLinearScale(0, 100);
 
     it('0 maps to 0, 100 maps to 1', () => {
@@ -68,8 +69,8 @@ describe('valToPct / pctToVal', () => {
     });
   });
 
-  describe('log base 10 (distr=3)', () => {
-    const scale = makeLinearScale(1, 1000, { distr: 3, log: 10 });
+  describe('log base 10 (distr=Log)', () => {
+    const scale = makeLinearScale(1, 1000, { distr: Distribution.Log, log: 10 });
 
     it('round-trips', () => {
       for (const v of [1, 10, 100, 1000]) {
@@ -84,8 +85,8 @@ describe('valToPct / pctToVal', () => {
     });
   });
 
-  describe('log base 2 (distr=3)', () => {
-    const scale = makeLinearScale(1, 16, { distr: 3, log: 2 });
+  describe('log base 2 (distr=Log)', () => {
+    const scale = makeLinearScale(1, 16, { distr: Distribution.Log, log: 2 });
 
     it('round-trips', () => {
       for (const v of [1, 2, 4, 8, 16]) {
@@ -94,8 +95,8 @@ describe('valToPct / pctToVal', () => {
     });
   });
 
-  describe('asinh (distr=4)', () => {
-    const scale = makeLinearScale(-100, 100, { distr: 4, asinh: 1 });
+  describe('asinh (distr=Asinh)', () => {
+    const scale = makeLinearScale(-100, 100, { distr: Distribution.Asinh, asinh: 1 });
 
     it('round-trips', () => {
       for (const v of [-100, -10, 0, 10, 100]) {
@@ -118,8 +119,8 @@ describe('valToPct / pctToVal', () => {
 
 // ---- valToPos / posToVal ----
 describe('valToPos / posToVal', () => {
-  describe('horizontal, dir=1', () => {
-    const scale = makeLinearScale(0, 100, { ori: 0, dir: 1 });
+  describe('horizontal, dir=Forward', () => {
+    const scale = makeLinearScale(0, 100, { ori: Orientation.Horizontal, dir: Direction.Forward });
 
     it('maps min to offset, max to offset+dim', () => {
       expect(valToPos(0, scale, 500, 10)).toBeCloseTo(10);
@@ -132,8 +133,8 @@ describe('valToPos / posToVal', () => {
     });
   });
 
-  describe('horizontal, dir=-1 (reversed)', () => {
-    const scale = makeLinearScale(0, 100, { ori: 0, dir: -1 });
+  describe('horizontal, dir=Backward (reversed)', () => {
+    const scale = makeLinearScale(0, 100, { ori: Orientation.Horizontal, dir: Direction.Backward });
 
     it('min maps to right, max maps to left', () => {
       expect(valToPos(0, scale, 500, 10)).toBeCloseTo(510);
@@ -146,8 +147,8 @@ describe('valToPos / posToVal', () => {
     });
   });
 
-  describe('vertical, dir=1 (bottom-to-top)', () => {
-    const scale = makeLinearScale(0, 100, { ori: 1, dir: 1 });
+  describe('vertical, dir=Forward (bottom-to-top)', () => {
+    const scale = makeLinearScale(0, 100, { ori: Orientation.Vertical, dir: Direction.Forward });
 
     it('min maps to bottom (offset+dim), max maps to top (offset)', () => {
       expect(valToPos(0, scale, 400, 20)).toBeCloseTo(420);
@@ -160,8 +161,8 @@ describe('valToPos / posToVal', () => {
     });
   });
 
-  describe('vertical, dir=-1 (top-to-bottom)', () => {
-    const scale = makeLinearScale(0, 100, { ori: 1, dir: -1 });
+  describe('vertical, dir=Backward (top-to-bottom)', () => {
+    const scale = makeLinearScale(0, 100, { ori: Orientation.Vertical, dir: Direction.Backward });
 
     it('round-trips', () => {
       const pos = valToPos(60, scale, 400, 20);

@@ -17,10 +17,10 @@ export default function SparseData() {
         Only 10 data points spread across an x-range of 0-1000, creating large gaps between points.
       </p>
       <Chart width={800} height={400} data={data}>
-        <Scale id="x" auto ori={0} dir={1} time={false} />
-        <Scale id="y" auto ori={1} dir={1} />
-        <Axis scale="x" side={2} label="X Position" />
-        <Axis scale="y" side={3} label="Value" />
+        <Scale id="x" />
+        <Scale id="y"  />
+        <Axis scale="x" label="X Position" />
+        <Axis scale="y" label="Value" />
         <Series
           group={0}
           index={0}

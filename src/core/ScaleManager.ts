@@ -1,5 +1,6 @@
 import type { ScaleConfig, ScaleState } from '../types';
 import type { ChartData } from '../types';
+import { Distribution } from '../types';
 import { createScaleState, invalidateScaleCache } from './Scale';
 import { rangeNum, rangeLog, autoRangePart, inf } from '../math/utils';
 import type { DataStore } from './DataStore';
@@ -132,7 +133,7 @@ export class ScaleManager {
       const i1 = window ? window[1] : yData.length - 1;
 
       const yScaleState = this.scales.get(yScale);
-      const isLog = yScaleState?.distr === 3;
+      const isLog = yScaleState?.distr === Distribution.Log;
       const [sMin, sMax] = dataStore.getCachedMinMax(group, index, i0, i1, 0, isLog);
 
       const curMin = yMins.get(yScale);
@@ -154,7 +155,7 @@ export class ScaleManager {
       let rMin: number;
       let rMax: number;
 
-      if (scale.distr === 3) {
+      if (scale.distr === Distribution.Log) {
         [rMin, rMax] = rangeLog(dataMin, dataMax, scale.log, false);
       } else {
         const rangeCfg = scale.range ?? { min: autoRangePart, max: autoRangePart };

@@ -18,19 +18,19 @@ export default function SoftMinMax() {
         The range expands to include data beyond those bounds but never contracts below them.
       </p>
       <Chart width={800} height={400} data={data}>
-        <Scale id="x" auto ori={0} dir={1} time={false} />
+        <Scale id="x" />
         <Scale
           id="y"
           auto
-          ori={1}
-          dir={1}
+         
+         
           range={{
             min: { soft: 0, mode: 1 },
             max: { soft: 100, mode: 1 },
           }}
         />
-        <Axis scale="x" side={2} label="Index" />
-        <Axis scale="y" side={3} label="Value" />
+        <Axis scale="x" label="Index" />
+        <Axis scale="y" label="Value" />
         <Series group={0} index={0} yScale="y" stroke="#27ae60" width={2} label="Data (soft 0-100)" />
         <Legend />
       </Chart>

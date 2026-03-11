@@ -4,7 +4,7 @@ import type { Side } from './common';
 export interface AxisConfig {
   /** Which scale this axis displays */
   scale: string;
-  /** Which side: 0=top, 1=right, 2=bottom, 3=left */
+  /** Which side of the chart (default: Bottom for "x" scale, Left for others) */
   side: Side;
   /** Whether to show this axis */
   show?: boolean;

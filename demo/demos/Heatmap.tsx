@@ -95,10 +95,10 @@ export default function Heatmap() {
 
   return (
     <Chart width={800} height={400} data={chartData} onDraw={onDraw}>
-      <Scale id="x" ori={0} dir={1} auto={false} min={0} max={HOURS} time={false} />
-      <Scale id="y" ori={1} dir={1} auto={false} min={0} max={MAX_LATENCY} />
-      <Axis scale="x" side={2} label="Hour" values={fmtHour} />
-      <Axis scale="y" side={3} label="Latency" values={fmtLatency} />
+      <Scale id="x" auto={false} min={0} max={HOURS} />
+      <Scale id="y" auto={false} min={0} max={MAX_LATENCY} />
+      <Axis scale="x" label="Hour" values={fmtHour} />
+      <Axis scale="y" label="Latency" values={fmtLatency} />
     </Chart>
   );
 }

@@ -3,6 +3,7 @@ import { convergeSize } from '@/axes/layout';
 import { createAxisState } from '@/axes/ticks';
 import { createScaleState } from '@/core/Scale';
 import type { ScaleState } from '@/types';
+import { Side } from '@/types';
 
 function makeScale(min: number, max: number): ScaleState {
   return { ...createScaleState({ id: 's' }), min, max };
@@ -10,7 +11,7 @@ function makeScale(min: number, max: number): ScaleState {
 
 describe('convergeSize integration', () => {
   it('single y-axis produces correct plotBox', () => {
-    const axes = [createAxisState({ scale: 'y', side: 3 })];
+    const axes = [createAxisState({ scale: 'y', side: Side.Left })];
     const scales: Record<string, ScaleState> = { y: makeScale(-10, 10) };
     const plotBox = convergeSize(800, 600, axes, id => scales[id]);
 
@@ -21,8 +22,8 @@ describe('convergeSize integration', () => {
 
   it('x + y axes produce correct plotBox', () => {
     const axes = [
-      createAxisState({ scale: 'x', side: 2 }),
-      createAxisState({ scale: 'y', side: 3 }),
+      createAxisState({ scale: 'x', side: Side.Bottom }),
+      createAxisState({ scale: 'y', side: Side.Left }),
     ];
     const scales: Record<string, ScaleState> = {
       x: makeScale(0, 1000),
@@ -40,8 +41,8 @@ describe('convergeSize integration', () => {
 
   it('is deterministic across multiple calls', () => {
     const makeAxes = () => [
-      createAxisState({ scale: 'x', side: 2 }),
-      createAxisState({ scale: 'y', side: 3 }),
+      createAxisState({ scale: 'x', side: Side.Bottom }),
+      createAxisState({ scale: 'y', side: Side.Left }),
     ];
     const scales: Record<string, ScaleState> = {
       x: makeScale(0, 100),
@@ -61,9 +62,9 @@ describe('convergeSize integration', () => {
 
   it('handles dual y-axes', () => {
     const axes = [
-      createAxisState({ scale: 'x', side: 2 }),
-      createAxisState({ scale: 'y1', side: 3 }),
-      createAxisState({ scale: 'y2', side: 1 }),
+      createAxisState({ scale: 'x', side: Side.Bottom }),
+      createAxisState({ scale: 'y1', side: Side.Left }),
+      createAxisState({ scale: 'y2', side: Side.Right }),
     ];
     const scales: Record<string, ScaleState> = {
       x: makeScale(0, 100),

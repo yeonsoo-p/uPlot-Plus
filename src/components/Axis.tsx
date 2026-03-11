@@ -1,9 +1,14 @@
 import { useEffect, useRef } from 'react';
 import type { AxisConfig } from '../types';
+import { Side } from '../types';
 import { useChart } from '../hooks/useChart';
 import { shallowEqual } from '../utils/shallowEqual';
 
-export type AxisProps = AxisConfig;
+export type AxisProps = Omit<AxisConfig, 'side'> & { side?: Side };
+
+function resolveAxis(p: AxisProps): AxisConfig {
+  return { ...p, side: p.side ?? (p.scale === 'x' ? Side.Bottom : Side.Left), show: p.show ?? true };
+}
 
 /**
  * Renderless component that registers an axis config with the chart store.
@@ -14,8 +19,9 @@ export type AxisProps = AxisConfig;
  */
 export function Axis(props: AxisProps): null {
   const store = useChart();
-  const propsRef = useRef(props);
-  propsRef.current = props;
+  const resolved = resolveAxis(props);
+  const propsRef = useRef(resolved);
+  propsRef.current = resolved;
 
   // Mount/unmount: register on mount, unregister on unmount or identity change.
   useEffect(() => {
@@ -23,7 +29,7 @@ export function Axis(props: AxisProps): null {
     store.axisConfigs = store.axisConfigs.filter(
       a => !(a.scale === p.scale && a.side === p.side),
     );
-    store.axisConfigs.push({ ...p, show: p.show ?? true });
+    store.axisConfigs.push(p);
     store.scheduleRedraw();
 
     return () => {
@@ -32,7 +38,7 @@ export function Axis(props: AxisProps): null {
       );
       store.scheduleRedraw();
     };
-  }, [store, props.scale, props.side]);
+  }, [store, resolved.scale, resolved.side]);
 
   // Sync props to store config, skipping when nothing changed.
   // No dependency array: runs every render to catch any prop change via shallow equality check.
@@ -42,8 +48,8 @@ export function Axis(props: AxisProps): null {
     prevPropsRef.current = props;
 
     store.axisConfigs = store.axisConfigs.map(a =>
-      (a.scale === props.scale && a.side === props.side)
-        ? { ...props, show: props.show ?? true }
+      (a.scale === resolved.scale && a.side === resolved.side)
+        ? resolved
         : a,
     );
     store.scheduleRedraw();

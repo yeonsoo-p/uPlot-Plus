@@ -26,10 +26,10 @@ export default function ZoomRangerDemo() {
   return (
     <div>
       <Chart width={800} height={300} data={data}>
-        <Scale id="x" ori={0} dir={1} auto={range == null} min={range?.[0]} max={range?.[1]} />
-        <Scale id="y" auto ori={1} dir={1} />
-        <Axis scale="x" side={2} />
-        <Axis scale="y" side={3} />
+        <Scale id="x" auto={range == null} min={range?.[0]} max={range?.[1]} />
+        <Scale id="y"  />
+        <Axis scale="x" />
+        <Axis scale="y" />
         <Series group={0} index={0} yScale="y" stroke="#2196f3" label="Signal A" />
         <Series group={0} index={1} yScale="y" stroke="#ff9800" label="Signal B" />
       </Chart>

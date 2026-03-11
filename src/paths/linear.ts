@@ -1,5 +1,6 @@
 import type { SeriesPaths, PathBuilder, PathBuilderOpts } from './types';
 import type { ScaleState } from '../types';
+import { Orientation, Direction, Distribution } from '../types';
 import { valToPos, posToVal } from '../core/Scale';
 import { nonNullIdxs, positiveIdxs } from '../math/utils';
 import { lineToH, lineToV, findGaps, clipGaps } from './utils';
@@ -42,12 +43,12 @@ export function linear(): PathBuilder {
     yOff: number,
     idx0: number,
     idx1: number,
-    dir: 1 | -1,
+    dir: Direction,
     pxRound: (v: number) => number,
     opts?: PathBuilderOpts,
   ): SeriesPaths => {
     const spanGaps = opts?.spanGaps ?? false;
-    const getIdxs = scaleY.distr === 3 ? positiveIdxs : nonNullIdxs;
+    const getIdxs = scaleY.distr === Distribution.Log ? positiveIdxs : nonNullIdxs;
     [idx0, idx1] = getIdxs(dataY, idx0, idx1);
 
     if (idx0 === -1) {
@@ -66,7 +67,7 @@ export function linear(): PathBuilder {
     let lineTo: typeof lineToH;
     let drawAcc: ReturnType<typeof _drawAcc>;
 
-    if (scaleX.ori === 0) {
+    if (scaleX.ori === Orientation.Horizontal) {
       lineTo = lineToH;
       drawAcc = drawAccH;
     } else {
@@ -96,17 +97,17 @@ export function linear(): PathBuilder {
       let inY = 0;
       let outY = 0;
 
-      let accX = pixelForX(dataX[dir === 1 ? idx0 : idx1] as number);
+      let accX = pixelForX(dataX[dir === Direction.Forward ? idx0 : idx1] as number);
 
       const idx0px = pixelForX(dataX[idx0] as number);
       const idx1px = pixelForX(dataX[idx1] as number);
 
       // tracks limit of current x bucket
-      let nextAccXVal = xForPixel(dir === 1 ? idx0px + 1 : idx1px - 1);
+      let nextAccXVal = xForPixel(dir === Direction.Forward ? idx0px + 1 : idx1px - 1);
 
-      for (let i = dir === 1 ? idx0 : idx1; i >= idx0 && i <= idx1; i += dir) {
+      for (let i = dir === Direction.Forward ? idx0 : idx1; i >= idx0 && i <= idx1; i += dir) {
         const xVal = dataX[i] as number;
-        const reuseAccX = dir === 1 ? (xVal < nextAccXVal) : (xVal > nextAccXVal);
+        const reuseAccX = dir === Direction.Forward ? (xVal < nextAccXVal) : (xVal > nextAccXVal);
         const x = reuseAccX ? accX : pixelForX(xVal);
 
         const yVal = dataY[i];
@@ -152,7 +153,7 @@ export function linear(): PathBuilder {
       if (minY != null && minY !== maxY)
         drawAcc(stroke, accX, pixelForY(minY), pixelForY(maxY), pixelForY(inY), pixelForY(outY));
     } else {
-      for (let i = dir === 1 ? idx0 : idx1; i >= idx0 && i <= idx1; i += dir) {
+      for (let i = dir === Direction.Forward ? idx0 : idx1; i >= idx0 && i <= idx1; i += dir) {
         const yVal = dataY[i];
 
         if (yVal === null && !spanGaps)
@@ -173,7 +174,7 @@ export function linear(): PathBuilder {
       let frX = xOff;
       let toX = xOff + xDim;
 
-      if (dir === -1)
+      if (dir === Direction.Backward)
         [toX, frX] = [frX, toX];
 
       lineTo(fill, toX, fillToY);

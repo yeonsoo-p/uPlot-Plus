@@ -34,10 +34,10 @@ export default function BarsValuesAutosize() {
         Bar chart with value labels drawn above each bar using the <code>onDraw</code> hook.
       </p>
       <Chart width={800} height={400} data={data} onDraw={onDraw}>
-        <Scale id="x" auto ori={0} dir={1} time={false} />
-        <Scale id="y" ori={1} dir={1} min={0} max={100} />
-        <Axis scale="x" side={2} label="Category" />
-        <Axis scale="y" side={3} label="Value" />
+        <Scale id="x" />
+        <Scale id="y" min={0} max={100} />
+        <Axis scale="x" label="Category" />
+        <Axis scale="y" label="Value" />
         <Series
           group={0}
           index={0}

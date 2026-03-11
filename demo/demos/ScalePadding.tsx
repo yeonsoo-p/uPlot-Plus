@@ -18,29 +18,29 @@ export default function ScalePadding() {
       <div style={{ marginBottom: 16 }}>
         <h4 style={{ margin: '0 0 4px' }}>With padding (10%)</h4>
         <Chart width={800} height={200} data={data}>
-          <Scale id="x" auto ori={0} dir={1} time={false} />
+          <Scale id="x" />
           <Scale
             id="y"
             auto
-            ori={1}
-            dir={1}
+           
+           
             range={{
               min: { pad: 0.1 },
               max: { pad: 0.1 },
             }}
           />
-          <Axis scale="x" side={2} />
-          <Axis scale="y" side={3} />
+          <Axis scale="x" />
+          <Axis scale="y" />
           <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Padded" />
         </Chart>
       </div>
       <div>
         <h4 style={{ margin: '0 0 4px' }}>Without padding (default)</h4>
         <Chart width={800} height={200} data={data}>
-          <Scale id="x" auto ori={0} dir={1} time={false} />
-          <Scale id="y" auto ori={1} dir={1} />
-          <Axis scale="x" side={2} />
-          <Axis scale="y" side={3} />
+          <Scale id="x" />
+          <Scale id="y"  />
+          <Axis scale="x" />
+          <Axis scale="y" />
           <Series group={0} index={0} yScale="y" stroke="#3498db" width={2} label="Default" />
         </Chart>
       </div>

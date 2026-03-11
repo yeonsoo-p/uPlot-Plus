@@ -57,30 +57,30 @@ export default function TimePeriods() {
       <div style={{ marginBottom: 16 }}>
         <h4 style={{ margin: '0 0 4px' }}>Hourly (48h)</h4>
         <Chart width={800} height={160} data={hourly}>
-          <Scale id="x" auto ori={0} dir={1} />
-          <Scale id="y" auto ori={1} dir={1} />
-          <Axis scale="x" side={2} values={fmtHour} />
-          <Axis scale="y" side={3} />
+          <Scale id="x"  />
+          <Scale id="y"  />
+          <Axis scale="x" values={fmtHour} />
+          <Axis scale="y" />
           <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Hourly" />
         </Chart>
       </div>
       <div style={{ marginBottom: 16 }}>
         <h4 style={{ margin: '0 0 4px' }}>Daily (60d)</h4>
         <Chart width={800} height={160} data={daily}>
-          <Scale id="x" auto ori={0} dir={1} />
-          <Scale id="y" auto ori={1} dir={1} />
-          <Axis scale="x" side={2} values={fmtDay} />
-          <Axis scale="y" side={3} />
+          <Scale id="x"  />
+          <Scale id="y"  />
+          <Axis scale="x" values={fmtDay} />
+          <Axis scale="y" />
           <Series group={0} index={0} yScale="y" stroke="#2980b9" width={2} label="Daily" />
         </Chart>
       </div>
       <div>
         <h4 style={{ margin: '0 0 4px' }}>Monthly (3yr)</h4>
         <Chart width={800} height={160} data={monthly}>
-          <Scale id="x" auto ori={0} dir={1} />
-          <Scale id="y" auto ori={1} dir={1} />
-          <Axis scale="x" side={2} values={fmtMonth} />
-          <Axis scale="y" side={3} />
+          <Scale id="x"  />
+          <Scale id="y"  />
+          <Axis scale="x" values={fmtMonth} />
+          <Axis scale="y" />
           <Series group={0} index={0} yScale="y" stroke="#27ae60" width={2} label="Monthly" />
         </Chart>
       </div>
