@@ -2,7 +2,7 @@
 
 High-performance React charting library ripped off from uPlot. Might perform occasionally better than original uPlot in React context (or worse). Definitely easier to use in React context.
 
-**[Live Demo (85+ examples)](https://yeonsoo-p.github.io/Uplot-Plus/)**
+**[Live Demo (85+ examples)](https://yeonsoo-p.github.io/uPlot-Plus/)**
 
 ## Features
 
