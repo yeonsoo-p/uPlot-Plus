@@ -77,8 +77,9 @@ export class ScaleManager {
       const group = data[groupIdx];
       if (!group || group.x.length === 0) continue;
 
-      const gMin = group.x[0] as number;
-      const gMax = group.x[group.x.length - 1] as number;
+      const gMin = group.x[0];
+      const gMax = group.x[group.x.length - 1];
+      if (gMin == null || gMax == null) continue;
       const existing = xRanges.get(scaleKey);
 
       if (existing) {

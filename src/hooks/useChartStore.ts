@@ -13,7 +13,10 @@ import { drawAxesGrid } from '../rendering/drawAxes';
 import { drawCursor } from '../rendering/drawCursor';
 import { drawSelection } from '../rendering/drawSelect';
 import { drawPoints, shouldShowPoints } from '../rendering/drawPoints';
+import { drawBand } from '../rendering/drawBands';
+import type { BandConfig } from '../types/bands';
 import { DirtyFlag } from '../types/common';
+import type { DrawContext, DrawCallback, CursorDrawCallback } from '../types/hooks';
 
 /**
  * Mutable chart store — holds all chart state outside of React state.
@@ -34,6 +37,7 @@ export interface ChartStore {
   scaleConfigs: ScaleConfig[];
   seriesConfigs: SeriesConfig[];
   axisConfigs: AxisConfig[];
+  bandConfigs: BandConfig[];
 
   // Runtime axis states (rebuilt from axisConfigs)
   axisStates: AxisState[];
@@ -47,17 +51,27 @@ export interface ChartStore {
   // Canvas ref
   canvas: HTMLCanvasElement | null;
 
-  // Subscribers
+  // Subscribers (for useSyncExternalStore — Legend, Tooltip, etc.)
   listeners: Set<() => void>;
 
   // Render scheduler with dirty flags
   scheduler: RenderScheduler;
+
+  // Draw callbacks (registered via useDrawHook / useCursorDrawHook / Chart props)
+  drawHooks: DrawCallback[];
+  cursorDrawHooks: CursorDrawCallback[];
+
+  // Focus mode: index of focused series, or null for none
+  focusedSeries: number | null;
 
   // Methods
   registerScale: (cfg: ScaleConfig) => void;
   unregisterScale: (id: string) => void;
   registerSeries: (cfg: SeriesConfig) => void;
   unregisterSeries: (group: number, index: number) => void;
+  toggleSeries: (group: number, index: number) => void;
+  setFocus: (seriesIdx: number | null) => void;
+  setSize: (w: number, h: number) => void;
   scheduleRedraw: () => void;
   scheduleCursorRedraw: () => void;
   subscribe: (fn: () => void) => () => void;
@@ -80,6 +94,7 @@ export function createChartStore(): ChartStore {
     scaleConfigs: [],
     seriesConfigs: [],
     axisConfigs: [],
+    bandConfigs: [],
     axisStates: [],
 
     width: 0,
@@ -90,6 +105,9 @@ export function createChartStore(): ChartStore {
     canvas: null,
     listeners: new Set(),
     scheduler: new RenderScheduler(),
+    drawHooks: [],
+    cursorDrawHooks: [],
+    focusedSeries: null,
 
     registerScale(cfg: ScaleConfig) {
       store.scaleConfigs = store.scaleConfigs.filter(s => s.id !== cfg.id);
@@ -113,6 +131,33 @@ export function createChartStore(): ChartStore {
       store.seriesConfigs = store.seriesConfigs.filter(
         s => !(s.group === group && s.index === index),
       );
+    },
+
+    toggleSeries(group: number, index: number) {
+      const cfg = store.seriesConfigs.find(s => s.group === group && s.index === index);
+      if (cfg != null) {
+        cfg.show = cfg.show === false ? undefined : false;
+        store.renderer.invalidateSeries(group, index);
+        store.scheduleRedraw();
+      }
+    },
+
+    setFocus(seriesIdx: number | null) {
+      store.focusedSeries = seriesIdx;
+      store.scheduleRedraw();
+    },
+
+    setSize(w: number, h: number) {
+      store.width = w;
+      store.height = h;
+      if (store.canvas) {
+        store.canvas.width = w * store.pxRatio;
+        store.canvas.height = h * store.pxRatio;
+        store.canvas.style.width = `${w}px`;
+        store.canvas.style.height = `${h}px`;
+      }
+      store.renderer.clearCache();
+      store.scheduleRedraw();
     },
 
     scheduleRedraw() {
@@ -156,6 +201,11 @@ export function createChartStore(): ChartStore {
           (gi) => scaleManager.getGroupXScaleKey(gi),
         );
         drawSelection(ctx, store.selectState, store.plotBox, pxRatio);
+        // Fire cursor draw hooks on the overlay
+        if (store.cursorDrawHooks.length > 0) {
+          const dc: DrawContext = { ctx, plotBox: store.plotBox, pxRatio };
+          for (const fn of store.cursorDrawHooks) fn(dc, store.cursorManager.state);
+        }
         for (const fn of store.listeners) fn();
         return;
       }
@@ -163,7 +213,6 @@ export function createChartStore(): ChartStore {
       // --- Full redraw path ---
 
       // 1. Auto-range scales from data (first pass)
-      // Note: group-to-xScale mappings are set in Chart.tsx's data useEffect
       const seriesScaleMap = seriesConfigs.map(s => ({
         group: s.group,
         index: s.index,
@@ -178,12 +227,12 @@ export function createChartStore(): ChartStore {
         return scaleKey != null ? scaleManager.getScale(scaleKey) : undefined;
       });
 
-      // 3. Re-range with windows (second pass for y-scales) — skip if windows unchanged
+      // 3. Re-range with windows (second pass for y-scales)
       if (windowsChanged) {
         scaleManager.autoRange(dataStore.data, seriesScaleMap, dataStore);
       }
 
-      // 4. Rebuild axis states from configs (if configs changed)
+      // 4. Rebuild axis states from configs
       syncAxisStates(store);
 
       // 5. Convergence loop: calculate axis sizes → compute plot rect
@@ -226,25 +275,48 @@ export function createChartStore(): ChartStore {
         });
       }
 
-      // Draw series in a clipped region with ctx.scale for HiDPI correctness.
       ctx.save();
       ctx.scale(pxRatio, pxRatio);
       ctx.beginPath();
-      ctx.rect(
-        store.plotBox.left,
-        store.plotBox.top,
-        store.plotBox.width,
-        store.plotBox.height,
-      );
+      ctx.rect(store.plotBox.left, store.plotBox.top, store.plotBox.width, store.plotBox.height);
       ctx.clip();
 
-      for (const info of renderList) {
-        renderer.drawSeries(info, store.plotBox, 1);
+      for (let i = 0; i < renderList.length; i++) {
+        const info = renderList[i];
+        if (info == null) continue;
+        // Focus mode: dim non-focused series via canvas globalAlpha
+        if (store.focusedSeries != null && i !== store.focusedSeries) {
+          ctx.globalAlpha = 0.15;
+          renderer.drawSeries(info, store.plotBox, 1);
+          ctx.globalAlpha = 1;
+        } else {
+          renderer.drawSeries(info, store.plotBox, 1);
+        }
       }
 
-      ctx.restore();
+      // 8b. Draw bands (shaded area between series, inside clip)
+      for (const band of store.bandConfigs) {
+        const xScaleKey = scaleManager.getGroupXScaleKey(band.group);
+        const xScale = xScaleKey != null ? scaleManager.getScale(xScaleKey) : undefined;
+        const upperCfg = seriesConfigs.find(s => s.group === band.group && s.index === band.series[0]);
+        const lowerCfg = seriesConfigs.find(s => s.group === band.group && s.index === band.series[1]);
 
-      // 8b. Draw data points (hollow circles) when zoomed in enough
+        if (xScale == null || upperCfg == null || lowerCfg == null) continue;
+
+        const yScale = scaleManager.getScale(upperCfg.yScale);
+        if (yScale == null) continue;
+
+        const [i0, i1] = dataStore.getWindow(band.group);
+        drawBand(
+          ctx, band,
+          dataStore.getXValues(band.group),
+          dataStore.getYValues(band.group, band.series[0]),
+          dataStore.getYValues(band.group, band.series[1]),
+          xScale, yScale, store.plotBox, pxRatio, i0, i1,
+        );
+      }
+
+      // 8c. Draw data points (inside clip)
       for (const info of renderList) {
         const cfg = info.config;
         if (cfg.show === false) continue;
@@ -265,7 +337,13 @@ export function createChartStore(): ChartStore {
         }
       }
 
-      // 9. Save snapshot of static content (before cursor/selection overlay)
+      ctx.restore();
+
+      // 9. Fire draw hooks (persistent layer), then save snapshot
+      if (store.drawHooks.length > 0) {
+        const dc: DrawContext = { ctx, plotBox: store.plotBox, pxRatio };
+        for (const fn of store.drawHooks) fn(dc);
+      }
       renderer.saveSnapshot(ctx, width * pxRatio, height * pxRatio);
 
       // 10. Draw cursor crosshair + point
@@ -283,7 +361,13 @@ export function createChartStore(): ChartStore {
       // 11. Draw selection rectangle
       drawSelection(ctx, store.selectState, store.plotBox, pxRatio);
 
-      // 12. Notify subscribers (Legend, Tooltip, etc.)
+      // 12. Fire cursor draw hooks (overlay layer)
+      if (store.cursorDrawHooks.length > 0) {
+        const dc: DrawContext = { ctx, plotBox: store.plotBox, pxRatio };
+        for (const fn of store.cursorDrawHooks) fn(dc, store.cursorManager.state);
+      }
+
+      // 13. Notify subscribers (Legend, Tooltip, etc.)
       for (const fn of store.listeners) fn();
     },
   };
@@ -295,12 +379,10 @@ export function createChartStore(): ChartStore {
 
 /**
  * Sync axisStates array with current axisConfigs.
- * Creates new states for new configs, preserves existing states.
  */
 function syncAxisStates(store: ChartStore): void {
   const { axisConfigs, axisStates } = store;
 
-  // Build map of existing states by scale+side
   const existing = new Map<string, AxisState>();
   for (const as of axisStates) {
     existing.set(`${as.config.scale}:${as.config.side}`, as);
@@ -310,7 +392,6 @@ function syncAxisStates(store: ChartStore): void {
     const key = `${cfg.scale}:${cfg.side}`;
     const prev = existing.get(key);
     if (prev != null) {
-      // Update config reference but preserve computed state
       prev.config = cfg;
       return prev;
     }

@@ -51,8 +51,10 @@ export class DataStore {
           i1 = closestIdx(xScale.max, x);
 
           // Include boundary points just outside visible range
-          if (i0 > 0 && (x[i0] as number) > xScale.min) i0--;
-          if (i1 < x.length - 1 && (x[i1] as number) < xScale.max) i1++;
+          const xi0 = x[i0];
+          const xi1 = x[i1];
+          if (i0 > 0 && xi0 != null && xi0 > xScale.min) i0--;
+          if (i1 < x.length - 1 && xi1 != null && xi1 < xScale.max) i1++;
         }
       }
 

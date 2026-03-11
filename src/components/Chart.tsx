@@ -3,13 +3,14 @@ import type { ChartProps } from '../types';
 import { useChartStore } from '../hooks/useChartStore';
 import { ChartContext } from '../hooks/useChart';
 import { useInteraction } from '../hooks/useInteraction';
+import { useSyncGroup } from '../sync/useSyncGroup';
 
 /**
  * Root chart component.
  * Creates a canvas element, manages the chart store, and provides context to children.
  * Canvas drawing is completely decoupled from React's reconciliation cycle.
  */
-export function Chart({ width, height, data, children, className, pxRatio: pxRatioOverride }: ChartProps) {
+export function Chart({ width, height, data, children, className, pxRatio: pxRatioOverride, onDraw, onCursorDraw, syncKey }: ChartProps) {
   const store = useChartStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -19,21 +20,44 @@ export function Chart({ width, height, data, children, className, pxRatio: pxRat
   // Attach mouse/touch interaction handlers
   useInteraction(store, containerRef);
 
-  // Update store dimensions
+  // Cursor sync across charts with same key
+  useSyncGroup(store, syncKey);
+
+  // Update store dimensions (assign canvas from ref before sizing,
+  // since the canvas-ref effect may not have run yet on first mount)
   useEffect(() => {
-    store.width = width;
-    store.height = height;
-    store.pxRatio = pxRatio;
-
-    if (canvasRef.current) {
-      canvasRef.current.width = width * pxRatio;
-      canvasRef.current.height = height * pxRatio;
-      canvasRef.current.style.width = `${width}px`;
-      canvasRef.current.style.height = `${height}px`;
+    if (canvasRef.current && store.canvas !== canvasRef.current) {
+      store.canvas = canvasRef.current;
     }
-
-    store.scheduleRedraw();
+    store.pxRatio = pxRatio;
+    store.setSize(width, height);
   }, [store, width, height, pxRatio]);
+
+  // ResizeObserver: auto-detect container size changes
+  useEffect(() => {
+    const el = containerRef.current;
+    if (el == null || typeof ResizeObserver === 'undefined') return;
+
+    let rafId = 0;
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry == null) return;
+      const { width: w, height: h } = entry.contentRect;
+      // Debounce via rAF to avoid layout thrashing
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        if (w > 0 && h > 0 && (w !== store.width || h !== store.height)) {
+          store.setSize(Math.round(w), Math.round(h));
+        }
+      });
+    });
+
+    observer.observe(el);
+    return () => {
+      cancelAnimationFrame(rafId);
+      observer.disconnect();
+    };
+  }, [store, containerRef]);
 
   // Update store data
   useEffect(() => {
@@ -68,6 +92,20 @@ export function Chart({ width, height, data, children, className, pxRatio: pxRat
       store.scheduler.cancel();
     };
   }, [store]);
+
+  // Register onDraw callback prop
+  useEffect(() => {
+    if (onDraw == null) return;
+    store.drawHooks.push(onDraw);
+    return () => { store.drawHooks = store.drawHooks.filter(h => h !== onDraw); };
+  }, [store, onDraw]);
+
+  // Register onCursorDraw callback prop
+  useEffect(() => {
+    if (onCursorDraw == null) return;
+    store.cursorDrawHooks.push(onCursorDraw);
+    return () => { store.cursorDrawHooks = store.cursorDrawHooks.filter(h => h !== onCursorDraw); };
+  }, [store, onCursorDraw]);
 
   return (
     <ChartContext.Provider value={store}>

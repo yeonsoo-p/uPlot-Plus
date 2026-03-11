@@ -1,4 +1,5 @@
 import type { ChartData } from './data';
+import type { DrawCallback, CursorDrawCallback } from './hooks';
 
 /** Props for the Chart component */
 export interface ChartProps {
@@ -14,4 +15,10 @@ export interface ChartProps {
   className?: string;
   /** Device pixel ratio override (default: window.devicePixelRatio) */
   pxRatio?: number;
+  /** Draw on the persistent layer (after series, before snapshot). */
+  onDraw?: DrawCallback;
+  /** Draw on the cursor overlay (redrawn every frame). */
+  onCursorDraw?: CursorDrawCallback;
+  /** Sync key — charts with the same key synchronize their cursors. */
+  syncKey?: string;
 }

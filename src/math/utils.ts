@@ -284,10 +284,6 @@ export function rangeNum(
     if (_min === 0 || _max === 0) {
       delta = 1e-24;
 
-      // In uPlot, these conditions modify padMin/padMax to 0
-      // but we use const, so they're handled by the existing values
-      void (softMinMode === 2 && softMin !== inf);
-      void (softMaxMode === 2 && softMax !== -inf);
     }
   }
 

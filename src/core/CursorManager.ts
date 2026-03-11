@@ -4,6 +4,13 @@ import type { SeriesConfig } from '../types/series';
 import { valToPos, posToVal } from './Scale';
 import { closestIdx } from '../math/utils';
 
+/** Minimal store interface to avoid circular dependency with ChartStore. */
+export interface SyncTarget {
+  dataStore: { data: ChartData; getWindow(gi: number): [number, number] };
+  scaleManager: { getGroupXScaleKey(gi: number): string | undefined; getScale(id: string): ScaleState | undefined };
+  plotBox: BBox;
+}
+
 /**
  * Manages cursor position and nearest-point snapping.
  * Computes the closest data point across all visible series/groups
@@ -118,5 +125,36 @@ export class CursorManager {
     this.state.activeGroup = bestGroup;
     this.state.activeSeriesIdx = bestSeries;
     this.state.activeDataIdx = bestIdx;
+  }
+
+  /**
+   * Sync cursor to a specific x-value (from another chart in a sync group).
+   * Finds the closest data index and positions the cursor there.
+   */
+  syncToValue(xVal: number, store: SyncTarget): void {
+    const data = store.dataStore.data;
+    if (data.length === 0) return;
+
+    // Find closest x-index in group 0 (primary)
+    const group = data[0];
+    if (group == null) return;
+
+    const xScaleKey = store.scaleManager.getGroupXScaleKey(0);
+    if (xScaleKey == null) return;
+    const xScale = store.scaleManager.getScale(xScaleKey);
+    if (xScale == null || xScale.min == null || xScale.max == null) return;
+
+    const [wi0, wi1] = store.dataStore.getWindow(0);
+    const dataIdx = closestIdx(xVal, group.x, wi0, wi1);
+    const foundX = group.x[dataIdx];
+    if (foundX == null) return;
+
+    // Convert to pixel position
+    const pxX = valToPos(foundX, xScale, store.plotBox.width, store.plotBox.left);
+    this.state.left = pxX - store.plotBox.left;
+    this.state.top = store.plotBox.height / 2; // center vertically
+    this.state.activeGroup = 0;
+    this.state.activeDataIdx = dataIdx;
+    this.state.activeSeriesIdx = 0;
   }
 }

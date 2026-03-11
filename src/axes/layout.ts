@@ -8,6 +8,9 @@ import {
   logAxisSplits,
   computeAxisSize,
 } from './ticks';
+import { timeIncrs } from '../time/timeIncrs';
+import { timeAxisSplits } from '../time/timeSplits';
+import { timeAxisVals, findTimeIncr } from '../time/timeVals';
 
 const CYCLE_LIMIT = 3;
 
@@ -53,7 +56,17 @@ export function axesCalc(
 
     const { min, max } = scale;
 
-    const [_incr, _space] = getIncrSpace(config, min, max, fullDim);
+    let _incr: number;
+    let _space: number;
+
+    if (scale.time) {
+      // Time scale: use time-specific increments
+      const minSpace = config.space ?? 80;
+      [_incr, _space] = findTimeIncr(min, max, timeIncrs, fullDim, minSpace);
+    } else {
+      [_incr, _space] = getIncrSpace(config, min, max, fullDim);
+    }
+
     axis._incr = _incr;
     axis._space = _space;
 
@@ -63,6 +76,8 @@ export function axesCalc(
     // Generate splits (tick positions)
     if (config.splits) {
       axis._splits = config.splits(min, max, _incr, _space);
+    } else if (scale.time) {
+      axis._splits = timeAxisSplits(min, max, _incr);
     } else if (scale.distr === 3) {
       axis._splits = logAxisSplits(min, max, scale.log);
     } else {
@@ -73,6 +88,8 @@ export function axesCalc(
     // Generate values (tick labels)
     if (config.values) {
       axis._values = config.values(axis._splits, _space, _incr);
+    } else if (scale.time) {
+      axis._values = timeAxisVals(axis._splits, _incr);
     } else {
       axis._values = numAxisVals(axis._splits);
     }

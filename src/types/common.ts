@@ -1,8 +1,8 @@
 /** Numeric array type used for data */
 export type NumArray = number[] | Float64Array;
 
-/** Nullable numeric array (supports gaps in data) */
-export type NullableNumArray = (number | null)[] | Float64Array;
+/** Nullable numeric array (supports gaps in data). Float64Array cannot hold null, so use NumArray for gap-free data. */
+export type NullableNumArray = (number | null)[];
 
 /** Bounding box in CSS pixels */
 export interface BBox {

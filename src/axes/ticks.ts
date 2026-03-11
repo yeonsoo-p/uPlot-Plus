@@ -10,6 +10,7 @@ import {
   pow,
   log10,
   log2,
+  abs,
 } from '../math/utils';
 import { numIncrs } from '../math/increments';
 
@@ -93,6 +94,85 @@ export function logAxisSplits(
   } while (split <= scaleMax);
 
   return splits;
+}
+
+/**
+ * Generate tick split positions for an asinh (symmetric log) axis.
+ * Produces linear ticks near zero and logarithmic ticks at larger magnitudes.
+ *
+ * @param scaleMin - minimum value on the scale
+ * @param scaleMax - maximum value on the scale
+ * @param linthresh - linear threshold (values within [-linthresh, linthresh] are linear)
+ */
+export function asinhAxisSplits(
+  scaleMin: number,
+  scaleMax: number,
+  linthresh = 1,
+): number[] {
+  const splits: number[] = [];
+
+  // Determine the order of magnitude for the range
+  const absMax = Math.max(abs(scaleMin), abs(scaleMax));
+  if (absMax === 0) return [0];
+
+  // Generate negative ticks (large magnitude to small)
+  if (scaleMin < 0) {
+    const negMax = abs(scaleMin);
+    let mag = pow(10, floor(log10(Math.max(negMax, linthresh))));
+
+    while (mag >= linthresh) {
+      const val = -mag;
+      if (val >= scaleMin && val <= scaleMax) splits.push(val);
+      mag /= 10;
+    }
+  }
+
+  // Linear region around zero
+  if (scaleMin <= 0 && scaleMax >= 0) {
+    splits.push(0);
+  }
+
+  // Generate positive ticks (small magnitude to large)
+  if (scaleMax > 0) {
+    let mag = linthresh;
+    const posMax = scaleMax;
+
+    while (mag <= posMax) {
+      if (mag >= scaleMin && mag <= scaleMax) splits.push(mag);
+      mag *= 10;
+    }
+  }
+
+  // Sort and deduplicate
+  splits.sort((a, b) => a - b);
+  const unique: number[] = [];
+  for (const s of splits) {
+    if (unique.length === 0 || unique[unique.length - 1] !== s) {
+      unique.push(s);
+    }
+  }
+
+  return unique;
+}
+
+/**
+ * Filter log axis split values to reduce label density.
+ * Keeps only values that are exact powers of the log base.
+ * This prevents crowded labels at intermediate ticks (2, 3, 4... between 1 and 10).
+ */
+export function logAxisValFilter(
+  splits: number[],
+  logBase: number,
+): boolean[] {
+  const logFn = logBase === 10 ? log10 : log2;
+
+  return splits.map(v => {
+    if (v === 0) return true;
+    if (v < 0) return false;
+    const logVal = logFn(v);
+    // Keep if it's an integer power of the base (within floating-point tolerance)
+    return abs(logVal - Math.round(logVal)) < 1e-10;
+  });
 }
 
 /**
