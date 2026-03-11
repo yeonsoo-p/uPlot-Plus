@@ -125,6 +125,7 @@ export function Chart({ width, height, data, children, className, pxRatio: pxRat
       <div
         className={className}
         style={{
+          position: 'relative',
           display: 'flex',
           flexDirection: 'column',
           width: `${width}px`,

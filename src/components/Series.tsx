@@ -21,10 +21,12 @@ export function Series(props: SeriesProps): null {
   useEffect(() => {
     const p = propsRef.current;
     store.registerSeries({ ...p, show: p.show ?? true });
+    store.renderer.clearCache();
     store.scheduleRedraw();
 
     return () => {
       store.unregisterSeries(p.group, p.index);
+      store.renderer.clearCache();
       store.scheduleRedraw();
     };
   }, [store, props.group, props.index]);
