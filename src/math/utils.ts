@@ -295,13 +295,15 @@ export function rangeNum(
 
   const _padMin = nonZeroDelta * (delta === 0 ? (_min === 0 ? 0.1 : 1) : padMin);
   const _newMin = roundDec(incrRoundDn(_min - _padMin, base / 10), 24);
-  const _softMin = _min >= softMin && (softMinMode === 1 || softMinMode === 3 && _newMin <= softMin || softMinMode === 2 && _newMin >= softMin) ? softMin : inf;
-  const minLim = max(hardMin, _newMin < _softMin && _min >= _softMin ? _softMin : min(_softMin, _newMin));
+  const useSoftMin = softMinMode === 1 || (softMinMode === 3 && _newMin <= softMin) || (softMinMode === 2 && _newMin >= softMin);
+  const _softMin = (_min >= softMin && useSoftMin) ? softMin : inf;
+  const minLim = max(hardMin, (_newMin < _softMin && _min >= _softMin) ? _softMin : min(_softMin, _newMin));
 
   const _padMax = nonZeroDelta * (delta === 0 ? (_max === 0 ? 0.1 : 1) : padMax);
   const _newMax = roundDec(incrRoundUp(_max + _padMax, base / 10), 24);
-  const _softMax = _max <= softMax && (softMaxMode === 1 || softMaxMode === 3 && _newMax >= softMax || softMaxMode === 2 && _newMax <= softMax) ? softMax : -inf;
-  const maxLim = min(hardMax, _newMax > _softMax && _max <= _softMax ? _softMax : max(_softMax, _newMax));
+  const useSoftMax = softMaxMode === 1 || (softMaxMode === 3 && _newMax >= softMax) || (softMaxMode === 2 && _newMax <= softMax);
+  const _softMax = (_max <= softMax && useSoftMax) ? softMax : -inf;
+  const maxLim = min(hardMax, (_newMax > _softMax && _max <= _softMax) ? _softMax : max(_softMax, _newMax));
 
   if (minLim === maxLim && minLim === 0)
     return [-1, 1];

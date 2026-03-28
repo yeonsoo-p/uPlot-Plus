@@ -1,6 +1,7 @@
 import type { ScaleState } from '../types';
 import { Orientation, Direction } from '../types';
 import { valToPos, posToVal } from '../core/Scale';
+import { clamp } from '../math/utils';
 
 /** Line-to for horizontal orientation */
 export function lineToH(path: Path2D, x: number, y: number): void {
@@ -45,7 +46,7 @@ export function findGaps(
       if (gapStart === -1) {
         // Use the previous non-null point's x pixel as gap start.
         // i - dir gives the previous index in iteration order; clamp to [idx0, idx1].
-        const prevI = Math.max(idx0, Math.min(i - dir, idx1));
+        const prevI = clamp(i - dir, idx0, idx1);
         gapStart = pixelForX(dataX[prevI] as number);
       }
     } else {

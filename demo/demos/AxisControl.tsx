@@ -1,8 +1,7 @@
 import React from 'react';
 import { Chart, Scale, Series, Axis } from '../../src';
-import type { ChartData } from '../../src';
 
-function generateData(): ChartData {
+function generateData() {
   const n = 50000;
   const x = new Float64Array(n);
   const y = new Float64Array(n);
@@ -19,12 +18,10 @@ export default function AxisControl() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data}>
-      <Scale id="x" />
+    <Chart width={800} height={400} data={data} xlabel="Sample Index">
       <Scale id="y" auto={false} min={-50} max={50} />
-      <Axis scale="x" label="Sample Index" />
       <Axis scale="y" label="Amplitude" labelSize={20} space={50} />
-      <Series group={0} index={0} yScale="y" stroke="#8e44ad" width={1} label="Signal" />
+      <Series group={0} index={0} label="Signal" />
     </Chart>
   );
 }

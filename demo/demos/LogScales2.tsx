@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis, Legend, Distribution } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Scale, Series, Axis, Distribution } from '../../src';
 
 export default function LogScales2() {
-  const data: ChartData = useMemo(() => {
+  const data = useMemo(() => {
     const n = 80;
     const x = Array.from({ length: n }, (_, i) => i + 1);
     const y = x.map(i => Math.pow(2, i / 8) + (Math.random() - 0.5) * Math.pow(2, i / 10));
@@ -30,20 +29,16 @@ export default function LogScales2() {
       </p>
       <div style={{ marginBottom: 16 }}>
         <Chart width={800} height={220} data={data} title="Log base 10">
-          <Scale id="x" />
           <Scale id="y"  distr={Distribution.Log} log={10} />
-          <Axis scale="x" />
           <Axis scale="y" label="Value (log10)" values={fmtLog10} />
-          <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Base 10" />
+          <Series group={0} index={0} label="Base 10" />
         </Chart>
       </div>
       <div>
         <Chart width={800} height={220} data={data} title="Log base 2">
-          <Scale id="x" />
           <Scale id="y"  distr={Distribution.Log} log={2} />
-          <Axis scale="x" />
           <Axis scale="y" label="Value (log2)" values={fmtLog2} />
-          <Series group={0} index={0} yScale="y" stroke="#2980b9" width={2} label="Base 2" />
+          <Series group={0} index={0} label="Base 2" />
         </Chart>
       </div>
     </div>

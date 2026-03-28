@@ -41,6 +41,7 @@ export function drawCursor(
   getScale: (id: string) => ScaleState | undefined,
   getGroupXScaleKey: (groupIdx: number) => string | undefined,
   config?: CursorDrawConfig,
+  seriesConfigMap?: Map<string, SeriesConfig>,
 ): void {
   if (cursor.left < 0 || cursor.top < 0) return;
 
@@ -100,19 +101,17 @@ export function drawCursor(
         // Find matching series config for stroke color and cursor opt-out
         let pointFill = cfg.stroke;
         let showPoint = true;
-        for (const sc of seriesConfigs) {
-          if (sc.group === gi && sc.index === si) {
-            const scStroke = sc.stroke;
-            pointFill = (typeof scStroke === 'string' ? scStroke : undefined) ?? cfg.stroke;
-            showPoint = sc.cursor?.show !== false;
-            break;
-          }
+        const matchedCfg = seriesConfigMap?.get(`${gi}:${si}`);
+        if (matchedCfg != null) {
+          const scStroke = matchedCfg.stroke;
+          pointFill = (typeof scStroke === 'string' ? scStroke : undefined) ?? cfg.stroke;
+          showPoint = matchedCfg.cursor?.show !== false;
         }
 
         if (showPoint) {
           const xScaleId = getGroupXScaleKey(gi);
           const xScale = xScaleId != null ? getScale(xScaleId) : undefined;
-          const yScaleId = findYScaleId(seriesConfigs, gi, si);
+          const yScaleId = seriesConfigMap?.get(`${gi}:${si}`)?.yScale ?? findYScaleId(seriesConfigs, gi, si);
           const yScale = yScaleId != null ? getScale(yScaleId) : undefined;
 
           if (xScale != null && yScale != null && xScale.min != null && xScale.max != null && yScale.min != null && yScale.max != null) {

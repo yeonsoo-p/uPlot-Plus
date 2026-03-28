@@ -1,8 +1,7 @@
 import React from 'react';
-import { Chart, Scale, Series, Axis } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series } from '../../src';
 
-function generateData(): ChartData {
+function generateData() {
   // Group 0: 100 points over [0, 10]
   const n0 = 100;
   const x0: number[] = [];
@@ -33,13 +32,9 @@ export default function MultiXAxis() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data}>
-      <Scale id="x" />
-      <Scale id="y"  />
-      <Axis scale="x" label="X" />
-      <Axis scale="y" label="Value" />
-      <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Sine (Group 0)" />
-      <Series group={1} index={0} yScale="y" stroke="#2ecc71" width={2} label="Cosine (Group 1)" />
+    <Chart width={800} height={400} data={data} xlabel="X" ylabel="Value">
+      <Series group={0} index={0} label="Sine (Group 0)" />
+      <Series group={1} index={0} label="Cosine (Group 1)" />
     </Chart>
   );
 }

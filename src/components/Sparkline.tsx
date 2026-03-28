@@ -2,12 +2,12 @@ import { Chart } from './Chart';
 import { Scale } from './Scale';
 import { Series } from './Series';
 import { Axis } from './Axis';
-import type { ChartData, ColorValue } from '../types';
+import type { DataInput, ColorValue } from '../types';
 import type { PathBuilder } from '../paths/types';
 
 export interface SparklineProps {
-  /** Chart data (single group, single series expected) */
-  data: ChartData;
+  /** Chart data — accepts {x,y}, [{x,y}], or [{x, series:[...]}] */
+  data: DataInput;
   /** Width in CSS pixels (default: 150) */
   width?: number;
   /** Height in CSS pixels (default: 30) */

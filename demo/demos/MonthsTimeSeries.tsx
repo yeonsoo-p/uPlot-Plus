@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis, Legend, fmtMonthName } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series, Axis, Legend, fmtMonthName } from '../../src';
 
 export default function MonthsTimeSeries() {
-  const data: ChartData = useMemo(() => {
+  const data = useMemo(() => {
     // Generate monthly timestamps for 2 years
     const x: number[] = [];
     const y1: number[] = [];
@@ -26,13 +25,10 @@ export default function MonthsTimeSeries() {
       <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
         Monthly time data with custom month-name formatter on the x-axis.
       </p>
-      <Chart width={800} height={400} data={data}>
-        <Scale id="x"  />
-        <Scale id="y"  />
+      <Chart width={800} height={400} data={data} ylabel="Value">
         <Axis scale="x" label="Month" values={fmtMonthName()} />
-        <Axis scale="y" label="Value" />
-        <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Metric A" />
-        <Series group={0} index={1} yScale="y" stroke="#3498db" width={2} label="Metric B" />
+        <Series group={0} index={0} label="Metric A" />
+        <Series group={0} index={1} label="Metric B" />
         <Legend />
       </Chart>
     </div>

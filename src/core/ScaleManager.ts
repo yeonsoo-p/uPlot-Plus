@@ -63,7 +63,7 @@ export class ScaleManager {
    * Call before updateWindows() so the x-scale range is set for window clipping.
    */
   autoRangeX(data: ChartData): void {
-    const xRanges = new Map<string, { dataMin: number; dataMax: number }>();
+    const xRanges = new Map<string, { dataMin: number; dataMax: number; groups: number[] }>();
 
     for (const [groupIdx, scaleKey] of this.groupXScales) {
       const scale = this.scales.get(scaleKey);
@@ -80,14 +80,31 @@ export class ScaleManager {
       if (existing) {
         existing.dataMin = Math.min(existing.dataMin, gMin);
         existing.dataMax = Math.max(existing.dataMax, gMax);
+        existing.groups.push(groupIdx);
       } else {
-        xRanges.set(scaleKey, { dataMin: gMin, dataMax: gMax });
+        xRanges.set(scaleKey, { dataMin: gMin, dataMax: gMax, groups: [groupIdx] });
       }
     }
 
-    for (const [scaleKey, { dataMin, dataMax }] of xRanges) {
+    for (const [scaleKey, { dataMin, dataMax, groups }] of xRanges) {
       const scale = this.scales.get(scaleKey);
       if (!scale) continue;
+
+      // Detect discrete (all-integer) x-data and find minimum spacing
+      let allIntegers = true;
+      let minDelta = inf;
+      for (const gi of groups) {
+        const group = data[gi];
+        if (!group) continue;
+        for (let i = 0; i < group.x.length; i++) {
+          if (!Number.isInteger(group.x[i])) allIntegers = false;
+          if (i > 0) {
+            const d = (group.x[i] as number) - (group.x[i - 1] as number);
+            if (d > 0 && d < minDelta) minDelta = d;
+          }
+        }
+      }
+      scale._discrete = allIntegers;
 
       if (scale.range) {
         const [rMin, rMax] = rangeNum(dataMin, dataMax, {
@@ -96,17 +113,25 @@ export class ScaleManager {
         });
         scale.min = rMin;
         scale.max = rMax;
+      } else if (dataMin === dataMax) {
+        [scale.min, scale.max] = rangeNum(dataMin, dataMax, {
+          min: { pad: 0.1, soft: null, mode: 0 },
+          max: { pad: 0.1, soft: null, mode: 0 },
+        });
+      } else if (minDelta < inf) {
+        // Pad by half a column width so edge bars/points aren't clipped
+        const halfCol = minDelta / 2;
+        scale.min = dataMin - halfCol;
+        scale.max = dataMax + halfCol;
       } else {
-        if (dataMin === dataMax) {
-          [scale.min, scale.max] = rangeNum(dataMin, dataMax, {
-            min: { pad: 0.1, soft: null, mode: 0 },
-            max: { pad: 0.1, soft: null, mode: 0 },
-          });
-        } else {
-          scale.min = dataMin;
-          scale.max = dataMax;
-        }
+        scale.min = dataMin;
+        scale.max = dataMax;
       }
+
+      // Respect config-provided fixed min/max (overrides auto-range)
+      if (scale._cfgMin != null) scale.min = scale._cfgMin;
+      if (scale._cfgMax != null) scale.max = scale._cfgMax;
+
       invalidateScaleCache(scale);
     }
   }
@@ -121,54 +146,8 @@ export class ScaleManager {
     seriesScaleMap: { group: number; index: number; yScale: string }[],
     dataStore: DataStore,
   ): void {
-    // Auto-range x-scales: compute union of all groups sharing the same scale
-    const xRanges = new Map<string, { dataMin: number; dataMax: number }>();
-
-    for (const [groupIdx, scaleKey] of this.groupXScales) {
-      const scale = this.scales.get(scaleKey);
-      if (!scale || !scale.auto) continue;
-
-      const group = data[groupIdx];
-      if (!group || group.x.length === 0) continue;
-
-      const gMin = group.x[0];
-      const gMax = group.x[group.x.length - 1];
-      if (gMin == null || gMax == null) continue;
-      const existing = xRanges.get(scaleKey);
-
-      if (existing) {
-        existing.dataMin = Math.min(existing.dataMin, gMin);
-        existing.dataMax = Math.max(existing.dataMax, gMax);
-      } else {
-        xRanges.set(scaleKey, { dataMin: gMin, dataMax: gMax });
-      }
-    }
-
-    for (const [scaleKey, { dataMin, dataMax }] of xRanges) {
-      const scale = this.scales.get(scaleKey);
-      if (!scale) continue;
-
-      if (scale.range) {
-        const [rMin, rMax] = rangeNum(dataMin, dataMax, {
-          min: { pad: scale.range.min?.pad ?? 0, soft: scale.range.min?.soft ?? null, mode: scale.range.min?.mode ?? 0 },
-          max: { pad: scale.range.max?.pad ?? 0, soft: scale.range.max?.soft ?? null, mode: scale.range.max?.mode ?? 0 },
-        });
-        scale.min = rMin;
-        scale.max = rMax;
-      } else {
-        if (dataMin === dataMax) {
-          // Single-point or zero-width range: pad to avoid min === max
-          [scale.min, scale.max] = rangeNum(dataMin, dataMax, {
-            min: { pad: 0.1, soft: null, mode: 0 },
-            max: { pad: 0.1, soft: null, mode: 0 },
-          });
-        } else {
-          scale.min = dataMin;
-          scale.max = dataMax;
-        }
-      }
-      invalidateScaleCache(scale);
-    }
+    // X-scales are already handled by autoRangeX() which runs first
+    // and includes proper padding for discrete/bar data.
 
     // Collect y-ranges per y-scale (using cached min/max from DataStore)
     const yMins = new Map<string, number>();
@@ -217,6 +196,10 @@ export class ScaleManager {
           max: { pad: rangeCfg.max?.pad ?? autoRangePart.pad, soft: rangeCfg.max?.soft ?? autoRangePart.soft, mode: rangeCfg.max?.mode ?? autoRangePart.mode },
         });
       }
+
+      // Respect config-provided fixed min/max (overrides auto-range)
+      if (scale._cfgMin != null) rMin = scale._cfgMin;
+      if (scale._cfgMax != null) rMax = scale._cfgMax;
 
       scale.min = rMin;
       scale.max = rMax;

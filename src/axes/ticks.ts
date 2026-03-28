@@ -32,7 +32,9 @@ export function numAxisSplits(
 
   const numDec = fixedDec.get(foundIncr) ?? 0;
 
-  const startMin = forceMin ? scaleMin : roundDec(incrRoundUp(scaleMin, foundIncr), numDec);
+  const startMin = forceMin
+    ? Math.ceil(scaleMin / foundIncr) * foundIncr  // snap to first integer-aligned tick within range
+    : roundDec(incrRoundUp(scaleMin, foundIncr), numDec);
 
   for (let val = startMin; val <= scaleMax; val = roundDec(val + foundIncr, numDec))
     splits.push(Object.is(val, -0) ? 0 : val);
@@ -184,10 +186,14 @@ export function logAxisValFilter(
  * Estimate minimum pixel spacing between tick labels based on label width.
  * Avoids overlap for large numbers (e.g., Unix timestamps) without canvas text measurement.
  */
+const EST_CHAR_WIDTH_PX = 7;       // ~7px per character at 12px font
+const MIN_LABEL_WIDTH_PX = 50;     // minimum pixel width for a tick label
+const LABEL_PADDING_PX = 16;       // padding between adjacent labels
+
 function estimateMinSpace(min: number, max: number): number {
   const maxAbsStr = fmtNum(Math.max(Math.abs(min), Math.abs(max)));
-  const estWidth = maxAbsStr.length * 7; // ~7px per char at 12px font
-  return Math.max(50, estWidth + 16);    // 16px padding between labels
+  const estWidth = maxAbsStr.length * EST_CHAR_WIDTH_PX;
+  return Math.max(MIN_LABEL_WIDTH_PX, estWidth + LABEL_PADDING_PX);
 }
 
 /**

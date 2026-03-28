@@ -28,6 +28,22 @@ export function fmtSuffix(suffix: string, decimals = 0): AxisValueFormatter {
 }
 
 /**
+ * Prepend a prefix to each formatted value: fmtPrefix('$') → "$42", fmtPrefix('Q') → "Q1".
+ */
+export function fmtPrefix(prefix: string, decimals = 0): AxisValueFormatter {
+  return (splits: number[]) =>
+    splits.map(v => prefix + v.toFixed(decimals));
+}
+
+/**
+ * Wrap each formatted value with a prefix and suffix: fmtWrap('$', 'K') → "$42K".
+ */
+export function fmtWrap(prefix: string, suffix: string, decimals = 0): AxisValueFormatter {
+  return (splits: number[]) =>
+    splits.map(v => prefix + v.toFixed(decimals) + suffix);
+}
+
+/**
  * Format unix timestamps (seconds) as HH:MM.
  */
 export function fmtHourMin(opts?: { utc?: boolean }): AxisValueFormatter {

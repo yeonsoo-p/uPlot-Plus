@@ -34,6 +34,10 @@ const baseItemStyle: React.CSSProperties = {
   fontFamily: 'sans-serif',
 };
 
+const itemStyleVisible: React.CSSProperties = { ...baseItemStyle, opacity: 1 };
+const itemStyleHidden: React.CSSProperties = { ...baseItemStyle, opacity: 0.4 };
+const swatchStyleCache = new Map<string, React.CSSProperties>();
+
 interface LegendItemProps {
   group: number;
   index: number;
@@ -49,12 +53,18 @@ const LegendItem = memo(function LegendItem({ group, index, label, color, isHidd
     store.toggleSeries(group, index);
   }, [store, group, index]);
 
+  let cachedSwatch = swatchStyleCache.get(color);
+  if (cachedSwatch == null) {
+    cachedSwatch = { ...swatchStyle, backgroundColor: color };
+    swatchStyleCache.set(color, cachedSwatch);
+  }
+
   return (
     <span
       onClick={handleClick}
-      style={{ ...baseItemStyle, opacity: isHidden ? 0.4 : 1 }}
+      style={isHidden ? itemStyleHidden : itemStyleVisible}
     >
-      <span style={{ ...swatchStyle, backgroundColor: color }} />
+      <span style={cachedSwatch} />
       <span>{label}</span>
       {valueStr && <span style={valueStyle}>{valueStr}</span>}
     </span>
@@ -70,7 +80,7 @@ export function Legend({ show = true, position = 'bottom', className }: LegendPr
   const snapRef = useRef<LegendSnapshot>({ activeGroup: -1, activeDataIdx: -1, seriesCount: 0, revision: -1 });
 
   const subscribe = useCallback(
-    (cb: () => void) => store.subscribe(cb),
+    (cb: () => void) => store.subscribeCursor(cb),
     [store],
   );
 
@@ -105,9 +115,10 @@ export function Legend({ show = true, position = 'bottom', className }: LegendPr
       }}
     >
       {store.seriesConfigs.map((cfg) => {
+        if (cfg.legend === false) return null;
         const color = typeof cfg.stroke === 'string' ? cfg.stroke : '#000';
         let valueStr = '';
-        if (activeDataIdx >= 0 && activeGroup >= 0) {
+        if (activeDataIdx >= 0 && activeGroup >= 0 && cfg.group === activeGroup) {
           const yData = store.dataStore.getYValues(cfg.group, cfg.index);
           const val = yData[activeDataIdx];
           if (val != null) {

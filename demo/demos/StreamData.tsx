@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Chart, Scale, Series, Axis, Legend } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series, Legend } from '../../src';
 
 const WINDOW = 2000;
 const BATCH = 4; // points per frame
 
-function initData(): ChartData {
+function initData() {
   const x = Array.from({ length: WINDOW }, (_, i) => i);
   const y1: number[] = []; // random walk
   const y2: number[] = []; // oscillating
@@ -24,7 +23,7 @@ function initData(): ChartData {
 }
 
 export default function StreamData() {
-  const [data, setData] = useState<ChartData>(initData);
+  const [data, setData] = useState(initData);
   const counterRef = useRef(WINDOW);
   const fpsRef = useRef(0);
   const frameCountRef = useRef(0);
@@ -104,14 +103,10 @@ export default function StreamData() {
           {fps} FPS
         </span>
       </div>
-      <Chart width={800} height={350} data={data}>
-        <Scale id="x" />
-        <Scale id="y"  />
-        <Axis scale="x" label="Tick" />
-        <Axis scale="y" label="Value" />
-        <Series group={0} index={0} yScale="y" stroke="#27ae60" width={1.5} label="Random Walk" />
-        <Series group={0} index={1} yScale="y" stroke="#2980b9" width={1.5} label="Oscillating" />
-        <Series group={0} index={2} yScale="y" stroke="#e74c3c" width={1} label="Spiky" />
+      <Chart width={800} height={350} data={data} xlabel="Tick" ylabel="Value">
+        <Series group={0} index={0} width={1.5} label="Random Walk" />
+        <Series group={0} index={1} width={1.5} label="Oscillating" />
+        <Series group={0} index={2} label="Spiky" />
         <Legend />
       </Chart>
     </div>

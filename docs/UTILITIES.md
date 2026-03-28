@@ -7,7 +7,7 @@ Helper functions exported by uPlot+ for axis formatting, colors, data transforms
 Pre-built formatters for common axis label patterns. Each returns an `AxisValueFormatter` compatible with the `<Axis values={...}>` prop.
 
 ```tsx
-import { fmtCompact, fmtSuffix, fmtHourMin, fmtMonthName, fmtDateStr, fmtLabels } from 'uplot-plus';
+import { fmtCompact, fmtSuffix, fmtPrefix, fmtWrap, fmtHourMin, fmtMonthName, fmtDateStr, fmtLabels } from 'uplot-plus';
 ```
 
 ### `fmtCompact(opts?: { decimals?: number })`
@@ -26,6 +26,24 @@ Append a suffix to each formatted value.
 ```tsx
 <Axis scale="y" values={fmtSuffix('%')} />         // 42%
 <Axis scale="y" values={fmtSuffix('°C', 1)} />    // 23.5°C
+```
+
+### `fmtPrefix(prefix: string, decimals?: number)`
+
+Prepend a prefix to each formatted value.
+
+```tsx
+<Axis scale="y" values={fmtPrefix('$')} />         // $42
+<Axis scale="y" values={fmtPrefix('$', 2)} />      // $42.00
+```
+
+### `fmtWrap(prefix: string, suffix: string, decimals?: number)`
+
+Wrap each value with a prefix and suffix.
+
+```tsx
+<Axis scale="y" values={fmtWrap('$', 'M')} />      // $42M
+<Axis scale="y" values={fmtWrap('(', ')')} />       // (42)
 ```
 
 ### `fmtHourMin(opts?: { utc?: boolean })`

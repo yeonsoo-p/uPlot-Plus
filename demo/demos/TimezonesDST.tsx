@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis, Legend } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series, Axis, Legend } from '../../src';
 
 export default function TimezonesDST() {
-  const data: ChartData = useMemo(() => {
+  const data = useMemo(() => {
     // Spring-forward DST transition: March 10, 2024 at 2:00 AM EST -> 3:00 AM EDT
     const startTs = new Date(2024, 2, 9, 0, 0, 0).getTime() / 1000; // March 9
     const n = 96; // 4 days of hourly data
@@ -31,12 +30,9 @@ export default function TimezonesDST() {
         Hourly data spanning the spring-forward DST transition (March 9-12, 2024).
         Note the time jump around March 10 at 2:00 AM.
       </p>
-      <Chart width={800} height={400} data={data}>
-        <Scale id="x"  />
-        <Scale id="y"  />
+      <Chart width={800} height={400} data={data} ylabel="Temperature (C)">
         <Axis scale="x" label="Date/Time" values={fmtDateTime} rotate={-45} />
-        <Axis scale="y" label="Temperature (C)" />
-        <Series group={0} index={0} yScale="y" stroke="#e67e22" width={2} label="Temp" />
+        <Series group={0} index={0} label="Temp" />
         <Legend />
       </Chart>
     </div>

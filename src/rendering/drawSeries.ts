@@ -3,7 +3,7 @@ import type { SeriesPaths } from '../paths/types';
 import type { GradientConfig, ColorValue } from '../types/series';
 
 /** Cache gradients by config identity + plotBox dimensions to avoid recreation every frame */
-const gradientCache = new WeakMap<GradientConfig, { grad: CanvasGradient; top: number; height: number }>();
+const gradientCache = new WeakMap<GradientConfig, { grad: CanvasGradient; left: number; top: number; width: number; height: number }>();
 
 /** Resolve a ColorValue to a CanvasGradient or string */
 function resolveColor(
@@ -22,14 +22,15 @@ function getCachedGradient(
   plotBox: BBox,
 ): CanvasGradient {
   const cached = gradientCache.get(cfg);
-  if (cached != null && cached.top === plotBox.top && cached.height === plotBox.height) {
+  if (cached != null && cached.left === plotBox.left && cached.top === plotBox.top &&
+      cached.width === plotBox.width && cached.height === plotBox.height) {
     return cached.grad;
   }
   const grad = ctx.createLinearGradient(0, plotBox.top, 0, plotBox.top + plotBox.height);
   for (const [offset, color] of cfg.stops) {
     grad.addColorStop(offset, color);
   }
-  gradientCache.set(cfg, { grad, top: plotBox.top, height: plotBox.height });
+  gradientCache.set(cfg, { grad, left: plotBox.left, top: plotBox.top, width: plotBox.width, height: plotBox.height });
   return grad;
 }
 

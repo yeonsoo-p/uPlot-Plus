@@ -1,6 +1,6 @@
 import type { XGroup } from '../types/data';
 import type { BandConfig } from '../types/bands';
-import type { NullableNumArray } from '../types/common';
+import type { NumArray, NullableNumArray } from '../types/common';
 
 /**
  * Stack series within a data group by computing cumulative sums.
@@ -43,9 +43,14 @@ export function stackGroup(
   }
 
   // Build new series array preserving original positions
-  const newSeries: NullableNumArray[] = [];
+  const indexToStackIdx = new Map<number, number>();
+  for (let si = 0; si < indices.length; si++) {
+    const idx = indices[si];
+    if (idx != null) indexToStackIdx.set(idx, si);
+  }
+  const newSeries: (NumArray | NullableNumArray)[] = [];
   for (let i = 0; i < group.series.length; i++) {
-    const stackIdx = indices.indexOf(i);
+    const stackIdx = indexToStackIdx.get(i) ?? -1;
     const stackedEntry = stackIdx >= 0 ? stacked[stackIdx] : undefined;
     if (stackedEntry != null) {
       newSeries.push(stackedEntry);

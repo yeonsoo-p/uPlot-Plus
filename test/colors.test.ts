@@ -30,14 +30,14 @@ describe('fadeGradient', () => {
     expect(g.stops).toHaveLength(2);
     expect(g.stops[0]?.[0]).toBe(0);
     expect(g.stops[1]?.[0]).toBe(1);
-    expect(g.stops[0]?.[1]).toMatch(/rgba\(52,152,219,0\.8\)/);
-    expect(g.stops[1]?.[1]).toMatch(/rgba\(52,152,219,0\)/);
+    expect(g.stops[0]?.[1]).toBe('rgba(52,152,219,0.8)');
+    expect(g.stops[1]?.[1]).toBe('rgba(52,152,219,0)');
   });
 
   it('uses custom alpha range', () => {
     const g = fadeGradient('#ff0000', 1.0, 0.2);
-    expect(g.stops[0]?.[1]).toMatch(/rgba\(255,0,0,1\)/);
-    expect(g.stops[1]?.[1]).toMatch(/rgba\(255,0,0,0\.2\)/);
+    expect(g.stops[0]?.[1]).toBe('rgba(255,0,0,1)');
+    expect(g.stops[1]?.[1]).toBe('rgba(255,0,0,0.2)');
   });
 
   it('falls back for unsupported color formats', () => {

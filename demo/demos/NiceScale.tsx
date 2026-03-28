@@ -1,21 +1,20 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series } from '../../src';
 
 export default function NiceScale() {
-  const data1: ChartData = useMemo(() => {
+  const data1 = useMemo(() => {
     const x = Array.from({ length: 50 }, (_, i) => i);
     const y = x.map(i => i * 0.37 + 2.1 + (Math.random() - 0.5) * 0.5);
     return [{ x, series: [y] }];
   }, []);
 
-  const data2: ChartData = useMemo(() => {
+  const data2 = useMemo(() => {
     const x = Array.from({ length: 50 }, (_, i) => i);
     const y = x.map(i => Math.sin(i * 0.12) * 1234 + 5000);
     return [{ x, series: [y] }];
   }, []);
 
-  const data3: ChartData = useMemo(() => {
+  const data3 = useMemo(() => {
     const x = Array.from({ length: 50 }, (_, i) => i);
     const y = x.map(i => 0.001 * i + 0.005 + (Math.random() - 0.5) * 0.002);
     return [{ x, series: [y] }];
@@ -28,29 +27,17 @@ export default function NiceScale() {
       </p>
       <div style={{ marginBottom: 16 }}>
         <Chart width={800} height={180} data={data1} title="Small range (~2-20)">
-          <Scale id="x" />
-          <Scale id="y"  />
-          <Axis scale="x" />
-          <Axis scale="y" />
-          <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Small" />
+          <Series group={0} index={0} label="Small" />
         </Chart>
       </div>
       <div style={{ marginBottom: 16 }}>
         <Chart width={800} height={180} data={data2} title="Medium range (~3700-6200)">
-          <Scale id="x" />
-          <Scale id="y"  />
-          <Axis scale="x" />
-          <Axis scale="y" />
-          <Series group={0} index={0} yScale="y" stroke="#2980b9" width={2} label="Medium" />
+          <Series group={0} index={0} label="Medium" />
         </Chart>
       </div>
       <div>
         <Chart width={800} height={180} data={data3} title="Tiny range (~0.004-0.056)">
-          <Scale id="x" />
-          <Scale id="y"  />
-          <Axis scale="x" />
-          <Axis scale="y" />
-          <Series group={0} index={0} yScale="y" stroke="#27ae60" width={2} label="Tiny" />
+          <Series group={0} index={0} label="Tiny" />
         </Chart>
       </div>
     </div>

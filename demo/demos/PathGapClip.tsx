@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis, Legend } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series, Legend } from '../../src';
 
 export default function PathGapClip() {
-  const data: ChartData = useMemo(() => {
+  const data = useMemo(() => {
     const n = 120;
     const x = Array.from({ length: n }, (_, i) => i);
     const base = x.map(i => Math.sin(i * 0.08) * 30 + 50);
@@ -24,13 +23,9 @@ export default function PathGapClip() {
       <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
         Same data with null gaps. Red line shows gaps (default). Blue line uses <code>spanGaps</code> to connect across nulls.
       </p>
-      <Chart width={800} height={400} data={data}>
-        <Scale id="x" />
-        <Scale id="y"  />
-        <Axis scale="x" label="Index" />
-        <Axis scale="y" label="Value" />
-        <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="With Gaps (default)" />
-        <Series group={0} index={1} yScale="y" stroke="#3498db" width={2} label="spanGaps = true" spanGaps />
+      <Chart width={800} height={400} data={data} xlabel="Index" ylabel="Value">
+        <Series group={0} index={0} label="With Gaps (default)" />
+        <Series group={0} index={1} label="spanGaps = true" spanGaps />
         <Legend />
       </Chart>
     </div>

@@ -1,8 +1,7 @@
 import React from 'react';
-import { Chart, Scale, Series, Axis, Tooltip } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series, Tooltip } from '../../src';
 
-function generateData(): ChartData {
+function generateData() {
   const n = 100;
   const x: number[] = [];
   const y1: number[] = [];
@@ -28,14 +27,10 @@ export default function Tooltips() {
       <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
         Hover over the chart to see the tooltip with all series values.
       </p>
-      <Chart width={800} height={400} data={data}>
-        <Scale id="x" />
-        <Scale id="y"  />
-        <Axis scale="x" label="Time" />
-        <Axis scale="y" label="Value" />
-        <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Alpha" />
-        <Series group={0} index={1} yScale="y" stroke="#2ecc71" width={2} label="Beta" />
-        <Series group={0} index={2} yScale="y" stroke="#3498db" width={2} label="Gamma" />
+      <Chart width={800} height={400} data={data} xlabel="Time" ylabel="Value">
+        <Series group={0} index={0} label="Alpha" />
+        <Series group={0} index={1} label="Beta" />
+        <Series group={0} index={2} label="Gamma" />
         <Tooltip />
       </Chart>
     </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Chart, Scale, Series, Axis } from '../../src';
+import { Chart, Series } from '../../src';
 import type { ChartData } from '../../src';
 
 const singlePoint: ChartData = [{ x: [1], series: [[42]] }];
@@ -10,11 +10,7 @@ function MiniChart({ title, data }: { title: string; data: ChartData }) {
   return (
     <div style={{ display: 'inline-block', marginRight: 16, marginBottom: 16, verticalAlign: 'top' }}>
       <Chart width={240} height={180} data={data} title={title}>
-        <Scale id="x" />
-        <Scale id="y"  />
-        <Axis scale="x" />
-        <Axis scale="y" />
-        <Series group={0} index={0} yScale="y" stroke="#2980b9" width={2}
+        <Series group={0} index={0}
           points={{ show: true, size: 6, fill: '#2980b9' }} />
       </Chart>
     </div>

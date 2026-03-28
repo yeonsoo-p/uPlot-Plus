@@ -1,5 +1,5 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { Chart, Scale, Series, Axis, Legend } from '../../src';
+import React, { useState, useEffect, useRef } from 'react';
+import { Chart, Series, Legend } from '../../src';
 import type { ChartData } from '../../src';
 
 function generateData(min: number, max: number, n: number): ChartData {
@@ -67,12 +67,8 @@ export default function ZoomFetch() {
         <button onClick={handleReset}>Reset</button>
         {loading && <span style={{ color: '#e67e22', fontWeight: 'bold' }}>Loading...</span>}
       </div>
-      <Chart width={800} height={400} data={data}>
-        <Scale id="x"  />
-        <Scale id="y"  />
-        <Axis scale="x" label="X" />
-        <Axis scale="y" label="Value" />
-        <Series group={0} index={0} yScale="y" stroke="#2980b9" width={2} label="Signal" />
+      <Chart width={800} height={400} data={data} xlabel="X" ylabel="Value">
+        <Series group={0} index={0} label="Signal" />
         <Legend />
       </Chart>
     </div>

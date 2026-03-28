@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Chart, Scale, Series, Axis, Legend } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Scale, Series, Legend } from '../../src';
 
 const WINDOW = 10000;
 const SAMPLE_RATE = 500; // samples per second
 const BATCH = 8; // samples per frame (~480/sec at 60fps)
 
-function initData(): ChartData {
+function initData() {
   const x = new Array<number>(WINDOW);
   const y1 = new Array<number>(WINDOW);
   const y2 = new Array<number>(WINDOW);
@@ -24,7 +23,7 @@ function initData(): ChartData {
 }
 
 export default function RealtimeSine() {
-  const [data, setData] = useState<ChartData>(initData);
+  const [data, setData] = useState(initData);
   const sampleRef = useRef(WINDOW);
   const [fps, setFps] = useState(0);
   const frameCountRef = useRef(0);
@@ -91,14 +90,11 @@ export default function RealtimeSine() {
           {fps} FPS
         </span>
       </div>
-      <Chart width={800} height={350} data={data}>
-        <Scale id="x" />
+      <Chart width={800} height={350} data={data} xlabel="Time (s)" ylabel="Amplitude">
         <Scale id="y" min={-1.5} max={1.5} />
-        <Axis scale="x" label="Time (s)" />
-        <Axis scale="y" label="Amplitude" />
-        <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={1.5} label="1 Hz" />
-        <Series group={0} index={1} yScale="y" stroke="#2980b9" width={1.5} label="2.5 Hz" />
-        <Series group={0} index={2} yScale="y" stroke="#27ae60" width={1.5} label="4 Hz" />
+        <Series group={0} index={0} width={1.5} label="1 Hz" />
+        <Series group={0} index={1} width={1.5} label="2.5 Hz" />
+        <Series group={0} index={2} width={1.5} label="4 Hz" />
         <Legend />
       </Chart>
     </div>

@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
 import { Chart, Scale, Series, Axis, Legend, Side } from '../../src';
-import type { ChartData } from '../../src';
 
 export default function YScaleDrag() {
-  const data: ChartData = useMemo(() => {
+  const data = useMemo(() => {
     const N = 200;
     const x = new Float64Array(N);
     const y1 = new Float64Array(N);
@@ -23,14 +22,10 @@ export default function YScaleDrag() {
       <p style={{ fontSize: 13, color: '#888', marginBottom: 8 }}>
         Click and drag on the left or right y-axis to pan the scale. Double-click chart to reset.
       </p>
-      <Chart width={800} height={400} data={data}>
-        <Scale id="x"  />
-        <Scale id="y"  />
+      <Chart width={800} height={400} data={data} ylabel="Temperature">
         <Scale id="y2"  />
-        <Series group={0} index={0} yScale="y" stroke="#e24d42" label="Temperature" width={2} />
-        <Series group={0} index={1} yScale="y2" stroke="#1f78b4" label="Humidity" width={2} />
-        <Axis scale="x" />
-        <Axis scale="y" label="Temperature" />
+        <Series group={0} index={0} label="Temperature" />
+        <Series group={0} index={1} yScale="y2" stroke="#1f78b4" label="Humidity" />
         <Axis scale="y2" side={Side.Right} label="Humidity" stroke="#1f78b4" />
         <Legend />
       </Chart>

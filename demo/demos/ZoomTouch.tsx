@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series } from '../../src';
 
 export default function ZoomTouch() {
-  const data: ChartData = useMemo(() => {
+  const data = useMemo(() => {
     const N = 500;
     const x = new Float64Array(N);
     const y = new Float64Array(N);
@@ -22,11 +21,7 @@ export default function ZoomTouch() {
         Use two-finger pinch to zoom on touch devices. Drag to zoom on desktop. Double-tap to reset.
       </p>
       <Chart width={800} height={400} data={data} cursor={{ wheelZoom: true }}>
-        <Scale id="x"  />
-        <Scale id="y"  />
-        <Series group={0} index={0} yScale="y" stroke="#e24d42" width={2} label="Signal" />
-        <Axis scale="x" />
-        <Axis scale="y" />
+        <Series group={0} index={0} label="Signal" />
       </Chart>
     </div>
   );

@@ -2,7 +2,7 @@
 
 High-performance React charting library ripped off from uPlot. Might perform occasionally better than original uPlot in React context (or worse). Definitely easier to use in React context.
 
-**[Live Demo (85+ examples)](https://yeonsoo-p.github.io/uPlot-Plus/)**
+**[Live Demo (99 examples)](https://yeonsoo-p.github.io/uPlot-Plus/)**
 
 ## Features
 
@@ -13,7 +13,7 @@ High-performance React charting library ripped off from uPlot. Might perform occ
 - **7 path builders** — linear, stepped, bars, monotone cubic, Catmull-Rom, points, candlestick
 - **Interactive** — wheel/touch zoom, drag-to-zoom, cursor snapping, series focus
 - **Cursor sync** — linked crosshairs and tooltips across multiple charts
-- **Compact bundle** — ~111KB (~30KB gzip), React 18+ peer dependency
+- **Compact bundle** — ~128KB (~36KB gzip), React 18+ peer dependency
 - **Dual output** — ES module + CommonJS
 
 ## Installation
@@ -29,6 +29,24 @@ npm install react react-dom
 ```
 
 ## Quick Start
+
+Scales, axes, and colors are auto-injected when omitted — the simplest chart is just data + series:
+
+```tsx
+import { Chart, Series } from 'uplot-plus';
+
+const data = { x: [1, 2, 3, 4, 5], y: [10, 25, 13, 30, 18] };
+
+function App() {
+  return (
+    <Chart width={800} height={400} data={data}>
+      <Series group={0} index={0} label="Revenue" />
+    </Chart>
+  );
+}
+```
+
+For full control, declare scales, axes, and series explicitly:
 
 ```tsx
 import { Chart, Scale, Series, Axis } from 'uplot-plus';
@@ -68,6 +86,8 @@ function App() {
 | `<Band>` | Fills a region between two series |
 | `<Legend>` | Interactive legend with live cursor values, click-to-toggle |
 | `<Tooltip>` | Floating tooltip at cursor position, auto-flips at edges |
+| `<FloatingLegend>` | Draggable or cursor-following legend panel with idle opacity fade |
+| `<HoverLabel>` | Shows nearest series info after a hover delay |
 | `<ZoomRanger>` | Overview mini-chart with draggable selection for zoom control |
 | `<Timeline>` | Horizontal lanes of colored event spans |
 | `<Sparkline>` | Compact inline chart for tables and dashboards (no axes, no interaction) |
@@ -81,13 +101,14 @@ function App() {
 
 ## Data Model
 
-Data is organized as groups, each with its own x-values:
+Three input forms — use whichever fits your data:
 
 ```ts
-import type { ChartData, XGroup } from 'uplot-plus';
+// Simplest: single series
+const data = { x: [1, 2, 3, 4, 5], y: [10, 20, 30, 40, 50] };
 
-// Single x-axis (most common)
-const data: ChartData = [
+// Multiple series sharing one x-axis
+const data = [
   {
     x: [1, 2, 3, 4, 5],
     series: [
@@ -98,7 +119,7 @@ const data: ChartData = [
 ];
 
 // Multi x-axis — two groups with independent x-ranges
-const multiData: ChartData = [
+const multiData = [
   { x: [0, 1, 2, 3], series: [[10, 20, 15, 25]] },
   { x: [0, 0.5, 1.5, 2.5, 3], series: [[8, 18, 22, 12, 30]] },
 ];
@@ -114,7 +135,9 @@ Null values in series arrays create gaps in the chart. Use `spanGaps` on `<Serie
 |---------|--------|----------|
 | `linear()` | `linear` | Line/area charts (default). Pixel-level decimation for large datasets |
 | `stepped()` | `stepped` | Step charts — step-after, step-before, or mid-step |
-| `bars()` | `bars` | Bar/column charts with configurable width, gaps, grouped bars |
+| `bars()` | `bars` | Bar/column charts with configurable width and gaps |
+| `groupedBars()` | `groupedBars` | Side-by-side grouped bar charts |
+| `stackedBars()` | `stackedBars` | Stacked bar charts |
 | `monotoneCubic()` | `monotoneCubic` | Smooth curves that preserve monotonicity (no overshoot) |
 | `catmullRom()` | `catmullRom` | Centripetal Catmull-Rom splines |
 | `points()` | `points` | Scatter plots — points only, no connecting lines |
@@ -270,7 +293,7 @@ import { drawHLine, drawVLine, drawLabel, drawRegion } from 'uplot-plus';
 
 | Category | Functions |
 | ---------- | ----------- |
-| Axis formatters | `fmtCompact`, `fmtSuffix`, `fmtHourMin`, `fmtMonthName`, `fmtDateStr`, `fmtLabels` |
+| Axis formatters | `fmtCompact`, `fmtSuffix`, `fmtPrefix`, `fmtWrap`, `fmtHourMin`, `fmtMonthName`, `fmtDateStr`, `fmtLabels` |
 | Color helpers | `fadeGradient`, `withAlpha`, `palette` |
 | Data transforms | `stackGroup`, `alignData` |
 | Scale math | `valToPos`, `posToVal` |
@@ -280,7 +303,7 @@ import { drawHLine, drawVLine, drawLabel, drawRegion } from 'uplot-plus';
 ## Development
 
 ```sh
-npm run dev         # Start demo dev server (85+ examples)
+npm run dev         # Start demo dev server (99 examples)
 npm run build       # Build library (ES + CJS to dist/)
 npm run typecheck   # TypeScript strict check
 npm run lint        # ESLint

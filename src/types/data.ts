@@ -1,5 +1,9 @@
 import type { NumArray, NullableNumArray } from './common';
 
+// ---------------------------------------------------------------------------
+// Internal normalized types (used throughout the core after normalization)
+// ---------------------------------------------------------------------------
+
 /**
  * An XGroup: a set of series sharing a single x-value array.
  * The x array provides the x-coordinates, and each entry in series
@@ -7,7 +11,7 @@ import type { NumArray, NullableNumArray } from './common';
  */
 export interface XGroup {
   x: NumArray;
-  series: NullableNumArray[];
+  series: (NumArray | NullableNumArray)[];
 }
 
 /**
@@ -32,3 +36,31 @@ export interface SeriesRef {
   group: number;
   index: number;
 }
+
+// ---------------------------------------------------------------------------
+// Public input types (user-facing, accepted by Chart/Sparkline/ZoomRanger)
+// ---------------------------------------------------------------------------
+
+/** User-facing array type: pass whatever you have. */
+export type DataArray = number[] | Float64Array | (number | null)[];
+
+/** Simple single-series group: one x array, one y array. */
+export interface SimpleGroup {
+  x: DataArray;
+  y: DataArray;
+}
+
+/** Full multi-series group: one x array, multiple y-series arrays. */
+export interface FullGroup {
+  x: DataArray;
+  series: DataArray[];
+}
+
+/**
+ * Flexible data input — Chart accepts all three forms:
+ *
+ * - `{ x, y }` — single series (simplest)
+ * - `[{ x, y }, ...]` — multiple single-series groups
+ * - `[{ x, series: [...] }, ...]` — full multi-series form
+ */
+export type DataInput = SimpleGroup | SimpleGroup[] | FullGroup[];

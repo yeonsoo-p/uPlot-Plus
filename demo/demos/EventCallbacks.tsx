@@ -1,8 +1,8 @@
 import React, { useMemo, useState, useCallback } from 'react';
-import { Chart, Scale, Series, Axis, Legend } from '../../src';
-import type { ChartData, ChartEventInfo } from '../../src';
+import { Chart, Scale, Series, Legend } from '../../src';
+import type { ChartEventInfo } from '../../src';
 
-function generateData(): ChartData {
+function generateData() {
   const n = 200;
   const x = Array.from({ length: n }, (_, i) => i);
   const y1 = x.map(i => Math.sin(i * 0.05) * 40 + 50 + (Math.random() - 0.5) * 8);
@@ -63,14 +63,13 @@ export default function EventCallbacks() {
           onClick={onClick}
           onContextMenu={onContextMenu}
           onScaleChange={onScaleChange}
+          xlabel="Sample"
+          ylabel="Value"
         >
           <Scale id="x"
             auto={xRange == null} min={xRange?.[0]} max={xRange?.[1]} />
-          <Scale id="y"  />
-          <Axis scale="x" label="Sample" />
-          <Axis scale="y" label="Value" />
-          <Series group={0} index={0} yScale="y" stroke="#2980b9" width={2} label="Signal A" />
-          <Series group={0} index={1} yScale="y" stroke="#e67e22" width={2} label="Signal B" />
+          <Series group={0} index={0} label="Signal A" />
+          <Series group={0} index={1} label="Signal B" />
           <Legend />
         </Chart>
 

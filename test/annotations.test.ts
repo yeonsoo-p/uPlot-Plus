@@ -61,9 +61,10 @@ describe('drawHLine', () => {
 
     drawHLine(dc, yScale, 50);
 
+    // valToPos(50, {min:0,max:100,Vertical,Forward}, height=300, top=20) = 20 + (1-0.5)*300 = 170
     expect(ctx.beginPath).toHaveBeenCalled();
-    expect(ctx.moveTo).toHaveBeenCalled();
-    expect(ctx.lineTo).toHaveBeenCalled();
+    expect(ctx.moveTo).toHaveBeenCalledWith(50, 170);
+    expect(ctx.lineTo).toHaveBeenCalledWith(450, 170);
     expect(ctx.stroke).toHaveBeenCalled();
   });
 
@@ -95,9 +96,10 @@ describe('drawVLine', () => {
 
     drawVLine(dc, xScale, 50);
 
+    // valToPos(50, {min:0,max:100,Horizontal,Forward}, width=400, left=50) = 50 + 0.5*400 = 250
     expect(ctx.beginPath).toHaveBeenCalled();
-    expect(ctx.moveTo).toHaveBeenCalled();
-    expect(ctx.lineTo).toHaveBeenCalled();
+    expect(ctx.moveTo).toHaveBeenCalledWith(250, 20);
+    expect(ctx.lineTo).toHaveBeenCalledWith(250, 320);
     expect(ctx.stroke).toHaveBeenCalled();
   });
 });
@@ -133,7 +135,13 @@ describe('drawRegion', () => {
 
     drawRegion(dc, yScale, 20, 80);
 
-    expect(ctx.fillRect).toHaveBeenCalled();
+    // valToPos(80, ...) = 20 + (1-0.8)*300 ≈ 80, valToPos(20, ...) = 20 + (1-0.2)*300 = 260
+    // fillRect(left=50, top=min(80,260)≈80, width=400, height≈180)
+    const args = ctx.fillRect.mock.calls[0]!;
+    expect(args[0]).toBe(50);
+    expect(args[1]).toBeCloseTo(80, 10);
+    expect(args[2]).toBe(400);
+    expect(args[3]).toBeCloseTo(180, 10);
   });
 
   it('draws a stroke border when stroke style provided', () => {

@@ -1,8 +1,7 @@
 import React from 'react';
 import { Chart, Scale, Series, Axis, Distribution } from '../../src';
-import type { ChartData } from '../../src';
 
-function generateData(): ChartData {
+function generateData() {
   const n = 200;
   const x = Array.from({ length: n }, (_, i) => i);
   const y = x.map(i => {
@@ -23,12 +22,10 @@ export default function AsinhScales() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data}>
-      <Scale id="x" />
+    <Chart width={800} height={400} data={data} xlabel="Sample">
       <Scale id="y"  distr={Distribution.Asinh} asinh={1} />
-      <Axis scale="x" label="Sample" />
       <Axis scale="y" label="Value (asinh)" values={fmtVal} />
-      <Series group={0} index={0} yScale="y" stroke="#8e44ad" fill="rgba(142,68,173,0.1)" width={2} label="Symmetric Data" />
+      <Series group={0} index={0} stroke="#8e44ad" fill="rgba(142,68,173,0.1)" label="Symmetric Data" />
     </Chart>
   );
 }

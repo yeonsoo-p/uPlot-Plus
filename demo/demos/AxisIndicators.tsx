@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis, Side } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series, Axis, Side } from '../../src';
 
 export default function AxisIndicators() {
-  const data: ChartData = useMemo(() => {
+  const data = useMemo(() => {
     const n = 80;
     const x = Array.from({ length: n }, (_, i) => i);
     const y = x.map(i => Math.sin(i * 0.1) * 40 + 50);
@@ -16,9 +15,6 @@ export default function AxisIndicators() {
         Each axis has different grid, tick, and border styles with custom colors, widths, and dash patterns.
       </p>
       <Chart width={800} height={400} data={data}>
-        <Scale id="x" />
-        <Scale id="y"  />
-
         {/* Bottom x-axis: blue grid dashed, red ticks, green border */}
         <Axis
           scale="x"
@@ -59,7 +55,7 @@ export default function AxisIndicators() {
           border={{ show: true, stroke: '#c0392b', width: 1 }}
         />
 
-        <Series group={0} index={0} yScale="y" stroke="#34495e" width={2} label="Signal" />
+        <Series group={0} index={0} label="Signal" />
       </Chart>
     </div>
   );

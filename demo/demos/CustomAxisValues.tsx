@@ -1,8 +1,7 @@
 import React from 'react';
-import { Chart, Scale, Series, Axis } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series, Axis } from '../../src';
 
-function generateData(): ChartData {
+function generateData() {
   const n = 288; // 24h at 5-min intervals
   const x: number[] = [];
   const y: number[] = [];
@@ -31,11 +30,9 @@ export default function CustomAxisValues() {
 
   return (
     <Chart width={800} height={400} data={data}>
-      <Scale id="x" />
-      <Scale id="y"  />
       <Axis scale="x" label="Time of Day" values={fmtTime} space={80} />
       <Axis scale="y" label="Throughput" values={fmtMBs} />
-      <Series group={0} index={0} yScale="y" stroke="#2980b9" fill="rgba(41,128,185,0.1)" width={2} label="Throughput" />
+      <Series group={0} index={0} stroke="#2980b9" fill="rgba(41,128,185,0.1)" label="Throughput" />
     </Chart>
   );
 }

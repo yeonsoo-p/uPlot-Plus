@@ -11,6 +11,8 @@ Complete props reference for all uPlot+ React components, organized by hierarchy
 ├── <Axis>                       Axis rendering (renderless)
 ├── <Band>                       Fill between two series (renderless)
 ├── <Legend>                      Interactive legend (HTML overlay)
+├── <FloatingLegend>             Draggable/cursor-following legend panel (HTML overlay)
+├── <HoverLabel>                 Nearest series info on hover delay (HTML overlay)
 ├── <Tooltip>                    Cursor tooltip (HTML overlay)
 ├── <Timeline>                   Event lanes (canvas draw hook)
 ├── <HLine>                      Horizontal line annotation (canvas draw hook)
@@ -37,13 +39,18 @@ Complete props reference for all uPlot+ React components, organized by hierarchy
 
 Root container. Creates two canvas layers (persistent data + cursor overlay), initializes the chart store, and provides context to all children.
 
+**Smart defaults:** `<Scale>`, `<Axis>` children are optional. If omitted, Chart auto-creates x/y scales and bottom/left axes. Series get auto-assigned colors from a 15-color palette when `stroke` is not provided. Data accepts three forms: `{ x, y }` (single series), `[{ x, y }, ...]` (multiple groups), or `[{ x, series: [...] }, ...]` (full form).
+
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `width` | `number` | — | Chart width in CSS pixels **(required)** |
 | `height` | `number` | — | Chart height in CSS pixels **(required)** |
-| `data` | `ChartData` | — | Chart data **(required)** |
+| `data` | `DataInput` | — | Chart data **(required)** — `{ x, y }`, `[{ x, y }]`, or `[{ x, series }]` |
 | `children` | `ReactNode` | — | Scale, Series, Axis, Legend, etc. |
 | `className` | `string` | — | CSS class name |
+| `title` | `string` | — | Title drawn on canvas above the plot area |
+| `xlabel` | `string` | `'X Axis'` | Label for auto-generated x-axis |
+| `ylabel` | `string` | `'Y Axis'` | Label for auto-generated y-axis |
 | `pxRatio` | `number` | `devicePixelRatio` | Device pixel ratio override |
 | `syncKey` | `string` | — | Sync cursor across charts with the same key |
 | `cursor` | `CursorConfig` | — | Cursor/interaction config |
@@ -63,8 +70,17 @@ Root container. Creates two canvas layers (persistent data + cursor overlay), in
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `wheelZoom` | `boolean` | `false` | Enable mouse wheel zoom on x-axis |
+| `wheelZoom` | `boolean \| 'x' \| 'y' \| 'xy' \| WheelZoomConfig` | `false` | Wheel zoom — `true` for x-only, `'xy'` for both, or object for modifier keys |
 | `focus` | `FocusConfig` | — | Focus mode: dims non-closest series |
+
+**`WheelZoomConfig`** (advanced):
+
+```ts
+{ x?: boolean | { key?: 'shift' | 'alt' | 'ctrl' },
+  y?: boolean | { key?: 'shift' | 'alt' | 'ctrl' } }
+```
+
+Example: `wheelZoom={{ x: true, y: { key: 'shift' } }}` — x-axis zooms by default, y-axis only with Shift held.
 
 **`FocusConfig`:**
 
@@ -160,11 +176,13 @@ interface RangePart {
 
 Registers a data series with the chart store. Each series references a `(group, index)` tuple in the data and maps to a y-scale. Renderless — returns `null`.
 
+**Smart defaults:** `yScale` defaults to `'y'`, `stroke` is auto-assigned from a 15-color palette based on registration order, and `show` defaults to `true`. The minimal series declaration is just `<Series group={0} index={0} />`.
+
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `group` | `number` | — | Data group index **(required)** |
 | `index` | `number` | — | Series index within group **(required)** |
-| `yScale` | `string` | — | Y-axis scale key **(required)** |
+| `yScale` | `string` | `'y'` | Y-axis scale key |
 | `show` | `boolean` | `true` | Visibility |
 | `label` | `string` | — | Legend/tooltip label |
 | `stroke` | `ColorValue` | — | Line color (string or gradient) |
@@ -213,6 +231,8 @@ Use the `fadeGradient()` and `withAlpha()` helpers from `uplot-plus` to create t
 | `linear()` | `linear` | Line/area charts (default). Pixel-level decimation. |
 | `stepped()` | `stepped` | Step-after, step-before, or mid-step. |
 | `bars()` | `bars` | Bar/column charts. |
+| `groupedBars()` | `groupedBars` | Side-by-side grouped bars. |
+| `stackedBars()` | `stackedBars` | Stacked bar charts. |
 | `monotoneCubic()` | `monotoneCubic` | Smooth curves preserving monotonicity. |
 | `catmullRom()` | `catmullRom` | Centripetal Catmull-Rom splines. |
 | `points()` | `points` | Scatter plots (points only, no lines). |
@@ -351,6 +371,53 @@ import { Legend } from 'uplot-plus';
 ```
 
 **Demos:** `legend`.
+
+---
+
+### `<FloatingLegend>`
+
+Floating legend panel that can be dragged around the plot area or follow the cursor. Subscribes only to cursor updates for performance. Must be inside `<Chart>`.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `mode` | `'draggable' \| 'cursor'` | `'draggable'` | Drag to reposition, or follow cursor |
+| `position` | `{ x, y } \| 'top-left' \| 'top-right' \| 'bottom-left' \| 'bottom-right'` | `'top-right'` | Initial position (draggable) or anchor (cursor) |
+| `offset` | `{ x: number; y: number }` | `{ x: 12, y: -12 }` | Offset from cursor (cursor mode only) |
+| `idleOpacity` | `number` | `0.3` | Opacity when cursor is outside plot (draggable mode) |
+| `show` | `boolean` | `true` | Visibility |
+| `className` | `string` | — | CSS class name |
+
+```tsx
+import { FloatingLegend } from 'uplot-plus';
+
+// Draggable panel in top-right corner
+<FloatingLegend mode="draggable" position="top-right" />
+
+// Follows cursor
+<FloatingLegend mode="cursor" offset={{ x: 16, y: -16 }} />
+```
+
+**Demos:** `floating-legend`.
+
+---
+
+### `<HoverLabel>`
+
+Shows a small label for the nearest series after a configurable hover delay. Useful for clean charts that only show series info on extended hover. Must be inside `<Chart>`.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `delay` | `number` | `1000` | Milliseconds before label appears |
+| `show` | `boolean` | `true` | Visibility |
+| `className` | `string` | — | CSS class name |
+
+```tsx
+import { HoverLabel } from 'uplot-plus';
+
+<HoverLabel delay={500} />
+```
+
+**Demos:** `hover-label`.
 
 ---
 

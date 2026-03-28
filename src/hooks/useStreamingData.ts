@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import type { ChartData } from '../types';
+import type { ChartData, DataInput } from '../types';
+import { normalizeData } from '../core/normalizeData';
 
 export interface StreamingOptions {
   /** Maximum number of data points to retain (sliding window size) */
@@ -54,13 +55,13 @@ interface PendingGroup {
  * into a single React state update, avoiding redundant re-renders.
  */
 export function useStreamingData(
-  initialData: ChartData,
+  initialData: DataInput,
   options: StreamingOptions,
 ): StreamingResult {
   const { window: windowSize, batchSize = 1 } = options;
   const autoStart = options.autoStart ?? true;
 
-  const [data, setData] = useState<ChartData>(initialData);
+  const [data, setData] = useState<ChartData>(() => normalizeData(initialData));
   const [running, setRunning] = useState(false);
   const [fps, setFps] = useState(0);
 
@@ -73,6 +74,8 @@ export function useStreamingData(
   const batchRafRef = useRef(0);
   const windowSizeRef = useRef(windowSize);
   windowSizeRef.current = windowSize;
+  const batchSizeRef = useRef(batchSize);
+  batchSizeRef.current = batchSize;
 
   const pushGroup = useCallback(
     (groupIdx: number, x: number[], ...ySeries: number[][]) => {
@@ -92,8 +95,9 @@ export function useStreamingData(
         arr.push(...(ySeries[i] ?? []));
       }
 
-      // Schedule flush on next rAF (coalesces multiple pushes per frame)
-      if (batchRafRef.current === 0) {
+      // Schedule flush on next rAF, respecting batchSize threshold
+      const totalPending = pending.x.length;
+      if (batchRafRef.current === 0 && totalPending >= batchSizeRef.current) {
         batchRafRef.current = requestAnimationFrame(() => {
           batchRafRef.current = 0;
           const batched = pendingRef.current;
@@ -187,10 +191,6 @@ export function useStreamingData(
   useEffect(() => {
     if (autoStart) setRunning(true);
   }, [autoStart]);
-
-  // Expose batchSize for external tick callbacks
-  // (consumers use push() in their own rAF or interval)
-  void batchSize;
 
   return { data, push, pushGroup, start, stop, running, fps };
 }

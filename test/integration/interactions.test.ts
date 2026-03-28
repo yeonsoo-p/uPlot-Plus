@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { createChartStore, type ChartStore } from '@/hooks/useChartStore';
 import { setupInteraction } from '@/hooks/useInteraction';
 import { createScaleState } from '@/core/Scale';
-import { Orientation, Direction } from '@/types';
 
 /**
  * Integration tests for chart interactions.
@@ -251,7 +250,7 @@ describe('Interaction: drag-to-zoom', () => {
     const info = cb.mock.calls[0][0];
     expect(info.left).toBeGreaterThan(0);
     expect(info.right).toBeGreaterThan(info.left);
-    expect(info.ranges).toHaveProperty('x');
+    expect(info.ranges.x).toEqual(expect.objectContaining({ min: expect.any(Number), max: expect.any(Number) }));
     expect(info.ranges.x.min).toBeGreaterThan(0);
     expect(info.ranges.x.max).toBeLessThan(100);
   });

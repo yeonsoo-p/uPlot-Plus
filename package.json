@@ -1,6 +1,6 @@
 {
   "name": "uplot-plus",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "High-performance React charting library with multi-x-axis support",
   "type": "module",
   "main": "dist/index.cjs",
@@ -29,7 +29,7 @@
   "scripts": {
     "dev": "vite serve demo",
     "build": "vite build && tsc -p tsconfig.build.json",
-    "lint": "eslint src/",
+    "lint": "eslint src/ demo/",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "build:demo": "vite build demo",

@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis, Legend } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series, Legend } from '../../src';
 
 export default function ZoomVariations() {
-  const data: ChartData = useMemo(() => {
+  const data = useMemo(() => {
     const N = 500;
     const x: number[] = [];
     const y: number[] = [];
@@ -24,12 +23,8 @@ export default function ZoomVariations() {
         <strong>Scroll wheel</strong> to zoom both axes &middot;{' '}
         <strong>Double-click</strong> to reset zoom
       </p>
-      <Chart width={800} height={400} data={data} cursor={{ wheelZoom: 'xy' }}>
-        <Scale id="x"  />
-        <Scale id="y"  />
-        <Axis scale="x" label="X" />
-        <Axis scale="y" label="Value" />
-        <Series group={0} index={0} yScale="y" stroke="#8e44ad" width={2} label="Sine Wave" />
+      <Chart width={800} height={400} data={data} cursor={{ wheelZoom: 'xy' }} xlabel="X" ylabel="Value">
+        <Series group={0} index={0} label="Sine Wave" />
         <Legend />
       </Chart>
     </div>

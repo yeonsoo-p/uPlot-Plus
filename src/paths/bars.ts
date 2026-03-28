@@ -1,4 +1,5 @@
 import type { SeriesPaths, PathBuilder, PathBuilderOpts } from './types';
+export type { PathBuilderOpts } from './types';
 import type { ScaleState } from '../types';
 import { Orientation, Direction } from '../types';
 import { valToPos } from '../core/Scale';
@@ -100,6 +101,115 @@ export function bars(): PathBuilder {
     return {
       stroke,
       fill: stroke, // bars are filled with the same path
+      clip: null,
+      band: null,
+      gaps: null,
+    };
+  };
+}
+
+/**
+ * Grouped bar chart path builder.
+ * Wraps bars() to inject barGroupIdx and barGroupCount for side-by-side grouped bars.
+ */
+export function groupedBars(groupIdx: number, groupCount: number): PathBuilder {
+  const inner = bars();
+  return (dataX, dataY, scaleX, scaleY, xDim, yDim, xOff, yOff, idx0, idx1, dir, pxRound, opts) => {
+    const merged: PathBuilderOpts = {
+      ...opts,
+      barGroupIdx: groupIdx,
+      barGroupCount: groupCount,
+    };
+    return inner(dataX, dataY, scaleX, scaleY, xDim, yDim, xOff, yOff, idx0, idx1, dir, pxRound, merged);
+  };
+}
+
+/**
+ * Stacked bar chart path builder.
+ * Draws wider bars (80% column width) suited for stacking.
+ * Use with stackGroup() to transform data into cumulative values and generate Band configs.
+ */
+export function stackedBars(): PathBuilder {
+  return (
+    dataX: ArrayLike<number>,
+    dataY: ArrayLike<number | null>,
+    scaleX: ScaleState,
+    scaleY: ScaleState,
+    xDim: number,
+    yDim: number,
+    xOff: number,
+    yOff: number,
+    idx0: number,
+    idx1: number,
+    dir: Direction,
+    pxRound: (v: number) => number,
+    opts?: PathBuilderOpts,
+  ): SeriesPaths => {
+    const barWidthFrac = opts?.barWidth ?? 0.8;
+    const extraGap = opts?.barGap ?? 0;
+    const radiusFrac = opts?.barRadius ?? 0;
+
+    const pixelForX = (val: number) => pxRound(valToPos(val, scaleX, xDim, xOff));
+    const pixelForY = (val: number) => pxRound(valToPos(val, scaleY, yDim, yOff));
+
+    // Find minimum column width from adjacent x-values
+    let colWid = xDim;
+    if (idx1 > idx0) {
+      let minDelta = Infinity;
+      let prevIdx = -1;
+
+      for (let i = idx0; i <= idx1; i++) {
+        if (dataY[i] != null) {
+          if (prevIdx >= 0) {
+            const dx = dataX[i] as number;
+            const dprev = dataX[prevIdx] as number;
+            const delta = Math.abs(pixelForX(dx) - pixelForX(dprev));
+            if (delta < minDelta) minDelta = delta;
+          }
+          prevIdx = i;
+        }
+      }
+      if (minDelta < Infinity) colWid = minDelta;
+    }
+
+    const gapWid = colWid * (1 - barWidthFrac);
+    const fullGap = Math.max(0, gapWid + extraGap);
+    const barWid = Math.max(1, pxRound(colWid - fullGap));
+
+    const fillToVal = opts?.fillTo ?? scaleY.min ?? 0;
+    const fillToY = pixelForY(fillToVal);
+
+    const stroke = new Path2D();
+    const isHorizontal = scaleX.ori === Orientation.Horizontal;
+
+    for (let i = dir === Direction.Forward ? idx0 : idx1; i >= idx0 && i <= idx1; i += dir) {
+      const yVal = dataY[i];
+      if (yVal == null) continue;
+
+      const xPos = pixelForX(dataX[i] as number);
+      const yPos = pixelForY(yVal);
+
+      const lft = pxRound(xPos - barWid / 2);
+      const top = Math.min(yPos, fillToY);
+      const btm = Math.max(yPos, fillToY);
+      const barHgt = btm - top;
+
+      if (barHgt === 0) continue;
+
+      if (radiusFrac > 0) {
+        const rad = Math.min(radiusFrac * barWid, barHgt / 2);
+        drawRoundedRect(stroke, isHorizontal, lft, top, barWid, barHgt, rad, yVal < fillToVal);
+      } else {
+        if (isHorizontal)
+          stroke.rect(lft, top, barWid, barHgt);
+        else
+          stroke.rect(top, lft, barHgt, barWid);
+      }
+    }
+
+    return {
+      stroke,
+      fill: stroke,
       clip: null,
       band: null,
       gaps: null,

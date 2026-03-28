@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis, Legend } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series, Legend } from '../../src';
 
 function movingAverage(arr: number[], window: number): number[] {
   const result: number[] = [];
@@ -18,7 +17,7 @@ function movingAverage(arr: number[], window: number): number[] {
   return result;
 }
 
-function generateData(): ChartData {
+function generateData() {
   const n = 300;
   const x: number[] = [];
   const noisy: number[] = [];
@@ -39,24 +38,15 @@ export default function DataSmoothing() {
   const data = useMemo(() => generateData(), []);
 
   return (
-    <Chart width={800} height={400} data={data}>
-      <Scale id="x" />
-      <Scale id="y"  />
-      <Axis scale="x" label="Sample" />
-      <Axis scale="y" label="Value" />
+    <Chart width={800} height={400} data={data} xlabel="Sample" ylabel="Value">
       <Series
         group={0}
         index={0}
-        yScale="y"
-        stroke="rgba(52, 152, 219, 0.3)"
-        width={1}
         label="Noisy"
       />
       <Series
         group={0}
         index={1}
-        yScale="y"
-        stroke="#e74c3c"
         width={2.5}
         label="Smoothed (MA-15)"
       />

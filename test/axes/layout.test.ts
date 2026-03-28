@@ -16,18 +16,18 @@ function makeGetScale(scales: Record<string, ScaleState>) {
 
 // ---- calcPlotRect ----
 describe('calcPlotRect', () => {
-  it('no axes: full chart area', () => {
+  it('no axes: full chart area with top margin for tick overflow', () => {
     const box = calcPlotRect(800, 600, []);
-    expect(box).toEqual({ left: 0, top: 0, width: 800, height: 600 });
+    expect(box).toEqual({ left: 0, top: 8, width: 800, height: 592 });
   });
 
-  it('bottom x-axis reduces height', () => {
+  it('bottom x-axis reduces height (with top margin)', () => {
     const axes: AxisState[] = [
       { ...createAxisState({ scale: 'x', side: Side.Bottom }), _show: true, _size: 50 },
     ];
     const box = calcPlotRect(800, 600, axes);
-    expect(box.height).toBe(550);
-    expect(box.top).toBe(0);
+    expect(box.height).toBe(542);
+    expect(box.top).toBe(8);
   });
 
   it('left y-axis reduces width and shifts left', () => {

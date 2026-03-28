@@ -4,6 +4,7 @@ import type { SelectState } from '../types/cursor';
 import type { ChartEventInfo, NearestPoint, SelectEventInfo } from '../types/events';
 import { posToVal, valToPos, invalidateScaleCache } from '../core/Scale';
 import { Side, Orientation, sideOrientation, DirtyFlag } from '../types/common';
+import { clamp } from '../math/utils';
 
 interface CoordSource {
   clientX: number;
@@ -99,9 +100,7 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
             // Compute pixel positions of the snapped point
             const xScaleKey = store.scaleManager.getGroupXScaleKey(cursor.activeGroup);
             const xScale = xScaleKey != null ? store.scaleManager.getScale(xScaleKey) : undefined;
-            const seriesCfg = store.seriesConfigs.find(
-              s => s.group === cursor.activeGroup && s.index === cursor.activeSeriesIdx,
-            );
+            const seriesCfg = store.seriesConfigMap.get(`${cursor.activeGroup}:${cursor.activeSeriesIdx}`);
             const yScale = seriesCfg != null ? store.scaleManager.getScale(seriesCfg.yScale) : undefined;
 
             let pxX = cx;
@@ -246,7 +245,7 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
       if (dragStart != null) {
         const startX = dragStart.x;
         const plotBox = store.plotBox;
-        const clampedCx = Math.max(0, Math.min(cx, plotBox.width));
+        const clampedCx = clamp(cx, 0, plotBox.width);
 
         selectState.show = true;
         selectState.left = Math.min(startX, clampedCx);
@@ -454,7 +453,7 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
 
       e.preventDefault();
 
-      const factor = Math.max(0.1, Math.min(10, 1 - e.deltaY * 0.001));
+      const factor = clamp(1 - e.deltaY * 0.001, 0.1, 10);
       const plotBox = store.plotBox;
 
       for (const scale of store.scaleManager.getAllScales()) {
@@ -478,7 +477,6 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
         invalidateScaleCache(scale);
       }
 
-      store.renderer.clearCache();
       store.scheduleRedraw();
       fireScaleChange();
     }
@@ -510,8 +508,6 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
         scale.auto = false;
         invalidateScaleCache(scale);
       }
-
-      store.renderer.clearCache();
     }
 
     // Touch support

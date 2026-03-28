@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react';
 import { Chart, Scale, Series, Axis, bars, Distribution } from '../../src';
-import type { ChartData } from '../../src';
 
-function generateMassSpecData(): ChartData {
+function generateMassSpecData() {
   // Mass spectrum: sharp peaks at specific m/z values
   const peaks: Array<{ mz: number; intensity: number }> = [
     { mz: 18, intensity: 5e3 },
@@ -63,17 +62,14 @@ export default function MassSpectrum() {
 
   return (
     <Chart width={800} height={400} data={data}>
-      <Scale id="x" />
       <Scale id="y"  distr={Distribution.Log} log={10} />
       <Axis scale="x" label="m/z" values={fmtMz} />
       <Axis scale="y" label="Intensity" values={fmtIntensity} />
       <Series
         group={0}
         index={0}
-        yScale="y"
         stroke="#2c3e50"
         fill="rgba(44, 62, 80, 0.5)"
-        width={1}
         label="Intensity"
         paths={bars(0.4)}
         fillTo={1}

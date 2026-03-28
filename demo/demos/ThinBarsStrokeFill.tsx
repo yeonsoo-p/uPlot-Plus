@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis, Legend, bars } from '../../src';
+import { Chart, Series, Legend, groupedBars } from '../../src';
 import type { ChartData } from '../../src';
 
 export default function ThinBarsStrokeFill() {
@@ -17,20 +17,13 @@ export default function ThinBarsStrokeFill() {
       <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
         Bar chart variations: stroke-only, fill-only, and stroke+fill with different widths.
       </p>
-      <Chart width={800} height={400} data={data}>
-        <Scale id="x" />
-        <Scale id="y"  />
-        <Axis scale="x" label="Item" />
-        <Axis scale="y" label="Value" />
+      <Chart width={800} height={400} data={data} xlabel="Item" ylabel="Value">
         {/* Stroke only */}
         <Series
           group={0}
           index={0}
-          yScale="y"
-          stroke="#e74c3c"
-          width={2}
           label="Stroke Only"
-          paths={bars()}
+          paths={groupedBars(0, 3)}
           fillTo={0}
           cursor={{ show: false }}
           points={{ show: false }}
@@ -39,12 +32,10 @@ export default function ThinBarsStrokeFill() {
         <Series
           group={0}
           index={1}
-          yScale="y"
           stroke="transparent"
           fill="rgba(52, 152, 219, 0.6)"
-          width={0}
           label="Fill Only"
-          paths={bars()}
+          paths={groupedBars(1, 3)}
           fillTo={0}
           cursor={{ show: false }}
           points={{ show: false }}
@@ -53,12 +44,10 @@ export default function ThinBarsStrokeFill() {
         <Series
           group={0}
           index={2}
-          yScale="y"
           stroke="#27ae60"
           fill="rgba(39, 174, 96, 0.3)"
-          width={3}
           label="Stroke + Fill"
-          paths={bars()}
+          paths={groupedBars(2, 3)}
           fillTo={0}
           cursor={{ show: false }}
           points={{ show: false }}

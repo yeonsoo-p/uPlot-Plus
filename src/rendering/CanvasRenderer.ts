@@ -44,6 +44,9 @@ export class CanvasRenderer {
   // --- Band path cache: keyed by group:upper:lower:i0:i1 ---
   private bandCache = new Map<string, Path2D>();
 
+  // Scale-stamp: fingerprint of all active scale ranges. Auto-clears cache on zoom.
+  private scaleStamp = '';
+
   // LRU tracking: doubly-linked list + Map for O(1) promotion and eviction
   private lruHead: LruNode | null = null; // oldest
   private lruTail: LruNode | null = null; // newest
@@ -196,21 +199,62 @@ export class CanvasRenderer {
     this.snapshotValid = false;
   }
 
+  // --- Scale-stamp auto-invalidation ---
+
+  /** Compare current scale ranges to cached stamp; clear path cache if scales changed (zoom). */
+  checkScaleStamp(renderList: RenderableSeriesInfo[]): void {
+    let stamp = '';
+    const seen = new Set<string>();
+    for (const info of renderList) {
+      for (const s of [info.xScale, info.yScale]) {
+        if (seen.has(s.id)) continue;
+        seen.add(s.id);
+        stamp += `${s.id}:${s.min}:${s.max};`;
+      }
+    }
+    if (stamp !== this.scaleStamp) {
+      if (this.scaleStamp !== '') {
+        // Scales changed (not first render) — clear stale paths
+        this.clearCache();
+      }
+      this.scaleStamp = stamp;
+    }
+  }
+
   // --- Two-level path cache ---
 
   private windowKey(i0: number, i1: number): string {
     return `${i0}:${i1}`;
   }
 
-  /** Get cached paths for a series, promoting to most-recently-used */
+  /** Get cached paths for a series, promoting to most-recently-used.
+   *  Falls back to a superset window match if exact key misses. */
   getCachedPaths(group: number, index: number, i0: number, i1: number): SeriesPaths | undefined {
     const groupMap = this.pathCache.get(group);
     if (groupMap == null) return undefined;
     const indexMap = groupMap.get(index);
     if (indexMap == null) return undefined;
     const wk = this.windowKey(i0, i1);
-    const paths = indexMap.get(wk);
-    if (paths != null) {
+    let paths = indexMap.get(wk);
+
+    // Superset fallback: check if any cached window fully contains the requested range
+    if (paths == null) {
+      for (const [cachedWk, cachedPaths] of indexMap) {
+        const sep = cachedWk.indexOf(':');
+        const ci0 = +cachedWk.slice(0, sep);
+        const ci1 = +cachedWk.slice(sep + 1);
+        if (ci0 <= i0 && ci1 >= i1) {
+          paths = cachedPaths;
+          // Promote the superset entry
+          const node = this.lruMap.get(this.lruKey(group, index, cachedWk));
+          if (node != null && node !== this.lruTail) {
+            this.lruUnlink(node);
+            this.lruAppend(node);
+          }
+          break;
+        }
+      }
+    } else {
       // O(1) promote to most-recently-used
       const node = this.lruMap.get(this.lruKey(group, index, wk));
       if (node != null && node !== this.lruTail) {
@@ -221,7 +265,8 @@ export class CanvasRenderer {
     return paths;
   }
 
-  /** Store paths in cache, evicting oldest 25% when at capacity */
+  /** Store paths in cache, evicting oldest 25% when at capacity.
+   *  Callers may pass padded i0/i1 (wider than the visible window) for "runway" during panning. */
   setCachedPaths(group: number, index: number, i0: number, i1: number, paths: SeriesPaths): void {
     // LRU eviction: remove oldest 25% when at capacity
     if (this.pathCacheSize >= MAX_CACHE_SIZE) {
@@ -313,7 +358,7 @@ export class CanvasRenderer {
         this.bandCache.delete(bk);
       }
     }
-    this.snapshotValid = false;
+    this.invalidateSnapshot();
   }
 
   /** Invalidate all cached paths (e.g. on scale change) */
@@ -324,7 +369,7 @@ export class CanvasRenderer {
     this.lruTail = null;
     this.lruMap.clear();
     this.bandCache.clear();
-    this.snapshotValid = false;
+    this.invalidateSnapshot();
   }
 
   // --- Band path cache ---
@@ -360,6 +405,13 @@ export class CanvasRenderer {
       const dir = info.xScale.dir;
       const pxRound = (v: number) => round(v);
 
+      // Expand window by ~10% on each side for "runway" during panning
+      const span = i1 - i0;
+      const pad = Math.max(1, Math.ceil(span * 0.1));
+      const dataLen = info.dataX.length;
+      const pi0 = Math.max(0, i0 - pad);
+      const pi1 = Math.min(dataLen - 1, i1 + pad);
+
       const fillToCfg = info.config.fillTo;
       const fillTo = typeof fillToCfg === 'function'
         ? fillToCfg(info.yScale.min ?? 0, info.yScale.max ?? 0)
@@ -374,14 +426,14 @@ export class CanvasRenderer {
         plotBox.height,
         plotBox.left,
         plotBox.top,
-        i0,
-        i1,
+        pi0,
+        pi1,
         dir,
         pxRound,
         { fillTo, spanGaps: info.config.spanGaps },
       );
 
-      this.setCachedPaths(group, index, i0, i1, paths);
+      this.setCachedPaths(group, index, pi0, pi1, paths);
     }
 
     drawSeriesPath(ctx, info.config, paths, pxRatio, plotBox);

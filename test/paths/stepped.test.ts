@@ -46,12 +46,17 @@ describe('stepped path builder', () => {
     const result = builder([0, 1, 2], [0, 10, 0], sx, sy, 200, 100, 0, 0, 0, 2, 1, pxRound, { align: 1 });
 
     const lineToPoints = getLineToCalls(result.stroke);
-    // Each consecutive pair of lineTo calls must share either x or y coordinate
-    for (let i = 1; i < lineToPoints.length; i++) {
-      const [px, py] = lineToPoints[i - 1]!;
-      const [cx, cy] = lineToPoints[i]!;
-      expect(px === cx || py === cy).toBe(true);
-    }
+    // pixelForX: 0→0, 1→100, 2→200; pixelForY: 0→100, 10→0
+    // align=1: horizontal to new x at old y, then vertical to new y
+    expect(lineToPoints).toEqual([
+      [0, 100],    // initial point
+      [0, 100],    // i=0: step to self (x1=0, prevY=100)
+      [0, 100],    // i=0: arrive at (0, 100)
+      [100, 100],  // i=1: horizontal step right at old y=100
+      [100, 0],    // i=1: vertical step down to y=0
+      [200, 0],    // i=2: horizontal step right at old y=0
+      [200, 100],  // i=2: vertical step up to y=100
+    ]);
   });
 
   it('align=-1 produces vertical-then-horizontal steps', () => {
@@ -60,11 +65,16 @@ describe('stepped path builder', () => {
     const result = builder([0, 1, 2], [0, 10, 0], sx, sy, 200, 100, 0, 0, 0, 2, 1, pxRound, { align: -1 });
 
     const lineToPoints = getLineToCalls(result.stroke);
-    for (let i = 1; i < lineToPoints.length; i++) {
-      const [px, py] = lineToPoints[i - 1]!;
-      const [cx, cy] = lineToPoints[i]!;
-      expect(px === cx || py === cy).toBe(true);
-    }
+    // align=-1: vertical to new y at old x, then horizontal to new x
+    expect(lineToPoints).toEqual([
+      [0, 100],    // initial point
+      [0, 100],    // i=0: step to self (prevX=0, y1=100)
+      [0, 100],    // i=0: arrive at (0, 100)
+      [0, 0],      // i=1: vertical to y=0 at old x=0
+      [100, 0],    // i=1: horizontal to x=100
+      [100, 100],  // i=2: vertical to y=100 at old x=100
+      [200, 100],  // i=2: horizontal to x=200
+    ]);
   });
 
   it('align=0 adds midpoint steps (more lineTo calls than align=1)', () => {

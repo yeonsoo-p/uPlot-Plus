@@ -2,6 +2,8 @@ import React from 'react';
 
 // --- Getting Started ---
 import BasicLine from './BasicLine';
+import SimpleData from './SimpleData';
+import MinimalChart from './MinimalChart';
 import AreaFill from './AreaFill';
 import PointStyles from './PointStyles';
 import DashPatterns from './DashPatterns';
@@ -19,6 +21,7 @@ import FillTo from './FillTo';
 import BarChart from './BarChart';
 import MultiBars from './MultiBars';
 import BarsGroupedStacked from './BarsGroupedStacked';
+import StackedBars from './StackedBars';
 import StackedSeries from './StackedSeries';
 import ThinBarsStrokeFill from './ThinBarsStrokeFill';
 import BarsValuesAutosize from './BarsValuesAutosize';
@@ -35,7 +38,8 @@ import ScalePadding from './ScalePadding';
 import SoftMinMax from './SoftMinMax';
 import SyncYZero from './SyncYZero';
 
-// --- Axes & Grid ---
+// --- Axes & Formatting ---
+import FormattersShowcase from './FormattersShowcase';
 import AxisControl from './AxisControl';
 import CustomAxisValues from './CustomAxisValues';
 import AxisAutosize from './AxisAutosize';
@@ -52,7 +56,8 @@ import TimePeriods from './TimePeriods';
 import TimeseriesDiscrete from './TimeseriesDiscrete';
 import TimelineDiscrete from './TimelineDiscrete';
 
-// --- Cursor & Tooltips ---
+// --- Cursor & Interaction ---
+import UseChartDemo from './UseChartDemo';
 import SyncCursor from './SyncCursor';
 import CursorBind from './CursorBind';
 import CursorSnap from './CursorSnap';
@@ -61,8 +66,10 @@ import NearestNonNull from './NearestNonNull';
 import Tooltips from './Tooltips';
 import TooltipsClosest from './TooltipsClosest';
 import CursorTooltip from './CursorTooltip';
+import HoverLabel from './HoverLabel';
+import FloatingLegendDemo from './FloatingLegendDemo';
 
-// --- Zoom & Interaction ---
+// --- Zoom & Pan ---
 import ZoomWheel from './ZoomWheel';
 import ZoomTouch from './ZoomTouch';
 import ZoomVariations from './ZoomVariations';
@@ -82,8 +89,13 @@ import PathGapClip from './PathGapClip';
 import AlignData from './AlignData';
 import MultiXAxis from './MultiXAxis';
 import AddDelSeries from './AddDelSeries';
+import DataTypes from './DataTypes';
 
-// --- Layout & Live Data ---
+// --- Tooltips & Legends ---
+import CustomTooltipDemo from './CustomTooltipDemo';
+
+// --- Layout & Streaming ---
+import StreamingHookDemo from './StreamingHookDemo';
 import Sparklines from './Sparklines';
 import ResizeDemo from './ResizeDemo';
 import ResponsiveDemo from './ResponsiveDemo';
@@ -93,7 +105,10 @@ import RealtimeSine from './RealtimeSine';
 import LargeDataset from './LargeDataset';
 import UpdateCursorSelectResize from './UpdateCursorSelectResize';
 
-// --- Annotations & Overlays ---
+// --- Annotations & Drawing ---
+import DrawHooksComposable from './DrawHooksComposable';
+import PaletteColors from './PaletteColors';
+import BandDemo from './BandDemo';
 import DrawHooks from './DrawHooks';
 import Annotations from './Annotations';
 import Gradients from './Gradients';
@@ -132,11 +147,13 @@ export interface DemoEntry {
 export const demos: DemoEntry[] = [
   // --- Getting Started ---
   { id: 'basic-line', title: 'Basic Line', description: 'Sine and cosine waves. Drag to zoom, double-click to reset.', category: 'Getting Started', component: BasicLine, sourceFile: 'BasicLine' },
+  { id: 'simple-data', title: 'Simple Data Formats', description: 'Three data input forms: {x,y}, [{x,y}], and [{x, series}].', category: 'Getting Started', component: SimpleData, sourceFile: 'SimpleData' },
+  { id: 'minimal-chart', title: 'Minimal Chart', description: 'Progressive complexity — from minimal to fully customized.', category: 'Getting Started', component: MinimalChart, sourceFile: 'MinimalChart' },
   { id: 'area-fill', title: 'Area Fill', description: 'Semi-transparent fill under each series using the fill prop.', category: 'Getting Started', component: AreaFill, sourceFile: 'AreaFill' },
   { id: 'point-styles', title: 'Point Styles', description: 'Line-only, line+points, points-only, and custom point colors.', category: 'Getting Started', component: PointStyles, sourceFile: 'PointStyles' },
   { id: 'dash-patterns', title: 'Dash Patterns', description: 'Visual catalog of line dash patterns and cap styles.', category: 'Getting Started', component: DashPatterns, sourceFile: 'DashPatterns' },
-  { id: 'legend', title: 'Legend', description: 'Legend component at top/bottom with live values and click-to-toggle.', category: 'Getting Started', component: LegendDemo, sourceFile: 'LegendDemo' },
-  { id: 'no-data', title: 'No Data / Edge Cases', description: 'Single point, two points, and all-null edge cases.', category: 'Getting Started', component: NoData, sourceFile: 'NoData' },
+  { id: 'legend', title: 'Legend', description: 'Legend component at top/bottom with live values and click-to-toggle.', category: 'Tooltips & Legends', component: LegendDemo, sourceFile: 'LegendDemo' },
+  { id: 'no-data', title: 'No Data / Edge Cases', description: 'Single point, two points, and all-null edge cases.', category: 'Data Handling', component: NoData, sourceFile: 'NoData' },
 
   // --- Line Styles ---
   { id: 'smooth-lines', title: 'Smooth Lines', description: 'Linear vs monotone cubic vs Catmull-Rom spline interpolation.', category: 'Line Styles', component: SmoothLines, sourceFile: 'SmoothLines' },
@@ -148,11 +165,12 @@ export const demos: DemoEntry[] = [
   // --- Bars & Stacking ---
   { id: 'bar-chart', title: 'Bar Chart', description: 'Bar path builder with multiple series for monthly revenue/cost data.', category: 'Bars & Stacking', component: BarChart, sourceFile: 'BarChart' },
   { id: 'multi-bars', title: 'Multi Bars', description: 'Multiple bar series grouped side-by-side per x-position.', category: 'Bars & Stacking', component: MultiBars, sourceFile: 'MultiBars' },
-  { id: 'bars-grouped-stacked', title: 'Grouped & Stacked Bars', description: 'Side-by-side grouped bars and stacked bars comparison.', category: 'Bars & Stacking', component: BarsGroupedStacked, sourceFile: 'BarsGroupedStacked' },
+  { id: 'bars-grouped', title: 'Grouped Bars', description: 'Side-by-side grouped bars using the groupedBars() path builder.', category: 'Bars & Stacking', component: BarsGroupedStacked, sourceFile: 'BarsGroupedStacked' },
+  { id: 'bars-stacked', title: 'Stacked Bars', description: 'Stacked bars using stackGroup() and Band components.', category: 'Bars & Stacking', component: StackedBars, sourceFile: 'StackedBars' },
   { id: 'stacked-series', title: 'Stacked Series', description: 'Stacked area chart using stackGroup() data transformation.', category: 'Bars & Stacking', component: StackedSeries, sourceFile: 'StackedSeries' },
   { id: 'thin-bars-stroke-fill', title: 'Thin Bars Stroke/Fill', description: 'Bar chart variations: stroke-only, fill-only, stroke+fill.', category: 'Bars & Stacking', component: ThinBarsStrokeFill, sourceFile: 'ThinBarsStrokeFill' },
   { id: 'bars-values-autosize', title: 'Bar Value Labels', description: 'Bar chart with value labels drawn above each bar.', category: 'Bars & Stacking', component: BarsValuesAutosize, sourceFile: 'BarsValuesAutosize' },
-  { id: 'sparklines-bars', title: 'Sparklines (Bars)', description: 'Sparkline-sized bar charts embedded in a table.', category: 'Bars & Stacking', component: SparklinesBars, sourceFile: 'SparklinesBars' },
+  { id: 'sparklines-bars', title: 'Sparklines (Bars)', description: 'Sparkline-sized bar charts embedded in a table.', category: 'Layout & Streaming', component: SparklinesBars, sourceFile: 'SparklinesBars' },
 
   // --- Scales ---
   { id: 'multiple-scales', title: 'Multiple Scales', description: 'Temperature and humidity on independent y-scales with left/right axes.', category: 'Scales', component: MultipleScales, sourceFile: 'MultipleScales' },
@@ -165,14 +183,15 @@ export const demos: DemoEntry[] = [
   { id: 'soft-minmax', title: 'Soft Min/Max', description: 'Scale soft limits that expand but do not contract.', category: 'Scales', component: SoftMinMax, sourceFile: 'SoftMinMax' },
   { id: 'sync-y-zero', title: 'Sync Y Zero', description: 'Two y-scales both pinned at zero.', category: 'Scales', component: SyncYZero, sourceFile: 'SyncYZero' },
 
-  // --- Axes & Grid ---
-  { id: 'axis-control', title: 'Axis Control', description: '50,000 points with a fixed y-scale range and axis customization.', category: 'Axes & Grid', component: AxisControl, sourceFile: 'AxisControl' },
-  { id: 'custom-axis-values', title: 'Custom Axis Values', description: 'Custom formatters: seconds as HH:MM on x-axis, MB/s units on y-axis.', category: 'Axes & Grid', component: CustomAxisValues, sourceFile: 'CustomAxisValues' },
-  { id: 'axis-autosize', title: 'Axis Autosize', description: 'Axis auto-sizing for wide numeric labels (millions).', category: 'Axes & Grid', component: AxisAutosize, sourceFile: 'AxisAutosize' },
-  { id: 'axis-indicators', title: 'Axis Indicators', description: 'Grid, tick, and border decoration options on all four axes.', category: 'Axes & Grid', component: AxisIndicators, sourceFile: 'AxisIndicators' },
-  { id: 'grid-over-series', title: 'Grid Over Series', description: 'Default grid-behind vs grid-over-series using onDraw hook.', category: 'Axes & Grid', component: GridOverSeries, sourceFile: 'GridOverSeries' },
-  { id: 'custom-scales', title: 'Custom Scales', description: 'Manual fixed min/max vs auto-ranged scale comparison.', category: 'Axes & Grid', component: CustomScales, sourceFile: 'CustomScales' },
-  { id: 'nice-scale', title: 'Nice Scale', description: 'Auto-range producing "nice" round tick values.', category: 'Axes & Grid', component: NiceScale, sourceFile: 'NiceScale' },
+  // --- Axes & Formatting ---
+  { id: 'axis-control', title: 'Axis Control', description: '50,000 points with a fixed y-scale range and axis customization.', category: 'Axes & Formatting', component: AxisControl, sourceFile: 'AxisControl' },
+  { id: 'custom-axis-values', title: 'Custom Axis Values', description: 'Custom formatters: seconds as HH:MM on x-axis, MB/s units on y-axis.', category: 'Axes & Formatting', component: CustomAxisValues, sourceFile: 'CustomAxisValues' },
+  { id: 'axis-autosize', title: 'Axis Autosize', description: 'Axis auto-sizing for wide numeric labels (millions).', category: 'Axes & Formatting', component: AxisAutosize, sourceFile: 'AxisAutosize' },
+  { id: 'axis-indicators', title: 'Axis Indicators', description: 'Grid, tick, and border decoration options on all four axes.', category: 'Axes & Formatting', component: AxisIndicators, sourceFile: 'AxisIndicators' },
+  { id: 'grid-over-series', title: 'Grid Over Series', description: 'Default grid-behind vs grid-over-series using onDraw hook.', category: 'Axes & Formatting', component: GridOverSeries, sourceFile: 'GridOverSeries' },
+  { id: 'formatters', title: 'Formatters', description: 'All axis formatter functions: fmtCompact, fmtSuffix, fmtHourMin, fmtMonthName, fmtDateStr, fmtLabels.', category: 'Axes & Formatting', component: FormattersShowcase, sourceFile: 'FormattersShowcase' },
+  { id: 'custom-scales', title: 'Custom Scales', description: 'Manual fixed min/max vs auto-ranged scale comparison.', category: 'Scales', component: CustomScales, sourceFile: 'CustomScales' },
+  { id: 'nice-scale', title: 'Nice Scale', description: 'Auto-range producing "nice" round tick values.', category: 'Scales', component: NiceScale, sourceFile: 'NiceScale' },
 
   // --- Time & Dates ---
   { id: 'time-series', title: 'Time Series', description: 'Unix timestamps with HH:MM formatting — monitoring dashboard pattern.', category: 'Time & Dates', component: TimeSeries, sourceFile: 'TimeSeries' },
@@ -180,30 +199,34 @@ export const demos: DemoEntry[] = [
   { id: 'timezones-dst', title: 'Timezones & DST', description: 'Time series spanning a DST spring-forward transition.', category: 'Time & Dates', component: TimezonesDST, sourceFile: 'TimezonesDST' },
   { id: 'time-periods', title: 'Time Periods', description: 'Hourly, daily, and monthly time granularities.', category: 'Time & Dates', component: TimePeriods, sourceFile: 'TimePeriods' },
   { id: 'timeseries-discrete', title: 'Discrete Time Series', description: 'Stepped interpolation for discrete status values.', category: 'Time & Dates', component: TimeseriesDiscrete, sourceFile: 'TimeseriesDiscrete' },
-  { id: 'timeline-discrete', title: 'Timeline (Discrete)', description: 'Discrete event spans as horizontal colored bars with lane labels.', category: 'Time & Dates', component: TimelineDiscrete, sourceFile: 'TimelineDiscrete' },
+  { id: 'timeline-discrete', title: 'Timeline (Discrete)', description: 'Discrete event spans as horizontal colored bars with lane labels.', category: 'Specialized Charts', component: TimelineDiscrete, sourceFile: 'TimelineDiscrete' },
 
-  // --- Cursor & Tooltips ---
-  { id: 'sync-cursor', title: 'Sync Cursor', description: 'Two charts sharing cursor position via syncKey.', category: 'Cursor & Tooltips', component: SyncCursor, sourceFile: 'SyncCursor' },
-  { id: 'cursor-bind', title: 'Cursor Bind', description: 'Two charts synced via syncKey with different data.', category: 'Cursor & Tooltips', component: CursorBind, sourceFile: 'CursorBind' },
-  { id: 'cursor-snap', title: 'Cursor Snap', description: 'Cursor snapping with sparse data (30 points).', category: 'Cursor & Tooltips', component: CursorSnap, sourceFile: 'CursorSnap' },
-  { id: 'focus-cursor', title: 'Focus Cursor', description: 'Proximity-based focus dims non-closest series on hover.', category: 'Cursor & Tooltips', component: FocusCursor, sourceFile: 'FocusCursor' },
-  { id: 'nearest-non-null', title: 'Nearest Non-Null', description: 'Cursor snapping that skips over null values.', category: 'Cursor & Tooltips', component: NearestNonNull, sourceFile: 'NearestNonNull' },
-  { id: 'tooltips', title: 'Tooltips', description: 'Default tooltip component showing all series values at cursor.', category: 'Cursor & Tooltips', component: Tooltips, sourceFile: 'Tooltips' },
-  { id: 'tooltips-closest', title: 'Tooltips (Closest)', description: 'Custom tooltip showing only the closest series value.', category: 'Cursor & Tooltips', component: TooltipsClosest, sourceFile: 'TooltipsClosest' },
-  { id: 'cursor-tooltip', title: 'Cursor + Tooltip Sync', description: 'Two synced charts each with tooltip following cursor.', category: 'Cursor & Tooltips', component: CursorTooltip, sourceFile: 'CursorTooltip' },
+  // --- Cursor & Interaction ---
+  { id: 'sync-cursor', title: 'Sync Cursor', description: 'Two charts sharing cursor position via syncKey.', category: 'Cursor & Interaction', component: SyncCursor, sourceFile: 'SyncCursor' },
+  { id: 'cursor-bind', title: 'Cursor Bind', description: 'Two charts synced via syncKey with different data.', category: 'Cursor & Interaction', component: CursorBind, sourceFile: 'CursorBind' },
+  { id: 'cursor-snap', title: 'Cursor Snap', description: 'Cursor snapping with sparse data (30 points).', category: 'Cursor & Interaction', component: CursorSnap, sourceFile: 'CursorSnap' },
+  { id: 'focus-cursor', title: 'Focus Cursor', description: 'Proximity-based focus dims non-closest series on hover.', category: 'Cursor & Interaction', component: FocusCursor, sourceFile: 'FocusCursor' },
+  { id: 'nearest-non-null', title: 'Nearest Non-Null', description: 'Cursor snapping that skips over null values.', category: 'Cursor & Interaction', component: NearestNonNull, sourceFile: 'NearestNonNull' },
+  { id: 'tooltips', title: 'Tooltips', description: 'Default tooltip component showing all series values at cursor.', category: 'Tooltips & Legends', component: Tooltips, sourceFile: 'Tooltips' },
+  { id: 'tooltips-closest', title: 'Tooltips (Closest)', description: 'Custom tooltip showing only the closest series value.', category: 'Tooltips & Legends', component: TooltipsClosest, sourceFile: 'TooltipsClosest' },
+  { id: 'cursor-tooltip', title: 'Cursor + Tooltip Sync', description: 'Two synced charts each with tooltip following cursor.', category: 'Tooltips & Legends', component: CursorTooltip, sourceFile: 'CursorTooltip' },
+  { id: 'hover-label', title: 'Hover Label', description: 'Hover over a series for 1 second to show its label as a floating tag.', category: 'Cursor & Interaction', component: HoverLabel, sourceFile: 'HoverLabel' },
+  { id: 'floating-legend', title: 'Floating Legend', description: 'Draggable legend widget inside the chart area with live values.', category: 'Tooltips & Legends', component: FloatingLegendDemo, sourceFile: 'FloatingLegendDemo' },
+  { id: 'custom-tooltip', title: 'Custom Tooltip', description: 'Fully custom tooltip UI via the Tooltip children render prop.', category: 'Tooltips & Legends', component: CustomTooltipDemo, sourceFile: 'CustomTooltipDemo' },
 
-  // --- Zoom & Interaction ---
-  { id: 'zoom-wheel', title: 'Wheel Zoom', description: 'Mouse wheel zoom on x-axis centered at cursor position.', category: 'Zoom & Interaction', component: ZoomWheel, sourceFile: 'ZoomWheel' },
-  { id: 'zoom-touch', title: 'Touch Zoom', description: 'Two-finger pinch to zoom on touch devices.', category: 'Zoom & Interaction', component: ZoomTouch, sourceFile: 'ZoomTouch' },
-  { id: 'zoom-variations', title: 'Zoom Variations', description: 'Drag zoom, wheel zoom, and double-click reset combined.', category: 'Zoom & Interaction', component: ZoomVariations, sourceFile: 'ZoomVariations' },
-  { id: 'zoom-fetch', title: 'Zoom Fetch', description: 'Zoom triggers simulated data re-fetch with loading indicator.', category: 'Zoom & Interaction', component: ZoomFetch, sourceFile: 'ZoomFetch' },
-  { id: 'zoom-modifier-keys', title: 'Modifier Key Zoom', description: 'Shift+scroll for X zoom, Alt+scroll for Y zoom.', category: 'Zoom & Interaction', component: ZoomModifierKeys, sourceFile: 'ZoomModifierKeys' },
-  { id: 'y-scale-drag', title: 'Y-Scale Drag', description: 'Click and drag on y-axis gutters to pan the scale range.', category: 'Zoom & Interaction', component: YScaleDrag, sourceFile: 'YScaleDrag' },
-  { id: 'zoom-ranger', title: 'Zoom Ranger', description: 'Overview mini-chart with draggable selection controlling detail chart zoom.', category: 'Zoom & Interaction', component: ZoomRangerDemo, sourceFile: 'ZoomRanger' },
-  { id: 'zoom-ranger-grips', title: 'Zoom Ranger (Grips)', description: 'Zoom ranger with visible grip handles on selection edges.', category: 'Zoom & Interaction', component: ZoomRangerGrips, sourceFile: 'ZoomRangerGrips' },
-  { id: 'zoom-ranger-xy', title: 'Zoom Ranger (XY)', description: 'Zoom ranger with dual y-axes and wheel zoom on detail chart.', category: 'Zoom & Interaction', component: ZoomRangerXY, sourceFile: 'ZoomRangerXY' },
-  { id: 'event-callbacks', title: 'Event Callbacks', description: 'Click, right-click context menu, and programmatic zoom via controlled Scale props.', category: 'Zoom & Interaction', component: EventCallbacks, sourceFile: 'EventCallbacks' },
-  { id: 'select-fetch', title: 'Select \u2192 Fetch', description: 'Intercept drag selection to fetch detail data instead of zooming via onSelect.', category: 'Zoom & Interaction', component: SelectFetch, sourceFile: 'SelectFetch' },
+  // --- Zoom & Pan ---
+  { id: 'zoom-wheel', title: 'Wheel Zoom', description: 'Mouse wheel zoom on x-axis centered at cursor position.', category: 'Zoom & Pan', component: ZoomWheel, sourceFile: 'ZoomWheel' },
+  { id: 'zoom-touch', title: 'Touch Zoom', description: 'Two-finger pinch to zoom on touch devices.', category: 'Zoom & Pan', component: ZoomTouch, sourceFile: 'ZoomTouch' },
+  { id: 'zoom-variations', title: 'Zoom Variations', description: 'Drag zoom, wheel zoom, and double-click reset combined.', category: 'Zoom & Pan', component: ZoomVariations, sourceFile: 'ZoomVariations' },
+  { id: 'zoom-fetch', title: 'Zoom Fetch', description: 'Zoom triggers simulated data re-fetch with loading indicator.', category: 'Zoom & Pan', component: ZoomFetch, sourceFile: 'ZoomFetch' },
+  { id: 'zoom-modifier-keys', title: 'Modifier Key Zoom', description: 'Shift+scroll for X zoom, Alt+scroll for Y zoom.', category: 'Zoom & Pan', component: ZoomModifierKeys, sourceFile: 'ZoomModifierKeys' },
+  { id: 'y-scale-drag', title: 'Y-Scale Drag', description: 'Click and drag on y-axis gutters to pan the scale range.', category: 'Zoom & Pan', component: YScaleDrag, sourceFile: 'YScaleDrag' },
+  { id: 'zoom-ranger', title: 'Zoom Ranger', description: 'Overview mini-chart with draggable selection controlling detail chart zoom.', category: 'Zoom & Pan', component: ZoomRangerDemo, sourceFile: 'ZoomRanger' },
+  { id: 'zoom-ranger-grips', title: 'Zoom Ranger (Grips)', description: 'Zoom ranger with visible grip handles on selection edges.', category: 'Zoom & Pan', component: ZoomRangerGrips, sourceFile: 'ZoomRangerGrips' },
+  { id: 'zoom-ranger-xy', title: 'Zoom Ranger (XY)', description: 'Zoom ranger with dual y-axes and wheel zoom on detail chart.', category: 'Zoom & Pan', component: ZoomRangerXY, sourceFile: 'ZoomRangerXY' },
+  { id: 'event-callbacks', title: 'Event Callbacks', description: 'Click, right-click context menu, and programmatic zoom via controlled Scale props.', category: 'Cursor & Interaction', component: EventCallbacks, sourceFile: 'EventCallbacks' },
+  { id: 'select-fetch', title: 'Select \u2192 Fetch', description: 'Intercept drag selection to fetch detail data instead of zooming via onSelect.', category: 'Cursor & Interaction', component: SelectFetch, sourceFile: 'SelectFetch' },
+  { id: 'use-chart', title: 'useChart() Hook', description: 'Programmatic access to chart store: scale ranges, cursor position, layout info.', category: 'Cursor & Interaction', component: UseChartDemo, sourceFile: 'UseChartDemo' },
 
   // --- Data Handling ---
   { id: 'missing-data', title: 'Missing Data', description: 'Null values in data arrays create gaps. Dual y-axes with custom formatters.', category: 'Data Handling', component: MissingData, sourceFile: 'MissingData' },
@@ -212,22 +235,27 @@ export const demos: DemoEntry[] = [
   { id: 'align-data', title: 'Align Data', description: 'Merge datasets with different x-values using alignData() utility.', category: 'Data Handling', component: AlignData, sourceFile: 'AlignData' },
   { id: 'multi-x-axis', title: 'Multi X-Axis', description: 'uPlot+ exclusive: two data groups with independent x-ranges on one chart.', category: 'Data Handling', component: MultiXAxis, sourceFile: 'MultiXAxis' },
   { id: 'add-del-series', title: 'Add/Remove Series', description: 'Toggle buttons to dynamically add/remove series.', category: 'Data Handling', component: AddDelSeries, sourceFile: 'AddDelSeries' },
+  { id: 'data-types', title: 'Data Types', description: 'Accepts number[], Float64Array, and (number|null)[] — normalized automatically.', category: 'Data Handling', component: DataTypes, sourceFile: 'DataTypes' },
 
-  // --- Layout & Live Data ---
-  { id: 'sparklines', title: 'Sparklines', description: 'Tiny 150x30 charts with hidden axes, embedded in a table.', category: 'Layout & Live Data', component: Sparklines, sourceFile: 'Sparklines' },
-  { id: 'resize-demo', title: 'Resize', description: 'Dynamically resize chart with width/height sliders.', category: 'Layout & Live Data', component: ResizeDemo, sourceFile: 'ResizeDemo' },
-  { id: 'responsive-demo', title: 'Responsive', description: 'Auto-size chart to container via ResizeObserver.', category: 'Layout & Live Data', component: ResponsiveDemo, sourceFile: 'ResponsiveDemo' },
-  { id: 'scroll-sync', title: 'Scroll Sync', description: 'Multiple synced charts in a scrollable container.', category: 'Layout & Live Data', component: ScrollSync, sourceFile: 'ScrollSync' },
-  { id: 'stream-data', title: 'Stream Data', description: '3-series 60fps streaming with 2000-point sliding window and FPS counter.', category: 'Layout & Live Data', component: StreamData, sourceFile: 'StreamData' },
-  { id: 'realtime-sine', title: 'Real-Time Sine', description: '10,000-point scrolling sine waves at 60fps — inspired by webgl-plot-react.', category: 'Layout & Live Data', component: RealtimeSine, sourceFile: 'RealtimeSine' },
-  { id: 'large-dataset', title: 'Large Dataset', description: '2,000,000 points rendered with minimal configuration to test performance.', category: 'Layout & Live Data', component: LargeDataset, sourceFile: 'LargeDataset' },
-  { id: 'update-cursor-select-resize', title: 'Live Data Update', description: 'Live-updating data with cursor stability testing.', category: 'Layout & Live Data', component: UpdateCursorSelectResize, sourceFile: 'UpdateCursorSelectResize' },
+  // --- Layout & Streaming ---
+  { id: 'sparklines', title: 'Sparklines', description: 'Tiny 150x30 charts with hidden axes, embedded in a table.', category: 'Layout & Streaming', component: Sparklines, sourceFile: 'Sparklines' },
+  { id: 'resize-demo', title: 'Resize', description: 'Dynamically resize chart with width/height sliders.', category: 'Layout & Streaming', component: ResizeDemo, sourceFile: 'ResizeDemo' },
+  { id: 'responsive-demo', title: 'Responsive', description: 'Auto-size chart to container via ResizeObserver.', category: 'Layout & Streaming', component: ResponsiveDemo, sourceFile: 'ResponsiveDemo' },
+  { id: 'scroll-sync', title: 'Scroll Sync', description: 'Multiple synced charts in a scrollable container.', category: 'Layout & Streaming', component: ScrollSync, sourceFile: 'ScrollSync' },
+  { id: 'streaming-hook', title: 'useStreamingData Hook', description: 'Streaming via the useStreamingData hook: push(), start/stop, FPS counter, sliding window.', category: 'Layout & Streaming', component: StreamingHookDemo, sourceFile: 'StreamingHookDemo' },
+  { id: 'stream-data', title: 'Stream Data', description: '3-series 60fps streaming with 2000-point sliding window and FPS counter.', category: 'Layout & Streaming', component: StreamData, sourceFile: 'StreamData' },
+  { id: 'realtime-sine', title: 'Real-Time Sine', description: '10,000-point scrolling sine waves at 60fps — inspired by webgl-plot-react.', category: 'Layout & Streaming', component: RealtimeSine, sourceFile: 'RealtimeSine' },
+  { id: 'large-dataset', title: 'Large Dataset', description: '2,000,000 points rendered with minimal configuration to test performance.', category: 'Layout & Streaming', component: LargeDataset, sourceFile: 'LargeDataset' },
+  { id: 'update-cursor-select-resize', title: 'Live Data Update', description: 'Live-updating data with cursor stability testing.', category: 'Layout & Streaming', component: UpdateCursorSelectResize, sourceFile: 'UpdateCursorSelectResize' },
 
-  // --- Annotations & Overlays ---
-  { id: 'draw-hooks', title: 'Draw Hooks', description: 'onDraw for threshold lines/zones, onCursorDraw for crosshair labels.', category: 'Annotations & Overlays', component: DrawHooks, sourceFile: 'DrawHooks' },
-  { id: 'annotations', title: 'Annotations', description: 'Declarative annotation components: horizontal lines, vertical markers, shaded regions, and labels.', category: 'Annotations & Overlays', component: Annotations, sourceFile: 'Annotations' },
-  { id: 'gradients', title: 'Gradients', description: 'Area chart with linear gradient fills from top to bottom.', category: 'Annotations & Overlays', component: Gradients, sourceFile: 'Gradients' },
-  { id: 'high-low-bands', title: 'High/Low Bands', description: 'Band component fills the region between upper and lower confidence bounds.', category: 'Annotations & Overlays', component: HighLowBands, sourceFile: 'HighLowBands' },
+  // --- Annotations & Drawing ---
+  { id: 'draw-hooks', title: 'Draw Hooks', description: 'onDraw for threshold lines/zones, onCursorDraw for crosshair labels.', category: 'Annotations & Drawing', component: DrawHooks, sourceFile: 'DrawHooks' },
+  { id: 'annotations', title: 'Annotations', description: 'Declarative annotation components: horizontal lines, vertical markers, shaded regions, and labels.', category: 'Annotations & Drawing', component: Annotations, sourceFile: 'Annotations' },
+  { id: 'gradients', title: 'Gradients', description: 'Area chart with linear gradient fills from top to bottom.', category: 'Annotations & Drawing', component: Gradients, sourceFile: 'Gradients' },
+  { id: 'high-low-bands', title: 'High/Low Bands', description: 'Band component fills the region between upper and lower confidence bounds.', category: 'Annotations & Drawing', component: HighLowBands, sourceFile: 'HighLowBands' },
+  { id: 'band-demo', title: 'Band Component', description: 'Band component: confidence intervals, between-series fills, and multiple bands.', category: 'Annotations & Drawing', component: BandDemo, sourceFile: 'BandDemo' },
+  { id: 'draw-hooks-composable', title: 'Composable Draw Hooks', description: 'useDrawHook and useCursorDrawHook as composable child components for canvas drawing.', category: 'Annotations & Drawing', component: DrawHooksComposable, sourceFile: 'DrawHooksComposable' },
+  { id: 'palette-colors', title: 'Palette & Colors', description: 'palette(), withAlpha(), fadeGradient() — auto-generate colors, transparency, and gradient fills.', category: 'Annotations & Drawing', component: PaletteColors, sourceFile: 'PaletteColors' },
 
   // --- Specialized Charts ---
   { id: 'candlestick-ohlc', title: 'Candlestick / OHLC', description: 'Financial candlestick chart with green/red candles via onDraw hook.', category: 'Specialized Charts', component: CandlestickOHLC, sourceFile: 'CandlestickOHLC' },

@@ -15,10 +15,10 @@ describe('convergeSize integration', () => {
     const scales: Record<string, ScaleState> = { y: makeScale(-10, 10) };
     const plotBox = convergeSize(800, 600, axes, id => scales[id]);
 
-    // Y-axis gutter is 50px; plotBox: {left:50, top:0, width:750, height:600}
+    // Y-axis gutter is 50px + 8px top margin for tick overflow
     expect(plotBox.left).toBe(50);
     expect(plotBox.width).toBe(750);
-    expect(plotBox.height).toBe(600); // no x-axis
+    expect(plotBox.height).toBe(592); // 600 - 8px top margin
   });
 
   it('x + y axes produce correct plotBox', () => {
@@ -32,11 +32,11 @@ describe('convergeSize integration', () => {
     };
     const plotBox = convergeSize(800, 600, axes, id => scales[id]);
 
-    // Y-axis left gutter ~50px, x-axis bottom gutter ~50px
+    // Y-axis left gutter ~50px, x-axis bottom gutter ~50px, 8px top margin
     expect(plotBox.left).toBe(50);
-    expect(plotBox.top).toBe(0);
+    expect(plotBox.top).toBe(8);
     expect(plotBox.width).toBe(750);
-    expect(plotBox.height).toBe(550);
+    expect(plotBox.height).toBe(542);
     expect(plotBox.width + plotBox.left).toBe(800);
     expect(plotBox.height + plotBox.top).toBeLessThanOrEqual(600);
   });
@@ -58,7 +58,7 @@ describe('convergeSize integration', () => {
     // Should produce same layout as x+y case
     expect(box1.left).toBe(50);
     expect(box1.width).toBe(750);
-    expect(box1.height).toBe(550);
+    expect(box1.height).toBe(542);
   });
 
   it('handles dual y-axes', () => {

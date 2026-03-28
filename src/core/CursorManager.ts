@@ -26,6 +26,33 @@ export class CursorManager {
     activeDataIdx: -1,
   };
 
+  /** Cached grouping of visible series configs by group index */
+  private _groupedConfigs = new Map<number, SeriesConfig[]>();
+  private _groupedConfigsSource: SeriesConfig[] | null = null;
+
+  /** Rebuild grouped configs only when seriesConfigs array reference changes */
+  private getGroupedConfigs(seriesConfigs: SeriesConfig[]): Map<number, SeriesConfig[]> {
+    if (this._groupedConfigsSource !== seriesConfigs) {
+      this._groupedConfigsSource = seriesConfigs;
+      this._groupedConfigs.clear();
+      for (const sc of seriesConfigs) {
+        if (sc.show === false) continue;
+        let arr = this._groupedConfigs.get(sc.group);
+        if (arr == null) {
+          arr = [];
+          this._groupedConfigs.set(sc.group, arr);
+        }
+        arr.push(sc);
+      }
+    }
+    return this._groupedConfigs;
+  }
+
+  /** Invalidate groupedConfigs cache (call after toggleSeries, etc.) */
+  invalidateGroupedConfigs(): void {
+    this._groupedConfigsSource = null;
+  }
+
   /** Hide the cursor (move off-screen) */
   hide(): void {
     this.state.left = -10;
@@ -63,17 +90,8 @@ export class CursorManager {
     let bestSeries = -1;
     let bestIdx = -1;
 
-    // Pre-group series configs by group index for O(1) lookup
-    const groupedConfigs = new Map<number, SeriesConfig[]>();
-    for (const sc of seriesConfigs) {
-      if (sc.show === false) continue;
-      let arr = groupedConfigs.get(sc.group);
-      if (arr == null) {
-        arr = [];
-        groupedConfigs.set(sc.group, arr);
-      }
-      arr.push(sc);
-    }
+    // Use cached grouped configs (rebuilt only when seriesConfigs reference changes)
+    const groupedConfigs = this.getGroupedConfigs(seriesConfigs);
 
     for (let gi = 0; gi < data.length; gi++) {
       const group = data[gi];

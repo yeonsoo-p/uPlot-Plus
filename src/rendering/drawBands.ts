@@ -1,6 +1,7 @@
 import type { BBox, ScaleState } from '../types';
 import type { BandConfig } from '../types/bands';
 import { valToPos } from '../core/Scale';
+import { hasData } from '../math/utils';
 
 /**
  * Build a Path2D for the filled region between two series.
@@ -18,6 +19,9 @@ export function buildBandPath(
   i1: number,
 ): Path2D | null {
   if (i0 > i1 || i0 < 0) return null;
+
+  // Skip if both series are all-null in the visible range
+  if (!hasData(upperY, i0, i1) && !hasData(lowerY, i0, i1)) return null;
 
   const toXPx = (val: number) => valToPos(val, xScale, plotBox.width, plotBox.left) * pxRatio;
   const toYPx = (val: number) => valToPos(val, yScale, plotBox.height, plotBox.top) * pxRatio;

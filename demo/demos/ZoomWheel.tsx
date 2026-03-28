@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis, Legend } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series, Legend } from '../../src';
 
 export default function ZoomWheel() {
-  const data: ChartData = useMemo(() => {
+  const data = useMemo(() => {
     const N = 1000;
     const x = new Float64Array(N);
     const y1 = new Float64Array(N);
@@ -20,12 +19,8 @@ export default function ZoomWheel() {
 
   return (
     <Chart width={800} height={400} data={data} cursor={{ wheelZoom: true }}>
-      <Scale id="x"  />
-      <Scale id="y"  />
-      <Series group={0} index={0} yScale="y" stroke="#e24d42" label="Damped sine" width={2} />
-      <Series group={0} index={1} yScale="y" stroke="#1f78b4" label="Cosine" width={2} />
-      <Axis scale="x" />
-      <Axis scale="y" />
+      <Series group={0} index={0} label="Damped sine" />
+      <Series group={0} index={1} label="Cosine" />
       <Legend />
     </Chart>
   );

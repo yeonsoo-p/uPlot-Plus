@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { Chart, Scale, Series, Axis, Legend } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series, Legend } from '../../src';
 
 /**
  * Example: responsive chart sizing via ResizeObserver.
@@ -43,7 +42,7 @@ export default function ResponsiveDemo() {
     return () => ro.disconnect();
   }, [computeSize]);
 
-  const data: ChartData = useMemo(() => {
+  const data = useMemo(() => {
     const n = 300;
     const x = Array.from({ length: n }, (_, i) => i);
     const y1 = x.map(i => Math.sin(i * 0.04) * 30 + 50);
@@ -77,13 +76,9 @@ export default function ResponsiveDemo() {
         }}
       >
         {size != null && (
-          <Chart width={size.width} height={size.height} data={data}>
-            <Scale id="x" />
-            <Scale id="y" />
-            <Axis scale="x" label="Index" />
-            <Axis scale="y" label="Value" />
-            <Series group={0} index={0} yScale="y" stroke="#2980b9" width={2} label="Sin" />
-            <Series group={0} index={1} yScale="y" stroke="#e74c3c" width={2} label="Cos" />
+          <Chart width={size.width} height={size.height} data={data} xlabel="Index" ylabel="Value">
+            <Series group={0} index={0} label="Sin" />
+            <Series group={0} index={1} label="Cos" />
             <Legend />
           </Chart>
         )}

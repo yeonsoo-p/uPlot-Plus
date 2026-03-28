@@ -1,6 +1,8 @@
 import React, { useSyncExternalStore, useCallback, useRef } from 'react';
 import { useChart } from '../hooks/useChart';
 import type { TooltipProps, TooltipData, TooltipItem } from '../types/tooltip';
+import { Panel, SeriesRow } from './overlay/SeriesPanel';
+import { clamp } from '../math/utils';
 
 interface TooltipSnapshot {
   left: number;
@@ -12,7 +14,7 @@ interface TooltipSnapshot {
 
 /**
  * Tooltip component that shows data values at the cursor position.
- * Uses useSyncExternalStore to subscribe to cursor state updates.
+ * Uses the shared Panel/SeriesRow visuals from FloatingLegend.
  * Positioned as an absolute HTML overlay inside the chart container.
  */
 export function Tooltip({
@@ -26,7 +28,7 @@ export function Tooltip({
   const tooltipRef = useRef<HTMLDivElement>(null);
 
   const subscribe = useCallback(
-    (cb: () => void) => store.subscribe(cb),
+    (cb: () => void) => store.subscribeCursor(cb),
     [store],
   );
 
@@ -60,7 +62,6 @@ export function Tooltip({
   if (snap.activeDataIdx < 0 || snap.activeGroup < 0) return null;
   if (snap.left < 0) return null;
 
-  // Build tooltip data
   const { activeGroup, activeDataIdx } = snap;
   const plotBox = store.plotBox;
 
@@ -72,7 +73,7 @@ export function Tooltip({
   // Series values
   const items: TooltipItem[] = [];
   for (const cfg of store.seriesConfigs) {
-    if (cfg.show === false) continue;
+    if (cfg.show === false || cfg.legend === false) continue;
     const yData = store.dataStore.getYValues(cfg.group, cfg.index);
     const val = cfg.group === activeGroup ? (yData[activeDataIdx] as number | null) : null;
     items.push({
@@ -95,62 +96,42 @@ export function Tooltip({
   const offX = offset.x ?? 12;
   const offY = offset.y ?? -12;
 
-  // Measure actual tooltip dimensions from previous frame
   const measuredWidth = tooltipRef.current?.offsetWidth ?? 0;
   const measuredHeight = tooltipRef.current?.offsetHeight ?? 0;
 
-  // Cursor position in container coordinates
   const cursorLeft = snap.left + plotBox.left;
   const cursorTop = snap.top + plotBox.top;
-
   const plotRight = plotBox.left + plotBox.width;
   const plotBottom = plotBox.top + plotBox.height;
 
-  // Position at cursor + offset, clamped within plot boundaries
-  const posLeft = Math.max(plotBox.left, Math.min(cursorLeft + offX, plotRight - measuredWidth));
-  const posTop = Math.max(plotBox.top, Math.min(cursorTop + offY, plotBottom - measuredHeight));
+  const posLeft = clamp(cursorLeft + offX, plotBox.left, plotRight - measuredWidth);
+  const posTop = clamp(cursorTop + offY, plotBox.top, plotBottom - measuredHeight);
 
-  const baseStyle: React.CSSProperties = {
-    position: 'absolute',
-    left: posLeft,
-    top: posTop,
-    whiteSpace: 'nowrap',
-    pointerEvents: 'none',
-    zIndex: 100,
-  };
-
+  // Custom render function
   if (children) {
     return (
-      <div ref={tooltipRef} className={className} style={baseStyle}>
+      <div
+        ref={tooltipRef}
+        className={className}
+        style={{ position: 'absolute', left: posLeft, top: posTop, whiteSpace: 'nowrap', pointerEvents: 'none', zIndex: 100 }}
+      >
         {children(tooltipData)}
       </div>
     );
   }
 
+  // Default: use shared Panel + SeriesRow
   return (
-    <div
-      ref={tooltipRef}
-      className={className}
-      style={{
-        ...baseStyle,
-        background: 'rgba(0,0,0,0.85)',
-        color: '#fff',
-        padding: '6px 10px',
-        borderRadius: 4,
-        fontSize: 12,
-        fontFamily: 'sans-serif',
-        whiteSpace: 'nowrap',
-        lineHeight: 1.5,
-      }}
-    >
-      <div style={{ fontWeight: 600, marginBottom: 2 }}>{xLabel}</div>
+    <Panel ref={tooltipRef} left={posLeft} top={posTop} className={className} style={{ pointerEvents: 'none', zIndex: 100 }}>
+      <div style={{ fontWeight: 600, marginBottom: 2, padding: '0 4px' }}>{xLabel}</div>
       {items.map((item) => (
-        <div key={`${item.group}:${item.index}`} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: item.color, display: 'inline-block' }} />
-          <span>{item.label}:</span>
-          <span style={{ fontWeight: 600 }}>{item.value != null ? item.value.toPrecision(4) : '—'}</span>
-        </div>
+        <SeriesRow
+          key={`${item.group}:${item.index}`}
+          label={item.label}
+          color={item.color}
+          value={item.value != null ? item.value.toPrecision(4) : '—'}
+        />
       ))}
-    </div>
+    </Panel>
   );
 }

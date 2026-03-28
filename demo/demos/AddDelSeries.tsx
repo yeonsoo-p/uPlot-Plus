@@ -1,14 +1,13 @@
 import React, { useState, useMemo } from 'react';
-import { Chart, Scale, Series, Axis, Legend } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series, Legend, palette } from '../../src';
 
-const COLORS = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6'];
+const COLORS = palette(5);
 const LABELS = ['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon'];
 
 export default function AddDelSeries() {
   const [visible, setVisible] = useState<boolean[]>([true, true, false, false, false]);
 
-  const data: ChartData = useMemo(() => {
+  const data = useMemo(() => {
     const n = 100;
     const x = Array.from({ length: n }, (_, i) => i);
     const allSeries = LABELS.map((_, si) =>
@@ -45,20 +44,13 @@ export default function AddDelSeries() {
           </button>
         ))}
       </div>
-      <Chart width={800} height={400} data={data}>
-        <Scale id="x" />
-        <Scale id="y"  />
-        <Axis scale="x" label="Index" />
-        <Axis scale="y" label="Value" />
+      <Chart width={800} height={400} data={data} xlabel="Index" ylabel="Value">
         {LABELS.map((label, i) =>
           visible[i] ? (
             <Series
               key={label}
               group={0}
               index={i}
-              yScale="y"
-              stroke={COLORS[i]!}
-              width={2}
               label={label}
             />
           ) : null

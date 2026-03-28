@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series } from '../../src';
 
-function generateData(): ChartData {
+function generateData() {
   const n = 2_000_000;
   const x = new Float64Array(n);
   const y = new Float64Array(n);
@@ -38,12 +37,8 @@ export default function LargeDataset() {
   const data = useMemo(generateData, []);
 
   return (
-    <Chart width={800} height={400} data={data}>
-      <Scale id="x" />
-      <Scale id="y"  />
-      <Axis scale="x" label="Index" />
-      <Axis scale="y" label="Value" />
-      <Series group={0} index={0} yScale="y" stroke="#8e44ad" width={1} label="2M Points" />
+    <Chart width={800} height={400} data={data} xlabel="Index" ylabel="Value">
+      <Series group={0} index={0} label="2M Points" />
     </Chart>
   );
 }

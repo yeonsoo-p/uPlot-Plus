@@ -12,17 +12,16 @@ describe('fmtDate', () => {
 
   it('formats hour:minute in UTC', () => {
     const result = fmtHourMinute(ts, 'UTC');
-    expect(result).toContain('11');
-    expect(result).toContain('30');
+    expect(result).toBe('11:30');
   });
 
   it('formats month day', () => {
     const result = fmtMonthDay(ts, 'UTC');
-    expect(result).toContain('15');
+    expect(result).toBe('Jan 15');
   });
 
   it('formats year', () => {
     const result = fmtYear(ts, 'UTC');
-    expect(result).toContain('2024');
+    expect(result).toBe('2024');
   });
 });

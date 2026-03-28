@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis, Legend } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Scale, Series } from '../../src';
 
 export default function ScalePadding() {
-  const data: ChartData = useMemo(() => {
+  const data = useMemo(() => {
     const n = 80;
     const x = Array.from({ length: n }, (_, i) => i);
     const y = x.map(i => Math.sin(i * 0.1) * 30 + 50);
@@ -17,7 +16,6 @@ export default function ScalePadding() {
       </p>
       <div style={{ marginBottom: 16 }}>
         <Chart width={800} height={200} data={data} title="With padding (10%)">
-          <Scale id="x" />
           <Scale
             id="y"
             auto
@@ -28,18 +26,12 @@ export default function ScalePadding() {
               max: { pad: 0.1 },
             }}
           />
-          <Axis scale="x" />
-          <Axis scale="y" />
-          <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Padded" />
+          <Series group={0} index={0} label="Padded" />
         </Chart>
       </div>
       <div>
         <Chart width={800} height={200} data={data} title="Without padding (default)">
-          <Scale id="x" />
-          <Scale id="y"  />
-          <Axis scale="x" />
-          <Axis scale="y" />
-          <Series group={0} index={0} yScale="y" stroke="#3498db" width={2} label="Default" />
+          <Series group={0} index={0} label="Default" />
         </Chart>
       </div>
     </div>

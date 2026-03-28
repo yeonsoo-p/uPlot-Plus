@@ -1,8 +1,8 @@
 import React, { useMemo, useState, useCallback } from 'react';
-import { Chart, Scale, Series, Axis } from '../../src';
-import type { ChartData, CursorDrawCallback, ChartEventInfo } from '../../src';
+import { Chart, Series } from '../../src';
+import type { CursorDrawCallback, ChartEventInfo } from '../../src';
 
-function generateData(): ChartData {
+function generateData() {
   const n = 200;
   const x = Array.from({ length: n }, (_, i) => i);
   const y = x.map(i => Math.sin(i * 0.05) * 40 + 50 + (Math.random() - 0.5) * 8);
@@ -97,12 +97,8 @@ export default function MeasureDatums() {
       <p style={{ margin: '0 0 8px', fontSize: 13, color: '#666' }}>
         Click to set a reference point, click again to clear. Move cursor to measure distance.
       </p>
-      <Chart width={800} height={400} data={data} onCursorDraw={onCursorDraw} onClick={handleClick}>
-        <Scale id="x" />
-        <Scale id="y"  />
-        <Axis scale="x" label="Sample" />
-        <Axis scale="y" label="Value" />
-        <Series group={0} index={0} yScale="y" stroke="#2980b9" width={2} label="Signal" />
+      <Chart width={800} height={400} data={data} onCursorDraw={onCursorDraw} onClick={handleClick} xlabel="Sample" ylabel="Value">
+        <Series group={0} index={0} label="Signal" />
       </Chart>
     </div>
   );

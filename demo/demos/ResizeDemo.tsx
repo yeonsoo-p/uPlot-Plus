@@ -1,12 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import { Chart, Scale, Series, Axis, Legend } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series, Legend } from '../../src';
 
 export default function ResizeDemo() {
   const [width, setWidth] = useState(800);
   const [height, setHeight] = useState(400);
 
-  const data: ChartData = useMemo(() => {
+  const data = useMemo(() => {
     const n = 200;
     const x = Array.from({ length: n }, (_, i) => i);
     const y = x.map(i => Math.sin(i * 0.05) * 40 + 50 + (Math.random() - 0.5) * 5);
@@ -40,12 +39,8 @@ export default function ResizeDemo() {
         </label>
       </div>
       <div style={{ border: '1px dashed #ccc', display: 'inline-block' }}>
-        <Chart width={width} height={height} data={data}>
-          <Scale id="x" />
-          <Scale id="y"  />
-          <Axis scale="x" label="Index" />
-          <Axis scale="y" label="Value" />
-          <Series group={0} index={0} yScale="y" stroke="#8e44ad" width={2} label="Signal" />
+        <Chart width={width} height={height} data={data} xlabel="Index" ylabel="Value">
+          <Series group={0} index={0} label="Signal" />
           <Legend />
         </Chart>
       </div>

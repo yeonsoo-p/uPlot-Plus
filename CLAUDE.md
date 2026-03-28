@@ -9,8 +9,8 @@ Library code lives at the project root. The `uPlot/` and `uplot-wrappers/` direc
 ```
 ./
 ├── src/
-│   ├── components/    Chart, Series, Scale, Axis, Band, Legend, Tooltip, ZoomRanger, Timeline,
-│   │                  Sparkline, ResponsiveChart, annotations/{HLine,VLine,Region,AnnotationLabel}
+│   ├── components/    Chart, Series, Scale, Axis, Band, Legend, Tooltip, FloatingLegend, HoverLabel,
+│   │                  ZoomRanger, Timeline, Sparkline, ResponsiveChart, annotations/{HLine,VLine,Region,AnnotationLabel}
 │   ├── core/          DataStore, ScaleManager, CursorManager, RenderScheduler, Scale
 │   ├── rendering/     CanvasRenderer, drawSeries, drawAxes, drawCursor, drawSelect
 │   ├── hooks/         useChart, useDrawHook, useCursorDrawHook, useStreamingData (public); useInteraction, useChartStore (internal)
@@ -24,7 +24,7 @@ Library code lives at the project root. The `uPlot/` and `uplot-wrappers/` direc
 │   ├── colors.ts      Color utilities (fadeGradient, withAlpha, palette)
 │   └── index.ts       public API exports
 ├── test/              Vitest test suite
-├── demo/              demo app (vite dev server, 85+ examples)
+├── demo/              demo app (vite dev server, 99 examples)
 └── dist/              build output (gitignored)
 ```
 
@@ -50,25 +50,29 @@ npm run test        # Vitest
 
 ## Features
 
-- **15 components**: Chart, Scale, Series, Axis, Band, Legend, Tooltip, ZoomRanger, Timeline, Sparkline, ResponsiveChart, HLine, VLine, Region, AnnotationLabel
-- **7 path builders**: linear (with pixel-level decimation), stepped, bars, monotoneCubic, catmullRom, points, candlestick
+- **17 components**: Chart, Scale, Series, Axis, Band, Legend, Tooltip, FloatingLegend, HoverLabel, ZoomRanger, Timeline, Sparkline, ResponsiveChart, HLine, VLine, Region, AnnotationLabel
+- **9 path builders**: linear (with pixel-level decimation), stepped, bars, groupedBars, stackedBars, monotoneCubic, catmullRom, points, candlestick
+- **Default injection**: Chart auto-creates missing x/y scales, axes, and series colors — minimal config: just `<Chart data={data}><Series group={0} index={0} /></Chart>`
 - **Annotations**: declarative `<HLine>`, `<VLine>`, `<Region>`, `<AnnotationLabel>` components; also imperative drawHLine/drawVLine/drawLabel/drawRegion
-- **Axis formatters**: fmtCompact (K/M/B), fmtSuffix (°C, %), fmtHourMin, fmtMonthName, fmtDateStr, fmtLabels
+- **Axis formatters**: fmtCompact (K/M/B), fmtSuffix (°C, %), fmtPrefix ($), fmtWrap (prefix+suffix), fmtHourMin, fmtMonthName, fmtDateStr, fmtLabels
 - **Color utilities**: fadeGradient, withAlpha, palette
 - **Time formatting**: Intl.DateTimeFormat-based formatters, 26 standard time increments, round-boundary tick alignment
 - **Cursor sync**: multiple charts share cursor state via `syncKey`
-- **Interactions**: wheel/touch zoom, drag-to-zoom, Y-scale dragging, focus mode
+- **Interactions**: wheel/touch zoom (x, y, or both with modifier keys), drag-to-zoom, Y-scale dragging, focus mode
 - **Data utilities**: stackGroup (stacked areas/bars), alignData (multi-x-axis alignment)
-- **Hooks**: useChart, useDrawHook, useCursorDrawHook, useStreamingData
+- **Hooks**: useChart, useDrawHook, useCursorDrawHook, useStreamingData (with batchSize)
 - **Scale types**: linear, ordinal, log (any base), asinh
 
 ## Architecture
 
 - **Data model**: `ChartData = XGroup[]` — each group has its own x-values and y-series arrays. Series are referenced by `(group, index)` tuple.
-- **Mutable ChartStore**: canvas operations are imperative, not driven by React re-renders. `useSyncExternalStore` powers Legend/Tooltip subscriptions.
-- **RenderScheduler**: dirty-flag batching for efficient canvas redraws. PathCache per series with invalidation on data/config changes.
-- **Cursor**: snaps to nearest point by pixel distance across all series/groups. Sync across charts via shared cursor state keyed by `syncKey`.
+- **Mutable ChartStore**: canvas operations are imperative, not driven by React re-renders. Two subscriber sets: `listeners` (full redraws) and `cursorListeners` (cursor-only redraws for Legend/Tooltip/FloatingLegend).
+- **RenderScheduler**: dirty-flag batching for efficient canvas redraws. Single `requestAnimationFrame` per frame — multiple `mark()` calls coalesce flags without extra rAF scheduling.
+- **Path cache**: Two-level LRU cache (group → index → window → SeriesPaths). Superset window matching + 10% padding "runway" for smooth panning. Auto-invalidated via scale-stamp fingerprinting when zoom changes scale ranges.
+- **Series lookup**: `seriesConfigMap` (`Map<"group:index", SeriesConfig>`) for O(1) lookups in drawCursor, useInteraction, and toggleSeries. Rebuilt on register/unregister/prop changes.
+- **Cursor**: snaps to nearest point by pixel distance across all series/groups. `CursorManager` caches grouped series configs (rebuilt only on reference change). Sync across charts via shared cursor state keyed by `syncKey`.
 - **Zoom**: linked by default — pixel fraction applied to all x-scales.
+- **Default injection**: `injectDefaults()` auto-creates missing x/y scales, axes (with `xlabel`/`ylabel` labels), and maps unmapped data groups to the `x` scale. Series get auto-assigned stroke colors from a 15-color palette. Users can provide any subset of children — only missing pieces are generated.
 - **Rendering**: Canvas 2D via `CanvasRenderer`. Axis layout uses a convergence loop (max 3 cycles). Two canvas layers: persistent (data/axes) and cursor overlay.
 
 ## Testing
@@ -79,7 +83,7 @@ npm run test        # Vitest
 - **Pattern**: `describe`/`it` blocks with `@/` path aliases; helper factories for scales/data
 - **Coverage**: math (utils, increments, stack, align), core (Scale, ScaleManager, DataStore), axes (ticks, layout, log filter), paths (linear, stepped, bars, spline, candlestick), annotations, time formatting, integration tests (convergence, auto-ranging, cursor snapping, interactions, resize, mount, focus)
 - **Interaction tests**: `setupInteraction()` extracted from `useInteraction` hook for direct DOM event testing without React Testing Library
-- **Demos**: 85+ interactive examples covering all chart types, interactions, and edge cases
+- **Demos**: 99 interactive examples covering all chart types, interactions, and edge cases
 
 ## Reference Code
 

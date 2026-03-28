@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Chart, Scale, Series, Axis, Legend } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series, Legend } from '../../src';
 
 const WINDOW = 100;
 
 export default function UpdateCursorSelectResize() {
-  const [data, setData] = useState<ChartData>(() => {
+  const [data, setData] = useState(() => {
     const x = Array.from({ length: WINDOW }, (_, i) => i);
     const y = x.map(i => Math.sin(i * 0.1) * 30 + 50);
     return [{ x, series: [y] }];
@@ -45,12 +44,8 @@ export default function UpdateCursorSelectResize() {
           Data updates every 200ms. Hover to test cursor stability during updates.
         </span>
       </div>
-      <Chart width={800} height={400} data={data}>
-        <Scale id="x" />
-        <Scale id="y"  />
-        <Axis scale="x" label="Tick" />
-        <Axis scale="y" label="Value" />
-        <Series group={0} index={0} yScale="y" stroke="#16a085" width={2} label="Live" />
+      <Chart width={800} height={400} data={data} xlabel="Tick" ylabel="Value">
+        <Series group={0} index={0} label="Live" />
         <Legend />
       </Chart>
     </div>

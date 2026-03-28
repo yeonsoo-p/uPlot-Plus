@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { Chart, Scale, Series, Axis, Legend } from '../../src';
+import { Chart, Series, Legend } from '../../src';
 import type { ChartData, SelectEventInfo } from '../../src';
 
 function generateData(min: number, max: number, n: number): ChartData {
@@ -68,12 +68,10 @@ export default function SelectFetch() {
         onSelect={onSelect}
         onDblClick={() => false}
         onScaleChange={onScaleChange}
+        xlabel="X"
+        ylabel="Value"
       >
-        <Scale id="x"  />
-        <Scale id="y"  />
-        <Axis scale="x" label="X" />
-        <Axis scale="y" label="Value" />
-        <Series group={0} index={0} yScale="y" stroke="#2980b9" width={2} label="Signal" />
+        <Series group={0} index={0} label="Signal" />
         <Legend />
       </Chart>
     </div>

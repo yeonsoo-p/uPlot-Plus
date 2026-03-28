@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis, Legend } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Scale, Series } from '../../src';
 
 export default function CustomScales() {
-  const data: ChartData = useMemo(() => {
+  const data = useMemo(() => {
     const n = 100;
     const x = Array.from({ length: n }, (_, i) => i);
     const y = x.map(i => Math.sin(i * 0.08) * 30 + 50 + (Math.random() - 0.5) * 5);
@@ -17,21 +16,14 @@ export default function CustomScales() {
         Data ranges ~20-80 but scale is fixed to 0-100.
       </p>
       <div style={{ marginBottom: 16 }}>
-        <Chart width={800} height={220} data={data} title="Fixed scale: 0 to 100">
-          <Scale id="x" />
+        <Chart width={800} height={220} data={data} title="Fixed scale: 0 to 100" xlabel="Index" ylabel="Value (0-100)">
           <Scale id="y" auto={false} min={0} max={100} />
-          <Axis scale="x" label="Index" />
-          <Axis scale="y" label="Value (0-100)" />
-          <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Fixed Range" />
+          <Series group={0} index={0} label="Fixed Range" />
         </Chart>
       </div>
       <div>
-        <Chart width={800} height={220} data={data} title="Auto scale (for comparison)">
-          <Scale id="x" />
-          <Scale id="y"  />
-          <Axis scale="x" label="Index" />
-          <Axis scale="y" label="Value (auto)" />
-          <Series group={0} index={0} yScale="y" stroke="#3498db" width={2} label="Auto Range" />
+        <Chart width={800} height={220} data={data} title="Auto scale (for comparison)" xlabel="Index" ylabel="Value (auto)">
+          <Series group={0} index={0} label="Auto Range" />
         </Chart>
       </div>
     </div>

@@ -1,17 +1,19 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
-import type { ChartData } from '../types';
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
+import type { DataInput } from '../types';
 import { Chart } from './Chart';
 import { Scale } from './Scale';
 import { Series } from './Series';
+import { clamp } from '../math/utils';
 import { Axis } from './Axis';
+import { normalizeData } from '../core/normalizeData';
 
 export interface ZoomRangerProps {
   /** Chart width in CSS pixels */
   width: number;
   /** Chart height in CSS pixels */
   height: number;
-  /** Data to render in the overview */
-  data: ChartData;
+  /** Data to render in the overview — accepts {x,y}, [{x,y}], or [{x, series:[...]}] */
+  data: DataInput;
   /** Called when the selection range changes */
   onRangeChange?: (min: number, max: number) => void;
   /** Initial selection range as [min, max] data values */
@@ -40,10 +42,13 @@ export function ZoomRanger({
 }: ZoomRangerProps): React.ReactElement {
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Normalize flexible input → internal ChartData
+  const normalized = useMemo(() => normalizeData(data), [data]);
+
   // Selection as fractions [0..1] of the chart width
   const [selFrac, setSelFrac] = useState<[number, number]>(() => {
-    if (initialRange != null && data.length > 0) {
-      const group = data[0];
+    if (initialRange != null && normalized.length > 0) {
+      const group = normalized[0];
       if (group != null && group.x.length > 1) {
         const xMin = group.x[0] as number;
         const xMax = group.x[group.x.length - 1] as number;
@@ -62,8 +67,8 @@ export function ZoomRanger({
   // Fire onRangeChange when selection changes
   const prevRangeRef = useRef<[number, number] | null>(null);
   useEffect(() => {
-    if (onRangeChange == null || data.length === 0) return;
-    const group = data[0];
+    if (onRangeChange == null || normalized.length === 0) return;
+    const group = normalized[0];
     if (group == null || group.x.length < 2) return;
 
     const xMin = group.x[0] as number;
@@ -77,7 +82,7 @@ export function ZoomRanger({
     if (prev != null && Math.abs(prev[0] - min) < eps && Math.abs(prev[1] - max) < eps) return;
     prevRangeRef.current = [min, max];
     onRangeChange(min, max);
-  }, [selFrac, data, onRangeChange]);
+  }, [selFrac, normalized, onRangeChange]);
 
   // Drag state
   const dragRef = useRef<{
@@ -90,7 +95,7 @@ export function ZoomRanger({
     const el = containerRef.current;
     if (el == null) return 0;
     const rect = el.getBoundingClientRect();
-    return Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    return clamp((clientX - rect.left) / rect.width, 0, 1);
   }, []);
 
   const onPointerDown = useCallback((e: React.PointerEvent) => {
@@ -112,7 +117,7 @@ export function ZoomRanger({
       // Click outside selection — center selection on click
       const selWidth = selFrac[1] - selFrac[0];
       const half = selWidth / 2;
-      const newLeft = Math.max(0, Math.min(1 - selWidth, frac - half));
+      const newLeft = clamp(frac - half, 0, 1 - selWidth);
       setSelFrac([newLeft, newLeft + selWidth]);
       mode = 'move';
     }
@@ -137,14 +142,13 @@ export function ZoomRanger({
 
     if (drag.mode === 'move') {
       const selWidth = drag.startFrac[1] - drag.startFrac[0];
-      let newLeft = drag.startFrac[0] + delta;
-      newLeft = Math.max(0, Math.min(1 - selWidth, newLeft));
+      const newLeft = clamp(drag.startFrac[0] + delta, 0, 1 - selWidth);
       setSelFrac([newLeft, newLeft + selWidth]);
     } else if (drag.mode === 'left') {
-      const newLeft = Math.max(0, Math.min(drag.startFrac[1] - 0.01, drag.startFrac[0] + delta));
+      const newLeft = clamp(drag.startFrac[0] + delta, 0, drag.startFrac[1] - 0.01);
       setSelFrac([newLeft, drag.startFrac[1]]);
     } else {
-      const newRight = Math.min(1, Math.max(drag.startFrac[0] + 0.01, drag.startFrac[1] + delta));
+      const newRight = clamp(drag.startFrac[1] + delta, drag.startFrac[0] + 0.01, 1);
       setSelFrac([drag.startFrac[0], newRight]);
     }
   }, [getFrac]);
@@ -158,7 +162,7 @@ export function ZoomRanger({
   const leftPct = `${selFrac[0] * 100}%`;
   const widthPct = `${(selFrac[1] - selFrac[0]) * 100}%`;
 
-  const group = data[0];
+  const group = normalized[0];
   const seriesCount = group != null ? group.series.length : 0;
 
   return (

@@ -107,11 +107,10 @@ export default function BoxWhisker() {
   };
 
   return (
-    <Chart width={800} height={400} data={chartData} onDraw={onDraw}>
+    <Chart width={800} height={400} data={chartData} onDraw={onDraw} ylabel="Value">
       <Scale id="x" auto={false} min={0.5} max={10.5} />
       <Scale id="y" auto={false} min={yMin} max={yMax} />
       <Axis scale="x" label="Category" values={fmtCategory} />
-      <Axis scale="y" label="Value" />
     </Chart>
   );
 }

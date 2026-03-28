@@ -1,8 +1,7 @@
 import React from 'react';
 import { Chart, Scale, Series, Axis, Direction, Side } from '../../src';
-import type { ChartData } from '../../src';
 
-function generateData(): ChartData {
+function generateData() {
   const n = 50;
   const x = Array.from({ length: n }, (_, i) => i);
   // Depth measurements — values increase with depth
@@ -18,15 +17,13 @@ export default function ScaleDirection() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data}>
-      <Scale id="x" />
+    <Chart width={800} height={400} data={data} xlabel="Sample">
       <Scale id="depth"  dir={Direction.Backward} />
       <Scale id="temp"  />
-      <Axis scale="x" label="Sample" />
       <Axis scale="depth" label="Depth (inverted)" values={fmtDepth} stroke="#2980b9" />
       <Axis scale="temp" side={Side.Right} label="Temperature (°C)" stroke="#e67e22" grid={{ show: false }} />
-      <Series group={0} index={0} yScale="depth" stroke="#2980b9" width={2} label="Density" />
-      <Series group={0} index={1} yScale="temp" stroke="#e67e22" width={2} label="Temperature" />
+      <Series group={0} index={0} yScale="depth" stroke="#2980b9" label="Density" />
+      <Series group={0} index={1} yScale="temp" stroke="#e67e22" label="Temperature" />
     </Chart>
   );
 }

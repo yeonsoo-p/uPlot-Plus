@@ -9,6 +9,8 @@ export { Tooltip } from './components/Tooltip';
 export { ZoomRanger } from './components/ZoomRanger';
 export { Timeline } from './components/Timeline';
 export { Sparkline } from './components/Sparkline';
+export { FloatingLegend } from './components/FloatingLegend';
+export { HoverLabel } from './components/HoverLabel';
 
 // Annotation components (declarative)
 export { HLine, VLine, Region, AnnotationLabel } from './components/annotations';
@@ -24,6 +26,10 @@ export type {
   ChartData,
   XGroup,
   SeriesRef,
+  DataArray,
+  SimpleGroup,
+  FullGroup,
+  DataInput,
   ScaleConfig,
   SeriesConfig,
   AxisConfig,
@@ -49,13 +55,15 @@ export type { ZoomRangerProps } from './components/ZoomRanger';
 export type { TimelineProps, TimelineLane, TimelineSegment } from './types/timeline';
 export type { CandlestickOpts } from './paths/candlestick';
 export type { SparklineProps } from './components/Sparkline';
+export type { FloatingLegendProps } from './components/FloatingLegend';
+export type { HoverLabelProps } from './components/HoverLabel';
 export type { HLineProps, VLineProps, RegionProps, AnnotationLabelProps } from './components/annotations';
 export type { StreamingOptions, StreamingResult } from './hooks/useStreamingData';
 
 // Path builders
 export { linear } from './paths/linear';
 export { stepped } from './paths/stepped';
-export { bars } from './paths/bars';
+export { bars, groupedBars, stackedBars } from './paths/bars';
 export { monotoneCubic } from './paths/monotoneCubic';
 export { catmullRom } from './paths/catmullRom';
 export { points } from './paths/points';
@@ -75,7 +83,7 @@ export { valToPos, posToVal } from './core/Scale';
 export { Side, Orientation, Direction, Distribution, SortOrder, sideOrientation } from './types';
 
 // Axis value formatters
-export { fmtCompact, fmtSuffix, fmtHourMin, fmtMonthName, fmtDateStr, fmtLabels } from './formatters';
+export { fmtCompact, fmtSuffix, fmtPrefix, fmtWrap, fmtHourMin, fmtMonthName, fmtDateStr, fmtLabels } from './formatters';
 export type { AxisValueFormatter } from './formatters';
 
 // Color utilities

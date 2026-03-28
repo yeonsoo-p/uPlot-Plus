@@ -1,8 +1,7 @@
 import React from 'react';
-import { Chart, Scale, Series, Axis, Legend } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series, Legend } from '../../src';
 
-function generateData(): ChartData {
+function generateData() {
   const n = 100;
   const x = Array.from({ length: n }, (_, i) => i);
   const y1 = x.map(i => Math.sin(i * 0.08) * 30 + 50);
@@ -19,27 +18,19 @@ export default function LegendDemo() {
     <div>
       <div style={{ marginBottom: 16 }}>
         <Chart width={800} height={250} data={data} title="Legend at bottom (default)">
-          <Scale id="x" />
-          <Scale id="y"  />
-          <Axis scale="x" />
-          <Axis scale="y" />
-          <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Alpha" />
-          <Series group={0} index={1} yScale="y" stroke="#3498db" width={2} label="Beta" />
-          <Series group={0} index={2} yScale="y" stroke="#2ecc71" width={2} label="Gamma" />
-          <Series group={0} index={3} yScale="y" stroke="#f39c12" width={2} label="Delta" />
+          <Series group={0} index={0} label="Alpha" />
+          <Series group={0} index={1} label="Beta" />
+          <Series group={0} index={2} label="Gamma" />
+          <Series group={0} index={3} label="Delta" />
           <Legend />
         </Chart>
       </div>
       <div>
         <Chart width={800} height={250} data={data} title="Legend at top — click series to toggle">
-          <Scale id="x" />
-          <Scale id="y"  />
-          <Axis scale="x" />
-          <Axis scale="y" />
-          <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Alpha" />
-          <Series group={0} index={1} yScale="y" stroke="#3498db" width={2} label="Beta" />
-          <Series group={0} index={2} yScale="y" stroke="#2ecc71" width={2} label="Gamma" />
-          <Series group={0} index={3} yScale="y" stroke="#f39c12" width={2} label="Delta" />
+          <Series group={0} index={0} label="Alpha" />
+          <Series group={0} index={1} label="Beta" />
+          <Series group={0} index={2} label="Gamma" />
+          <Series group={0} index={3} label="Delta" />
           <Legend position="top" />
         </Chart>
       </div>

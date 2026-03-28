@@ -1,8 +1,7 @@
 import React from 'react';
-import { Chart, Scale, Series, Axis, fadeGradient } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series, fadeGradient } from '../../src';
 
-function generateData(): ChartData {
+function generateData() {
   const n = 120;
   const x: number[] = [];
   const y1: number[] = [];
@@ -26,13 +25,9 @@ export default function Gradients() {
       <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
         Area chart with linear gradient fills fading from top to bottom.
       </p>
-      <Chart width={800} height={400} data={data}>
-        <Scale id="x" />
-        <Scale id="y"  />
-        <Axis scale="x" label="Time" />
-        <Axis scale="y" label="Value" />
-        <Series group={0} index={0} yScale="y" stroke="#4285f4" fill={fadeGradient('#4285f4')} width={2} label="Blue Series" />
-        <Series group={0} index={1} yScale="y" stroke="#9c27b0" fill={fadeGradient('#9c27b0', 0.7)} width={2} label="Purple Series" />
+      <Chart width={800} height={400} data={data} xlabel="Time" ylabel="Value">
+        <Series group={0} index={0} stroke="#4285f4" fill={fadeGradient('#4285f4')} label="Blue Series" />
+        <Series group={0} index={1} stroke="#9c27b0" fill={fadeGradient('#9c27b0', 0.7)} label="Purple Series" />
       </Chart>
     </div>
   );

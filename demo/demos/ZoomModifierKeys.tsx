@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis, Legend } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series, Legend } from '../../src';
 
 export default function ZoomModifierKeys() {
-  const data: ChartData = useMemo(() => {
+  const data = useMemo(() => {
     const N = 500;
     const x: number[] = [];
     const y1: number[] = [];
@@ -32,13 +31,11 @@ export default function ZoomModifierKeys() {
         height={400}
         data={data}
         cursor={{ wheelZoom: { x: { key: 'shift' }, y: { key: 'alt' } } }}
+        xlabel="Time"
+        ylabel="Value"
       >
-        <Scale id="x" />
-        <Scale id="y" />
-        <Axis scale="x" label="Time" />
-        <Axis scale="y" label="Value" />
-        <Series group={0} index={0} yScale="y" stroke="#e24d42" width={2} label="Sine" />
-        <Series group={0} index={1} yScale="y" stroke="#1f78b4" width={2} label="Cosine" />
+        <Series group={0} index={0} label="Sine" />
+        <Series group={0} index={1} label="Cosine" />
         <Legend />
       </Chart>
     </div>

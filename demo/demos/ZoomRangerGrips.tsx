@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback } from 'react';
-import { Chart, Scale, Series, Axis, ZoomRanger } from '../../src';
+import { Chart, Scale, Series, ZoomRanger } from '../../src';
 import type { ChartData } from '../../src';
 
 function generateData(): ChartData {
@@ -25,10 +25,7 @@ export default function ZoomRangerGripsDemo() {
     <div>
       <Chart width={800} height={300} data={data}>
         <Scale id="x" auto={range == null} min={range?.[0]} max={range?.[1]} />
-        <Scale id="y"  />
-        <Axis scale="x" />
-        <Axis scale="y" />
-        <Series group={0} index={0} yScale="y" stroke="#e91e63" label="Value" />
+        <Series group={0} index={0} label="Value" />
       </Chart>
 
       <div style={{ marginTop: 8 }}>

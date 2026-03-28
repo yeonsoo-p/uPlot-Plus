@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
 import { Chart, Scale, Series, Axis, Legend, stepped } from '../../src';
-import type { ChartData } from '../../src';
 
 export default function TimeseriesDiscrete() {
-  const data: ChartData = useMemo(() => {
+  const data = useMemo(() => {
     const base = new Date(2024, 5, 1, 0, 0, 0).getTime() / 1000;
     const n = 200;
     const x: number[] = [];
@@ -42,17 +41,14 @@ export default function TimeseriesDiscrete() {
         Discrete status values (0=OK, 1=WARN, 2=CRIT) over time using stepped interpolation.
       </p>
       <Chart width={800} height={300} data={data}>
-        <Scale id="x"  />
         <Scale id="y" min={-0.5} max={2.5} />
         <Axis scale="x" label="Time" values={fmtTime} />
         <Axis scale="y" label="Status" values={fmtStatus} />
         <Series
           group={0}
           index={0}
-          yScale="y"
           stroke="#e74c3c"
           fill="rgba(231, 76, 60, 0.15)"
-          width={2}
           label="Service Status"
           paths={stepped(1)}
           fillTo={-0.5}

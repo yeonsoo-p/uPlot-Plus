@@ -18,11 +18,13 @@ describe('auto-ranging pipeline', () => {
     ds.setData(data);
 
     // First pass: auto-range x from data
+    mgr.autoRangeX(data);
     mgr.autoRange(data, [{ group: 0, index: 0, yScale: 'y' }], ds);
 
     const xScale = mgr.getScale('x');
-    expect(xScale!.min).toBe(0);
-    expect(xScale!.max).toBe(9);
+    // autoRangeX pads by halfCol (minDelta=1, halfCol=0.5)
+    expect(xScale!.min).toBe(-0.5);
+    expect(xScale!.max).toBe(9.5);
 
     // Update windows from x-scale
     ds.updateWindows((gi) => {
@@ -34,13 +36,10 @@ describe('auto-ranging pipeline', () => {
     mgr.autoRange(data, [{ group: 0, index: 0, yScale: 'y' }], ds);
 
     const yScale = mgr.getScale('y');
-    expect(yScale!.min).toBeDefined();
-    expect(yScale!.max).toBeDefined();
-    // Auto-range with 10% padding: data [10, 100] → range [1, 109]
-    expect(yScale!.min!).toBeGreaterThanOrEqual(-5);
-    expect(yScale!.min!).toBeLessThanOrEqual(10);
-    expect(yScale!.max!).toBeGreaterThanOrEqual(100);
-    expect(yScale!.max!).toBeLessThanOrEqual(115);
+    // Auto-range with 10% padding: data [10, 100], delta=90, base=10, incr=1
+    // min = incrRoundDn(10-9, 1) = 1, max = incrRoundUp(100+9, 1) = 109
+    expect(yScale!.min).toBe(1);
+    expect(yScale!.max).toBe(109);
   });
 
   it('zoom narrows y-range to windowed data', () => {
@@ -57,7 +56,8 @@ describe('auto-ranging pipeline', () => {
     const ds = new DataStore();
     ds.setData(data);
 
-    // Auto-range x (full)
+    // Auto-range x (full), then y
+    mgr.autoRangeX(data);
     mgr.autoRange(data, [{ group: 0, index: 0, yScale: 'y' }], ds);
     ds.updateWindows(gi => {
       const key = mgr.getGroupXScaleKey(gi);
@@ -76,10 +76,9 @@ describe('auto-ranging pipeline', () => {
 
     const yScale = mgr.getScale('y');
     // y-range should reflect only the first half's data (10-30), not 3000
-    // Auto-range with 10% padding: data [10, 30] → range [8, 32]
-    expect(yScale!.min!).toBeGreaterThan(0);
-    expect(yScale!.min!).toBeLessThanOrEqual(10);
-    expect(yScale!.max!).toBeGreaterThanOrEqual(30);
-    expect(yScale!.max!).toBeLessThan(50);
+    // Auto-range with 10% padding: data [10, 30], delta=20, base=10, incr=1
+    // min = incrRoundDn(10-2, 1) = 8, max = incrRoundUp(30+2, 1) = 32
+    expect(yScale!.min).toBe(8);
+    expect(yScale!.max).toBe(32);
   });
 });

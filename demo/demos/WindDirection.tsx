@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis } from '../../src';
-import type { ChartData, DrawCallback } from '../../src';
+import { Chart, Series, Axis } from '../../src';
+import type { DrawCallback } from '../../src';
 
-function generateWindData(): { directions: number[]; chartData: ChartData } {
+function generateWindData() {
   const n = 48; // 48 half-hour intervals
   const x: number[] = [];
   const speed: number[] = [];
@@ -97,12 +97,9 @@ export default function WindDirection() {
   const fmtHour = (splits: number[]) => splits.map(v => `${v.toFixed(0)}h`);
 
   return (
-    <Chart width={800} height={400} data={chartData} onDraw={onDraw}>
-      <Scale id="x" />
-      <Scale id="y"  />
+    <Chart width={800} height={400} data={chartData} onDraw={onDraw} ylabel="Wind Speed (km/h)">
       <Axis scale="x" label="Time (hours)" values={fmtHour} />
-      <Axis scale="y" label="Wind Speed (km/h)" />
-      <Series group={0} index={0} yScale="y" stroke="#3498db" width={1.5} label="Speed"
+      <Series group={0} index={0} label="Speed"
         dash={[4, 3]} />
     </Chart>
   );

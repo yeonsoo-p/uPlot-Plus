@@ -1,9 +1,8 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis, Legend } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series, Legend } from '../../src';
 
 export default function FocusCursor() {
-  const data: ChartData = useMemo(() => {
+  const data = useMemo(() => {
     const N = 200;
     const x = new Float64Array(N);
     const series: Float64Array[] = [];
@@ -33,21 +32,14 @@ export default function FocusCursor() {
       data={data}
       cursor={{ focus: { alpha: 0.15 } }}
     >
-      <Scale id="x"  />
-      <Scale id="y"  />
       {colors.map((color, i) => (
         <Series
           key={i}
           group={0}
           index={i}
-          yScale="y"
-          stroke={color}
           label={`Series ${i + 1}`}
-          width={2}
         />
       ))}
-      <Axis scale="x" />
-      <Axis scale="y" />
       <Legend />
     </Chart>
   );

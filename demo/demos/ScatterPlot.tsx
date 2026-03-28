@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis, Legend, points } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series, Legend, points } from '../../src';
 
-function generateScatterData(): ChartData {
+function generateScatterData() {
   const n1 = 80;
   const n2 = 60;
 
@@ -39,16 +38,10 @@ export default function ScatterPlot() {
   const data = useMemo(() => generateScatterData(), []);
 
   return (
-    <Chart width={800} height={400} data={data} cursor={{ wheelZoom: 'xy' }}>
-      <Scale id="x" />
-      <Scale id="y"  />
-      <Axis scale="x" label="X" />
-      <Axis scale="y" label="Y" />
+    <Chart width={800} height={400} data={data} cursor={{ wheelZoom: 'xy' }} xlabel="X" ylabel="Y">
       <Series
         group={0}
         index={0}
-        yScale="y"
-        stroke="#e74c3c"
         fill="rgba(231, 76, 60, 0.6)"
         width={0}
         label="Cluster A"
@@ -57,8 +50,6 @@ export default function ScatterPlot() {
       <Series
         group={1}
         index={0}
-        yScale="y"
-        stroke="#3498db"
         fill="rgba(52, 152, 219, 0.6)"
         width={0}
         label="Cluster B"

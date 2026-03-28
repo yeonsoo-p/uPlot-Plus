@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis } from '../../src';
-import type { ChartData, DrawCallback } from '../../src';
+import { Chart, Series } from '../../src';
+import type { DrawCallback } from '../../src';
 
-function generateOHLC(): ChartData {
+function generateOHLC() {
   const n = 60;
   const x: number[] = [];
   const open: number[] = [];
@@ -80,15 +80,11 @@ export default function CandlestickOHLC() {
   };
 
   return (
-    <Chart width={800} height={400} data={data} onDraw={onDraw}>
-      <Scale id="x" />
-      <Scale id="y"  />
-      <Axis scale="x" label="Day" />
-      <Axis scale="y" label="Price" />
-      <Series group={0} index={0} yScale="y" show={false} label="Open" />
-      <Series group={0} index={1} yScale="y" show={false} label="High" />
-      <Series group={0} index={2} yScale="y" show={false} label="Low" />
-      <Series group={0} index={3} yScale="y" show={false} label="Close" />
+    <Chart width={800} height={400} data={data} onDraw={onDraw} xlabel="Day" ylabel="Price">
+      <Series group={0} index={0} show={false} label="Open" />
+      <Series group={0} index={1} show={false} label="High" />
+      <Series group={0} index={2} show={false} label="Low" />
+      <Series group={0} index={3} show={false} label="Close" />
     </Chart>
   );
 }

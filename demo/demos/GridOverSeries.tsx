@@ -1,8 +1,8 @@
 import React from 'react';
-import { Chart, Scale, Series, Axis } from '../../src';
-import type { ChartData, DrawCallback } from '../../src';
+import { Chart, Series, Axis } from '../../src';
+import type { DrawCallback } from '../../src';
 
-function generateData(): ChartData {
+function generateData() {
   const n = 60;
   const x = Array.from({ length: n }, (_, i) => i);
   const y1 = x.map(i => Math.sin(i * 0.15) * 30 + 50);
@@ -49,22 +49,16 @@ export default function GridOverSeries() {
     <div>
       <div style={{ marginBottom: 16 }}>
         <Chart width={800} height={200} data={data} title="Default (grid behind series)">
-          <Scale id="x" />
-          <Scale id="y"  />
-          <Axis scale="x" />
-          <Axis scale="y" />
-          <Series group={0} index={0} yScale="y" stroke="#e74c3c" fill="rgba(231,76,60,0.3)" width={2} label="Series A" />
-          <Series group={0} index={1} yScale="y" stroke="#3498db" fill="rgba(52,152,219,0.3)" width={2} label="Series B" />
+          <Series group={0} index={0} stroke="#e74c3c" fill="rgba(231,76,60,0.3)" label="Series A" />
+          <Series group={0} index={1} stroke="#3498db" fill="rgba(52,152,219,0.3)" label="Series B" />
         </Chart>
       </div>
       <div>
         <Chart width={800} height={200} data={data} onDraw={gridOverlay} title="Grid over series (via onDraw hook)">
-          <Scale id="x" />
-          <Scale id="y"  />
           <Axis scale="x" grid={{ show: false }} />
           <Axis scale="y" grid={{ show: false }} />
-          <Series group={0} index={0} yScale="y" stroke="#e74c3c" fill="rgba(231,76,60,0.3)" width={2} label="Series A" />
-          <Series group={0} index={1} yScale="y" stroke="#3498db" fill="rgba(52,152,219,0.3)" width={2} label="Series B" />
+          <Series group={0} index={0} stroke="#e74c3c" fill="rgba(231,76,60,0.3)" label="Series A" />
+          <Series group={0} index={1} stroke="#3498db" fill="rgba(52,152,219,0.3)" label="Series B" />
         </Chart>
       </div>
     </div>

@@ -1,10 +1,11 @@
-import { useRef, useEffect, useCallback, useState } from 'react';
+import { useRef, useEffect, useCallback, useState, useMemo } from 'react';
 import type { ChartProps } from '../types';
 import type { DrawCallback, CursorDrawCallback } from '../types/hooks';
 import { useChartStore } from '../hooks/useChartStore';
 import { ChartContext } from '../hooks/useChart';
 import { useInteraction } from '../hooks/useInteraction';
 import { useSyncGroup } from '../sync/useSyncGroup';
+import { normalizeData } from '../core/normalizeData';
 
 /**
  * Root chart component.
@@ -12,7 +13,7 @@ import { useSyncGroup } from '../sync/useSyncGroup';
  * Canvas drawing is completely decoupled from React's reconciliation cycle.
  */
 export function Chart({
-  width, height, data, children, className, pxRatio: pxRatioOverride, title,
+  width, height, data, children, className, pxRatio: pxRatioOverride, title, xlabel, ylabel,
   onDraw, onCursorDraw, syncKey, cursor,
   onClick, onContextMenu, onDblClick, onCursorMove, onCursorLeave,
   onScaleChange, onSelect,
@@ -33,17 +34,26 @@ export function Chart({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- wheelZoomKey is the stable serialization of wheelZoom
   }, [store, wheelZoomKey, focusAlpha]);
 
-  // Sync title to store
-  store.title = title;
+  // Sync title and axis labels to store (in effect, not render)
+  useEffect(() => {
+    store.title = title;
+    store.xlabel = xlabel;
+    store.ylabel = ylabel;
+  }, [store, title, xlabel, ylabel]);
 
-  // Sync event callback props to store (direct assignment to mutable store object)
-  store.eventCallbacks.onClick = onClick;
-  store.eventCallbacks.onContextMenu = onContextMenu;
-  store.eventCallbacks.onDblClick = onDblClick;
-  store.eventCallbacks.onCursorMove = onCursorMove;
-  store.eventCallbacks.onCursorLeave = onCursorLeave;
-  store.eventCallbacks.onScaleChange = onScaleChange;
-  store.eventCallbacks.onSelect = onSelect;
+  // Sync event callback props via refs to avoid excessive effect runs
+  const eventCallbacksRef = useRef(store.eventCallbacks);
+  eventCallbacksRef.current = store.eventCallbacks;
+  useEffect(() => {
+    const cbs = eventCallbacksRef.current;
+    cbs.onClick = onClick;
+    cbs.onContextMenu = onContextMenu;
+    cbs.onDblClick = onDblClick;
+    cbs.onCursorMove = onCursorMove;
+    cbs.onCursorLeave = onCursorLeave;
+    cbs.onScaleChange = onScaleChange;
+    cbs.onSelect = onSelect;
+  });
 
   // Attach mouse/touch interaction handlers
   useInteraction(store, containerEl);
@@ -94,29 +104,19 @@ export function Chart({
     return () => { observer.disconnect(); };
   }, [store, containerEl]);
 
+  // Normalize flexible input → internal ChartData
+  const normalized = useMemo(() => normalizeData(data), [data]);
+
   // Update store data
   const prevDataRef = useRef(data);
   useEffect(() => {
     if (data === prevDataRef.current && store.dataStore.data.length > 0) return;
     prevDataRef.current = data;
 
-    store.dataStore.setData(data);
+    store.dataStore.setData(normalized);
     store.renderer.clearCache();
-
-    // Auto-create a single shared x-scale for all groups
-    const xScaleKey = 'x';
-    if (!store.scaleManager.getScale(xScaleKey)) {
-      store.registerScale({
-        id: xScaleKey,
-        auto: true,
-      });
-    }
-    for (let i = 0; i < data.length; i++) {
-      store.scaleManager.setGroupXScale(i, xScaleKey);
-    }
-
     store.scheduleRedraw();
-  }, [store, data]);
+  }, [store, data, normalized]);
 
   // Ref wrapper for onDraw — register stable wrapper once, update ref on each render
   const onDrawRef = useRef<DrawCallback | undefined>(onDraw);

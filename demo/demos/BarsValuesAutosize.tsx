@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis, bars } from '../../src';
-import type { ChartData, DrawCallback } from '../../src';
+import { Chart, Scale, Series, bars } from '../../src';
+import type { DrawCallback } from '../../src';
 
 export default function BarsValuesAutosize() {
   const values = useMemo(() => Array.from({ length: 10 }, () => Math.round(Math.random() * 80 + 10)), []);
 
-  const data: ChartData = useMemo(() => {
+  const data = useMemo(() => {
     const x = Array.from({ length: values.length }, (_, i) => i + 1);
     return [{ x, series: [values] }];
   }, [values]);
@@ -33,15 +33,11 @@ export default function BarsValuesAutosize() {
       <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
         Bar chart with value labels drawn above each bar using the <code>onDraw</code> hook.
       </p>
-      <Chart width={800} height={400} data={data} onDraw={onDraw}>
-        <Scale id="x" />
+      <Chart width={800} height={400} data={data} onDraw={onDraw} xlabel="Category" ylabel="Value">
         <Scale id="y" min={0} max={100} />
-        <Axis scale="x" label="Category" />
-        <Axis scale="y" label="Value" />
         <Series
           group={0}
           index={0}
-          yScale="y"
           stroke="#2980b9"
           fill="rgba(41, 128, 185, 0.6)"
           width={0}

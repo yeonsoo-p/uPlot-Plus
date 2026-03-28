@@ -1,5 +1,5 @@
-import { DAY, HOUR, MIN, MONTH, YEAR } from './timeIncrs';
-import { fmtHourMinute, fmtTimeOnly, fmtFullDateTime, fmtMonthDay, fmtMonthYear, fmtYear } from './fmtDate';
+import { DAY, HOUR, MIN, MONTH, WEEK, YEAR } from './timeIncrs';
+import { fmtHourMinute, fmtTimeOnly, fmtFullDateTime, fmtDateOnly, fmtMonthDay, fmtMonthYear, fmtYear } from './fmtDate';
 
 /**
  * Format time axis tick values as strings.
@@ -21,6 +21,8 @@ export function timeAxisVals(
     fmt = fmtYear;
   else if (incr >= MONTH)
     fmt = fmtMonthYear;
+  else if (incr >= WEEK)
+    fmt = fmtDateOnly;
   else if (incr >= DAY)
     fmt = fmtMonthDay;
   else if (incr >= HOUR)

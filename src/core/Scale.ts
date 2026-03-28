@@ -16,6 +16,9 @@ export function createScaleState(cfg: ScaleConfig): ScaleState {
     time: cfg.time ?? false,
     auto: cfg.auto ?? true,
     range: cfg.range ?? null,
+    _discrete: false,
+    _cfgMin: cfg.min ?? null,
+    _cfgMax: cfg.max ?? null,
     _min: null,
     _max: null,
   };
@@ -33,6 +36,9 @@ function getTransformedMin(scale: ScaleState): number {
   const { min, distr } = scale;
   if (min == null) return 0;
   if (distr === Distribution.Log) {
+    if (min <= 0) {
+      console.warn(`[uPlot+] Log scale "${scale.id}": min value ${min} <= 0, clamping to 1e-10`);
+    }
     const safeMin = min > 0 ? min : 1e-10;
     scale._min = (scale.log === 10 ? log10 : log2)(safeMin);
   } else if (distr === Distribution.Asinh) {
@@ -49,6 +55,9 @@ function getTransformedMax(scale: ScaleState): number {
   const { max, distr } = scale;
   if (max == null) return 0;
   if (distr === Distribution.Log) {
+    if (max <= 0) {
+      console.warn(`[uPlot+] Log scale "${scale.id}": max value ${max} <= 0, clamping to 1e-10`);
+    }
     const safeMax = max > 0 ? max : 1e-10;
     scale._max = (scale.log === 10 ? log10 : log2)(safeMax);
   } else if (distr === Distribution.Asinh) {

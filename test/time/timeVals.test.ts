@@ -10,9 +10,7 @@ describe('timeAxisVals', () => {
     const splits = [1700006400, 1700010000, 1700013600];
     const vals = timeAxisVals(splits, HOUR, 'UTC');
     expect(vals.length).toBe(3);
-    expect(vals[0]).toContain('00');
-    expect(vals[1]).toContain('01');
-    expect(vals[2]).toContain('02');
+    expect(vals).toEqual(['00:00', '01:00', '02:00']);
   });
 
   it('formats daily splits as month + day', () => {
@@ -24,7 +22,7 @@ describe('timeAxisVals', () => {
   it('formats yearly splits as 4-digit year', () => {
     const vals = timeAxisVals([1700006400], YEAR, 'UTC');
     expect(vals.length).toBe(1);
-    expect(vals[0]).toContain('2023');
+    expect(vals[0]).toBe('2023');
   });
 
   it('formats sub-minute splits with seconds', () => {

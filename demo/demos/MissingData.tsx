@@ -1,8 +1,7 @@
 import React from 'react';
 import { Chart, Scale, Series, Axis, Side } from '../../src';
-import type { ChartData } from '../../src';
 
-function generateData(): ChartData {
+function generateData() {
   const n = 200;
   const x: number[] = [];
   const cpu: (number | null)[] = [];
@@ -31,15 +30,13 @@ export default function MissingData() {
 
   return (
     <Chart width={800} height={400} data={data}>
-      <Scale id="x"  />
       <Scale id="pct"  />
       <Scale id="mb"  />
-      <Axis scale="x" />
       <Axis scale="pct" values={fmtPct} />
       <Axis scale="mb" side={Side.Right} values={fmtMB} grid={{ show: false }} />
-      <Series group={0} index={0} yScale="pct" stroke="red" fill="rgba(255,0,0,0.05)" width={2} label="CPU" />
-      <Series group={0} index={1} yScale="pct" stroke="blue" fill="rgba(0,0,255,0.05)" width={2} label="RAM" />
-      <Series group={0} index={2} yScale="mb" stroke="green" fill="rgba(0,255,0,0.05)" width={2} label="TCP Out" />
+      <Series group={0} index={0} yScale="pct" stroke="red" fill="rgba(255,0,0,0.05)" label="CPU" />
+      <Series group={0} index={1} yScale="pct" stroke="blue" fill="rgba(0,0,255,0.05)" label="RAM" />
+      <Series group={0} index={2} yScale="mb" stroke="green" fill="rgba(0,255,0,0.05)" label="TCP Out" />
     </Chart>
   );
 }

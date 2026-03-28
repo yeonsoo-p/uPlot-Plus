@@ -1,4 +1,4 @@
-import type { ChartData } from './data';
+import type { DataInput } from './data';
 import type { DrawCallback, CursorDrawCallback } from './hooks';
 import type { ChartEventInfo, SelectEventInfo, ScaleChangeCallback } from './events';
 
@@ -41,8 +41,8 @@ export interface ChartProps {
   width: number;
   /** Height in CSS pixels */
   height: number;
-  /** Chart data */
-  data: ChartData;
+  /** Chart data — accepts {x,y}, [{x,y}], or [{x, series:[...]}] */
+  data: DataInput;
   /** React children (Scale, Series, Axis, Legend, Tooltip, Band) */
   children?: React.ReactNode;
   /** CSS class name */
@@ -57,6 +57,10 @@ export interface ChartProps {
   syncKey?: string;
   /** Chart title displayed above the plot area */
   title?: string;
+  /** X-axis label for the default axis (default: 'X Axis') */
+  xlabel?: string;
+  /** Y-axis label for the default axis (default: 'Y Axis') */
+  ylabel?: string;
   /** Cursor and interaction config */
   cursor?: CursorConfig;
 

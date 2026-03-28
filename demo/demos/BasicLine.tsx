@@ -1,8 +1,7 @@
 import React from 'react';
-import { Chart, Scale, Series, Axis } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series } from '../../src';
 
-function generateData(): ChartData {
+function generateData() {
   const n = 200;
   const x: number[] = [];
   const y1: number[] = [];
@@ -22,13 +21,9 @@ export default function BasicLine() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data}>
-      <Scale id="x"  />
-      <Scale id="y"  />
-      <Axis scale="x" label="Time (s)" />
-      <Axis scale="y" label="Value" />
-      <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={1} label="Sine" />
-      <Series group={0} index={1} yScale="y" stroke="#3498db" width={1} label="Cosine" />
+    <Chart width={800} height={400} data={data} xlabel="Time (s)" ylabel="Value">
+      <Series group={0} index={0} label="Sine" />
+      <Series group={0} index={1} label="Cosine" />
     </Chart>
   );
 }

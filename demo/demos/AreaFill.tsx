@@ -1,8 +1,7 @@
 import React from 'react';
-import { Chart, Scale, Series, Axis, withAlpha } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series, withAlpha } from '../../src';
 
-function generateData(): ChartData {
+function generateData() {
   const xs = Array.from({ length: 30 }, (_, i) => i + 1);
   const vals = [-10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   const pick = () => vals[Math.floor(Math.random() * vals.length)];
@@ -22,13 +21,9 @@ export default function AreaFill() {
 
   return (
     <Chart width={800} height={400} data={data}>
-      <Scale id="x" />
-      <Scale id="y"  />
-      <Axis scale="x" />
-      <Axis scale="y" />
-      <Series group={0} index={0} yScale="y" stroke="#ff0000" fill={withAlpha('#ff0000', 0.1)} width={2} label="Red" />
-      <Series group={0} index={1} yScale="y" stroke="#00ff00" fill={withAlpha('#00ff00', 0.1)} width={2} label="Green" />
-      <Series group={0} index={2} yScale="y" stroke="#0000ff" fill={withAlpha('#0000ff', 0.1)} width={2} label="Blue" />
+      <Series group={0} index={0} stroke="#ff0000" fill={withAlpha('#ff0000', 0.1)} label="Red" />
+      <Series group={0} index={1} stroke="#00ff00" fill={withAlpha('#00ff00', 0.1)} label="Green" />
+      <Series group={0} index={2} stroke="#0000ff" fill={withAlpha('#0000ff', 0.1)} label="Blue" />
     </Chart>
   );
 }

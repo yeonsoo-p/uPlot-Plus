@@ -56,6 +56,12 @@ export interface ScaleState {
   time: boolean;
   auto: boolean;
   range: RangeConfig | null;
+  /** True if x-data values are all integers (used for discrete tick generation) */
+  _discrete: boolean;
+  /** Config-provided fixed min (preserved across auto-ranging) */
+  _cfgMin: number | null;
+  /** Config-provided fixed max (preserved across auto-ranging) */
+  _cfgMax: number | null;
   /** Cached transformed min (for log/asinh distributions) */
   _min: number | null;
   /** Cached transformed max (for log/asinh distributions) */

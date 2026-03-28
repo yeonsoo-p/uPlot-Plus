@@ -1,10 +1,9 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series, Axis } from '../../src';
 
 export default function TimePeriods() {
   // Hourly data: 48 hours
-  const hourly: ChartData = useMemo(() => {
+  const hourly = useMemo(() => {
     const base = new Date(2024, 5, 1, 0, 0, 0).getTime() / 1000;
     const x = Array.from({ length: 48 }, (_, i) => base + i * 3600);
     const y = x.map((_, i) => 20 + Math.sin(i * 0.26) * 8 + (Math.random() - 0.5) * 2);
@@ -12,7 +11,7 @@ export default function TimePeriods() {
   }, []);
 
   // Daily data: 60 days
-  const daily: ChartData = useMemo(() => {
+  const daily = useMemo(() => {
     const base = new Date(2024, 0, 1).getTime() / 1000;
     const x = Array.from({ length: 60 }, (_, i) => base + i * 86400);
     const y = x.map((_, i) => 100 + Math.sin(i * 0.1) * 30 + (Math.random() - 0.5) * 10);
@@ -20,7 +19,7 @@ export default function TimePeriods() {
   }, []);
 
   // Monthly data: 36 months
-  const monthly: ChartData = useMemo(() => {
+  const monthly = useMemo(() => {
     const x: number[] = [];
     const y: number[] = [];
     for (let i = 0; i < 36; i++) {
@@ -56,29 +55,20 @@ export default function TimePeriods() {
       </p>
       <div style={{ marginBottom: 16 }}>
         <Chart width={800} height={160} data={hourly} title="Hourly (48h)">
-          <Scale id="x"  />
-          <Scale id="y"  />
           <Axis scale="x" values={fmtHour} />
-          <Axis scale="y" />
-          <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Hourly" />
+          <Series group={0} index={0} label="Hourly" />
         </Chart>
       </div>
       <div style={{ marginBottom: 16 }}>
         <Chart width={800} height={160} data={daily} title="Daily (60d)">
-          <Scale id="x"  />
-          <Scale id="y"  />
           <Axis scale="x" values={fmtDay} />
-          <Axis scale="y" />
-          <Series group={0} index={0} yScale="y" stroke="#2980b9" width={2} label="Daily" />
+          <Series group={0} index={0} label="Daily" />
         </Chart>
       </div>
       <div>
         <Chart width={800} height={160} data={monthly} title="Monthly (3yr)">
-          <Scale id="x"  />
-          <Scale id="y"  />
           <Axis scale="x" values={fmtMonth} />
-          <Axis scale="y" />
-          <Series group={0} index={0} yScale="y" stroke="#27ae60" width={2} label="Monthly" />
+          <Series group={0} index={0} label="Monthly" />
         </Chart>
       </div>
     </div>

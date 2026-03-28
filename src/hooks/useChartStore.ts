@@ -16,10 +16,77 @@ import { drawSelection } from '../rendering/drawSelect';
 import { drawPoints, shouldShowPoints } from '../rendering/drawPoints';
 import { buildBandPath, drawBandPath } from '../rendering/drawBands';
 import type { BandConfig } from '../types/bands';
-import { DirtyFlag } from '../types/common';
+import { Side, DirtyFlag } from '../types/common';
 import type { DrawContext, DrawCallback, CursorDrawCallback } from '../types/hooks';
 import { valToPos } from '../core/Scale';
 import type { EventCallbacks } from '../types/events';
+
+/**
+ * Inject sensible defaults for missing y-scales, series, and axes.
+ * Called at the top of the full redraw path so users can render charts
+ * without explicitly declaring Scale/Axis/Series children.
+ *
+ * Each check is independent — users can provide any subset of children
+ * and only the missing pieces get auto-generated.
+ */
+function injectDefaults(store: ChartStore): void {
+  const data = store.dataStore.data;
+  if (data.length === 0) return;
+
+  // 1. Default x-scale (if none registered)
+  if (!store.scaleManager.getScale('x')) {
+    const cfg: ScaleConfig = { id: 'x', auto: true };
+    store.scaleConfigs.push(cfg);
+    store.scaleManager.addScale(cfg);
+  }
+
+  // Map unmapped data groups to the 'x' scale
+  for (let i = 0; i < data.length; i++) {
+    if (!store.scaleManager.getGroupXScaleKey(i)) {
+      store.scaleManager.setGroupXScale(i, 'x');
+    }
+  }
+
+  // 2. Ensure every y-scale referenced by a series exists
+  const registeredScales = new Set(store.scaleConfigs.map(s => s.id));
+  const referencedYScales = new Set<string>();
+  for (const s of store.seriesConfigs) {
+    referencedYScales.add(s.yScale);
+  }
+  // If no series registered yet, ensure at least a default 'y' scale
+  if (referencedYScales.size === 0 && !registeredScales.has('y')) {
+    referencedYScales.add('y');
+  }
+  for (const yId of referencedYScales) {
+    if (!registeredScales.has(yId)) {
+      const cfg: ScaleConfig = { id: yId, auto: true };
+      store.scaleConfigs.push(cfg);
+      store.scaleManager.addScale(cfg);
+      registeredScales.add(yId);
+    }
+  }
+
+  // 3. Default x-axis (if no x-axis registered)
+  const hasXAxis = store.axisConfigs.some(a => a.scale === 'x');
+  if (!hasXAxis) {
+    store.axisConfigs.push({
+      scale: 'x', side: Side.Bottom, show: true,
+      label: store.xlabel ?? 'X Axis',
+    });
+  }
+
+  // 4. Ensure every y-scale has at least one axis
+  const axisScales = new Set(store.axisConfigs.map(a => a.scale));
+  for (const yId of referencedYScales) {
+    if (!axisScales.has(yId)) {
+      store.axisConfigs.push({
+        scale: yId, side: Side.Left, show: true,
+        label: store.ylabel ?? 'Y Axis',
+      });
+      axisScales.add(yId);
+    }
+  }
+}
 
 /** Build a DrawContext with valToX/valToY helpers bound to current scales. */
 function buildDrawContext(
@@ -76,6 +143,8 @@ export interface ChartStore {
 
   // Subscribers (for useSyncExternalStore — Legend, Tooltip, etc.)
   listeners: Set<() => void>;
+  /** Cursor-only subscribers — fired on cursor redraws without full redraw overhead */
+  cursorListeners: Set<() => void>;
 
   // Render scheduler with dirty flags
   scheduler: RenderScheduler;
@@ -92,6 +161,10 @@ export interface ChartStore {
   wheelZoom: CursorConfig['wheelZoom'];
   /** Chart title drawn on canvas */
   title: string | undefined;
+  /** X-axis label for default axis */
+  xlabel: string | undefined;
+  /** Y-axis label for default axis */
+  ylabel: string | undefined;
 
   // Revision counter — incremented on visibility toggles to trigger subscriber re-renders
   revision: number;
@@ -113,7 +186,18 @@ export interface ChartStore {
   scheduleRedraw: () => void;
   scheduleCursorRedraw: () => void;
   subscribe: (fn: () => void) => () => void;
+  subscribeCursor: (fn: () => void) => () => void;
+  /** Pre-built lookup map for series config by "group:index" key */
+  seriesConfigMap: Map<string, SeriesConfig>;
   redraw: () => void;
+}
+
+/** Rebuild the series config lookup map from the current seriesConfigs array. */
+function rebuildSeriesConfigMap(store: ChartStore): void {
+  store.seriesConfigMap.clear();
+  for (const cfg of store.seriesConfigs) {
+    store.seriesConfigMap.set(`${cfg.group}:${cfg.index}`, cfg);
+  }
 }
 
 /**
@@ -142,6 +226,7 @@ export function createChartStore(): ChartStore {
 
     canvas: null,
     listeners: new Set(),
+    cursorListeners: new Set(),
     scheduler: new RenderScheduler(),
     drawHooks: new Set(),
     cursorDrawHooks: new Set(),
@@ -149,9 +234,12 @@ export function createChartStore(): ChartStore {
     focusAlpha: 0.15,
     wheelZoom: false,
     title: undefined,
+    xlabel: undefined,
+    ylabel: undefined,
     revision: 0,
     eventCallbacks: {},
     _prevScaleRanges: new Map(),
+    seriesConfigMap: new Map(),
 
     registerScale(cfg: ScaleConfig) {
       store.scaleConfigs = store.scaleConfigs.filter(s => s.id !== cfg.id);
@@ -169,20 +257,24 @@ export function createChartStore(): ChartStore {
         s => !(s.group === cfg.group && s.index === cfg.index),
       );
       store.seriesConfigs.push(cfg);
+      rebuildSeriesConfigMap(store);
     },
 
     unregisterSeries(group: number, index: number) {
       store.seriesConfigs = store.seriesConfigs.filter(
         s => !(s.group === group && s.index === index),
       );
+      rebuildSeriesConfigMap(store);
     },
 
     toggleSeries(group: number, index: number) {
-      const cfg = store.seriesConfigs.find(s => s.group === group && s.index === index);
+      const cfg = store.seriesConfigMap.get(`${group}:${index}`);
       if (cfg != null) {
         cfg.show = cfg.show === false ? true : false;
         store.revision++;
+        store.cursorManager.invalidateGroupedConfigs();
         store.renderer.invalidateSeries(group, index);
+        store.renderer.invalidateSnapshot();
         store.scheduleRedraw();
       }
     },
@@ -218,6 +310,11 @@ export function createChartStore(): ChartStore {
       return () => { store.listeners.delete(fn); };
     },
 
+    subscribeCursor(fn: () => void) {
+      store.cursorListeners.add(fn);
+      return () => { store.cursorListeners.delete(fn); };
+    },
+
     redraw() {
       const { scaleManager, dataStore, renderer, seriesConfigs, width, height, pxRatio, canvas, scheduler } = store;
 
@@ -244,6 +341,8 @@ export function createChartStore(): ChartStore {
           seriesConfigs,
           getScale,
           (gi) => scaleManager.getGroupXScaleKey(gi),
+          undefined,
+          store.seriesConfigMap,
         );
         drawSelection(ctx, store.selectState, store.plotBox, pxRatio);
         // Fire cursor draw hooks on the overlay (pxRatio-scaled)
@@ -256,11 +355,14 @@ export function createChartStore(): ChartStore {
           }
           ctx.restore();
         }
-        for (const fn of store.listeners) fn();
+        for (const fn of store.cursorListeners) fn();
         return;
       }
 
       // --- Full redraw path ---
+
+      // 0. Inject defaults for missing y-scales, series, and axes
+      injectDefaults(store);
 
       // 1. Auto-range x-scales (cheap: reads first/last x values only)
       scaleManager.autoRangeX(dataStore.data);
@@ -323,6 +425,9 @@ export function createChartStore(): ChartStore {
           window: dataStore.getWindow(cfg.group),
         });
       }
+
+      // Auto-invalidate path cache if scale ranges changed (zoom)
+      renderer.checkScaleStamp(renderList);
 
       ctx.save();
       ctx.scale(pxRatio, pxRatio);
@@ -448,6 +553,8 @@ export function createChartStore(): ChartStore {
         seriesConfigs,
         getScale,
         (gi) => scaleManager.getGroupXScaleKey(gi),
+        undefined,
+        store.seriesConfigMap,
       );
 
       // 12. Draw selection rectangle
@@ -466,6 +573,7 @@ export function createChartStore(): ChartStore {
 
       // 13. Notify subscribers (Legend, Tooltip, etc.)
       for (const fn of store.listeners) fn();
+      for (const fn of store.cursorListeners) fn();
 
       // 14. Fire onScaleChange for scales whose ranges changed
       if (store._prevScaleRanges.size > 0 && store.eventCallbacks.onScaleChange != null) {

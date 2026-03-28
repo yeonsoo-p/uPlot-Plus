@@ -1,8 +1,7 @@
 import React from 'react';
-import { Chart, Scale, Series, Axis, Band } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series, Band } from '../../src';
 
-function generateData(): ChartData {
+function generateData() {
   const n = 100;
   const x = Array.from({ length: n }, (_, i) => i);
   const mean: number[] = [];
@@ -24,14 +23,10 @@ export default function HighLowBands() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data}>
-      <Scale id="x" />
-      <Scale id="y"  />
-      <Axis scale="x" label="Sample" />
-      <Axis scale="y" label="Value" />
-      <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Mean" />
-      <Series group={0} index={1} yScale="y" stroke="rgba(52,152,219,0.3)" width={1} label="Upper" dash={[4, 4]} />
-      <Series group={0} index={2} yScale="y" stroke="rgba(52,152,219,0.3)" width={1} label="Lower" dash={[4, 4]} />
+    <Chart width={800} height={400} data={data} xlabel="Sample" ylabel="Value">
+      <Series group={0} index={0} label="Mean" />
+      <Series group={0} index={1} label="Upper" dash={[4, 4]} />
+      <Series group={0} index={2} label="Lower" dash={[4, 4]} />
       <Band series={[1, 2]} group={0} fill="rgba(52,152,219,0.15)" />
     </Chart>
   );

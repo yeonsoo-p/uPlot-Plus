@@ -23,6 +23,8 @@ export interface SeriesConfig {
   show?: boolean;
   /** Label for legend/tooltip */
   label?: string;
+  /** Whether to show this series in legend/tooltip (default: true) */
+  legend?: boolean;
   /** Stroke color (string or gradient config) */
   stroke?: ColorValue;
   /** Fill color (string or gradient config) */

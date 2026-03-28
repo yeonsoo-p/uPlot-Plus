@@ -24,9 +24,10 @@ describe('numAxisSplits', () => {
     expect(splits[splits.length - 1]!).toBeLessThanOrEqual(5);
   });
 
-  it('forceMin starts at scaleMin', () => {
+  it('forceMin snaps to first increment-aligned tick', () => {
     const splits = numAxisSplits(1.3, 10, 2, 50, true);
-    expect(splits[0]).toBe(1.3);
+    // ceil(1.3 / 2) * 2 = 2
+    expect(splits[0]).toBe(2);
   });
 
   it('returns empty for zero increment', () => {

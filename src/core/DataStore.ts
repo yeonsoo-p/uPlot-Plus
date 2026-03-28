@@ -157,7 +157,9 @@ export class DataStore {
    * Append new data points to an existing group.
    * Much cheaper than setData() for streaming scenarios — O(newPoints) instead of O(totalPoints).
    *
-   * Only works with regular arrays (not Float64Array) since arrays need to grow.
+   * On first append, Float64Array x/y values are silently converted to regular
+   * arrays so they can grow. This is a one-time O(n) cost — subsequent appends
+   * are O(newPoints) only.
    * Block trees are incrementally updated, and only the affected group's cache is invalidated.
    */
   appendData(
@@ -168,8 +170,14 @@ export class DataStore {
     const group = this.data[groupIdx];
     if (!group) return;
 
-    const xArr = group.x;
-    if (!Array.isArray(xArr)) return; // Can't append to Float64Array
+    // Convert typed x-array → growable regular array on first append
+    let xArr: number[];
+    if (!Array.isArray(group.x)) {
+      xArr = Array.from(group.x);
+      group.x = xArr;
+    } else {
+      xArr = group.x;
+    }
 
     // Append x values
     for (let i = 0; i < newX.length; i++) {
@@ -179,13 +187,20 @@ export class DataStore {
 
     // Append y values for each series
     for (let si = 0; si < group.series.length; si++) {
-      const yArr = group.series[si];
-      if (!yArr || !Array.isArray(yArr)) continue;
+      let yArr = group.series[si];
+      if (!yArr) continue;
+
+      // Convert typed y-array → growable regular array on first append
+      if (!Array.isArray(yArr)) {
+        yArr = Array.from(yArr) as (number | null)[];
+        group.series[si] = yArr;
+      }
 
       const newY = newSeries[si];
       if (newY) {
+        const mutableY = yArr as (number | null)[];
         for (let i = 0; i < newY.length; i++) {
-          yArr.push(newY[i] ?? null);
+          mutableY.push(newY[i] ?? null);
         }
       }
 

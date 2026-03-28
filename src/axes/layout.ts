@@ -69,6 +69,11 @@ export function axesCalc(
       [_incr, _space] = getIncrSpace(config, min, max, fullDim);
     }
 
+    // Discrete x-data: force integer-only ticks
+    if (scale._discrete && _incr > 0 && _incr < 1) {
+      _incr = 1;
+    }
+
     axis._incr = _incr;
     axis._space = _space;
 
@@ -83,7 +88,7 @@ export function axesCalc(
     } else if (scale.distr === Distribution.Log) {
       axis._splits = logAxisSplits(min, max, scale.log);
     } else {
-      const forceMin = scale.distr === Distribution.Ordinal;
+      const forceMin = scale.distr === Distribution.Ordinal || scale._discrete;
       axis._splits = numAxisSplits(min, max, _incr, _space, forceMin);
     }
 
@@ -155,6 +160,14 @@ export function calcPlotRect(
         }
       }
     }
+  }
+
+  // If no top-side axis, add small margin so the topmost tick label isn't clipped
+  const hasTopAxis = axisStates.some(a => a._show && a.config.side === Side.Top);
+  if (!hasTopAxis && plotTopCss <= titleHeight) {
+    const topMargin = 8;
+    plotTopCss += topMargin;
+    plotHgtCss -= topMargin;
   }
 
   return {

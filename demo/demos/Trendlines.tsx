@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis } from '../../src';
-import type { ChartData, DrawCallback } from '../../src';
+import { Chart, Series } from '../../src';
+import type { DrawCallback } from '../../src';
 
-function generateData(): ChartData {
+function generateData() {
   const n = 80;
   const x: number[] = [];
   const y: number[] = [];
@@ -86,12 +86,8 @@ export default function Trendlines() {
   };
 
   return (
-    <Chart width={800} height={400} data={data} onDraw={onDraw}>
-      <Scale id="x" />
-      <Scale id="y"  />
-      <Axis scale="x" label="X" />
-      <Axis scale="y" label="Y" />
-      <Series group={0} index={0} yScale="y" stroke="#3498db" width={2} label="Data"
+    <Chart width={800} height={400} data={data} onDraw={onDraw} xlabel="X" ylabel="Y">
+      <Series group={0} index={0} label="Data"
         points={{ show: true, size: 4, fill: '#3498db' }} />
     </Chart>
   );

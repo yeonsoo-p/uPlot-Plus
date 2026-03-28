@@ -1,8 +1,7 @@
 import React from 'react';
 import { Chart, Scale, Series, Axis, Side } from '../../src';
-import type { ChartData } from '../../src';
 
-function generateData(): ChartData {
+function generateData() {
   const n = 100;
   const x = Array.from({ length: n }, (_, i) => i);
   // Temperature in Fahrenheit
@@ -18,13 +17,11 @@ export default function DependentScales() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data}>
-      <Scale id="x" />
+    <Chart width={800} height={400} data={data} xlabel="Day">
       <Scale id="f"  />
-      <Axis scale="x" label="Day" />
       <Axis scale="f" label="Fahrenheit" values={fmtF} stroke="#e74c3c" />
       <Axis scale="f" side={Side.Right} label="Celsius" values={fmtC} stroke="#3498db" grid={{ show: false }} />
-      <Series group={0} index={0} yScale="f" stroke="#e74c3c" width={2} label="Temperature" />
+      <Series group={0} index={0} yScale="f" stroke="#e74c3c" label="Temperature" />
     </Chart>
   );
 }

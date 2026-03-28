@@ -79,11 +79,12 @@ describe('ScaleManager', () => {
       const ds = new DataStore();
       ds.setData(data);
 
-      mgr.autoRange(data, [], ds);
+      mgr.autoRangeX(data);
 
       const s = mgr.getScale('x');
-      expect(s!.min).toBe(0);
-      expect(s!.max).toBe(4);
+      // autoRangeX pads by halfCol (minDelta=1, halfCol=0.5)
+      expect(s!.min).toBe(-0.5);
+      expect(s!.max).toBe(4.5);
     });
 
     it('auto-ranges y-scale from series data', () => {
@@ -93,6 +94,7 @@ describe('ScaleManager', () => {
 
       const ds = new DataStore();
       ds.setData(data);
+      mgr.autoRangeX(data);
       ds.updateWindows(() => mgr.getScale('x'));
 
       const seriesMap = [{ group: 0, index: 0, yScale: 'y' }];
@@ -153,11 +155,13 @@ describe('ScaleManager', () => {
 
       const ds = new DataStore();
       ds.setData(multiData);
+      mgr.autoRangeX(multiData);
       mgr.autoRange(multiData, [], ds);
 
       const s = mgr.getScale('x');
-      expect(s!.min).toBe(0);
-      expect(s!.max).toBe(7);
+      // autoRangeX pads by halfCol (minDelta=1, halfCol=0.5)
+      expect(s!.min).toBe(-0.5);
+      expect(s!.max).toBe(7.5);
     });
   });
 });
