@@ -1,7 +1,7 @@
 import type { ScaleState, BBox } from '../types';
 import type { AxisState } from '../types/axes';
 import { Side, Orientation, sideOrientation } from '../types';
-import { valToPos } from '../core/Scale';
+import { valToPos, isScaleReady } from '../core/Scale';
 import { round, PI } from '../math/utils';
 
 const TOP = 'top';
@@ -101,7 +101,7 @@ export function drawAxesGrid(
     const ori = sideOrientation(side);
 
     const scale = getScale(config.scale);
-    if (!scale || scale.min == null || scale.max == null)
+    if (!scale || !isScaleReady(scale))
       continue;
 
     const fillStyle = config.stroke ?? '#000';

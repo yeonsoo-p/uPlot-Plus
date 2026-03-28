@@ -1,6 +1,4 @@
-import type { ScaleState } from '../types';
 import { Orientation, Direction } from '../types';
-import { valToPos, posToVal } from '../core/Scale';
 import { clamp } from '../math/utils';
 
 /** Line-to for horizontal orientation */
@@ -11,16 +9,6 @@ export function lineToH(path: Path2D, x: number, y: number): void {
 /** Line-to for vertical orientation */
 export function lineToV(path: Path2D, y: number, x: number): void {
   path.lineTo(x, y);
-}
-
-/** Create a valToPos function for a given scale, dimension, and offset */
-export function makeValToPos(scale: ScaleState, dim: number, off: number): (val: number) => number {
-  return (val: number) => valToPos(val, scale, dim, off);
-}
-
-/** Create a posToVal function for a given scale, dimension, and offset */
-export function makePosToVal(scale: ScaleState, dim: number, off: number): (pos: number) => number {
-  return (pos: number) => posToVal(pos, scale, dim, off);
 }
 
 /**

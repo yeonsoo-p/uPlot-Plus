@@ -1,6 +1,6 @@
 import { useDrawHook } from '../hooks/useDrawHook';
 import { useChart } from '../hooks/useChart';
-import { valToPos } from '../core/Scale';
+import { valToPos, isScaleReady } from '../core/Scale';
 import type { TimelineProps } from '../types/timeline';
 
 /**
@@ -18,7 +18,7 @@ export function Timeline({
 
   useDrawHook(({ ctx, plotBox, pxRatio }) => {
     const scale = store.scaleManager.getScale(scaleId);
-    if (scale == null || scale.min == null || scale.max == null) return;
+    if (scale == null || !isScaleReady(scale)) return;
 
     ctx.save();
 

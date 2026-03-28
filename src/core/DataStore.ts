@@ -2,6 +2,7 @@ import type { ChartData } from '../types';
 import type { ScaleState } from '../types';
 import { SortOrder } from '../types';
 import { closestIdx, getMinMax } from '../math/utils';
+import { isScaleReady } from './Scale';
 import { BlockMinMaxTree } from './BlockMinMax';
 
 /**
@@ -61,7 +62,7 @@ export class DataStore {
       let i0: number;
       let i1: number;
 
-      if (!group || !xScale || xScale.min == null || xScale.max == null) {
+      if (!group || !xScale || !isScaleReady(xScale)) {
         i0 = 0;
         i1 = Math.max(0, (group?.x.length ?? 1) - 1);
       } else {

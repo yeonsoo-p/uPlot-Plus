@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import type { ChartStore } from './useChartStore';
 import type { SelectState } from '../types/cursor';
 import type { ChartEventInfo, NearestPoint, SelectEventInfo } from '../types/events';
-import { posToVal, valToPos, invalidateScaleCache } from '../core/Scale';
+import { posToVal, valToPos, invalidateScaleCache, isScaleReady } from '../core/Scale';
 import { Side, Orientation, sideOrientation, DirtyFlag } from '../types/common';
 import { clamp } from '../math/utils';
 
@@ -115,10 +115,10 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
 
             let pxX = cx;
             let pxY = cy;
-            if (xScale?.min != null && xScale.max != null) {
+            if (xScale != null && isScaleReady(xScale)) {
               pxX = valToPos(xVal, xScale, plotBox.width, plotBox.left) - plotBox.left;
             }
-            if (yScale?.min != null && yScale.max != null) {
+            if (yScale != null && isScaleReady(yScale)) {
               pxY = valToPos(yVal, yScale, plotBox.height, plotBox.top) - plotBox.top;
             }
 
@@ -151,7 +151,7 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
       const ranges: Record<string, { min: number; max: number }> = {};
       for (const scale of store.scaleManager.getAllScales()) {
         if (scale.ori !== Orientation.Horizontal) continue;
-        if (scale.min == null || scale.max == null) continue;
+        if (!isScaleReady(scale)) continue;
 
         const minVal = posToVal(
           plotBox.left + fracLeft * plotBox.width,
@@ -177,7 +177,7 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
       if (cb == null) return;
 
       for (const scale of store.scaleManager.getAllScales()) {
-        if (scale.min == null || scale.max == null) continue;
+        if (!isScaleReady(scale)) continue;
         const prev = store._prevScaleRanges.get(scale.id);
         if (prev == null || prev.min !== scale.min || prev.max !== scale.max) {
           cb(scale.id, scale.min, scale.max);
@@ -285,7 +285,7 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
       const axisHit = hitTestAxis(e.clientX, e.clientY);
       if (axisHit != null && axisHit.ori === Orientation.Vertical) {
         const scale = store.scaleManager.getScale(axisHit.scaleId);
-        if (scale != null && scale.min != null && scale.max != null) {
+        if (scale != null && isScaleReady(scale)) {
           const rect = el.getBoundingClientRect();
           axisDrag = {
             scaleId: axisHit.scaleId,
@@ -467,7 +467,7 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
       const plotBox = store.plotBox;
 
       for (const scale of store.scaleManager.getAllScales()) {
-        if (scale.min == null || scale.max == null) continue;
+        if (!isScaleReady(scale)) continue;
 
         const isX = scale.ori === Orientation.Horizontal;
         if (isX && !zoomX) continue;
@@ -498,7 +498,7 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
 
       for (const scale of store.scaleManager.getAllScales()) {
         if (scale.ori !== Orientation.Horizontal) continue;
-        if (scale.min == null || scale.max == null) continue;
+        if (!isScaleReady(scale)) continue;
 
         const newMin = posToVal(
           plotBox.left + fracLeft * plotBox.width,
@@ -564,7 +564,7 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
 
         for (const scale of store.scaleManager.getAllScales()) {
           if (scale.ori !== Orientation.Horizontal) continue;
-          if (scale.min == null || scale.max == null) continue;
+          if (!isScaleReady(scale)) continue;
 
           const cursorVal = posToVal(midCx + plotBox.left, scale, plotBox.width, plotBox.left);
           const newMin = cursorVal - (cursorVal - scale.min) / factor;

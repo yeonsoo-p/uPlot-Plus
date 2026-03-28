@@ -2,6 +2,7 @@ import type { ScaleState, BBox } from '../types';
 import type { AxisState } from '../types/axes';
 import { Side, Orientation, Distribution, sideOrientation } from '../types';
 import { ceil } from '../math/utils';
+import { isScaleReady } from '../core/Scale';
 import {
   getIncrSpace,
   numAxisSplits,
@@ -39,7 +40,7 @@ export function axesCalc(
 
     const scale = getScale(config.scale);
 
-    if (!scale || scale.min == null || scale.max == null) {
+    if (!scale || !isScaleReady(scale)) {
       if (axis._show) {
         converged = false;
         axis._show = false;
@@ -56,7 +57,8 @@ export function axesCalc(
     const ori = sideOrientation(side);
     const fullDim = ori === Orientation.Horizontal ? plotWidCss : plotHgtCss;
 
-    const { min, max } = scale;
+    const min = scale.min;
+    const max = scale.max;
 
     let _incr: number;
     let _space: number;

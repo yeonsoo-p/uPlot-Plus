@@ -1,7 +1,7 @@
 import type { CursorState, ScaleState, BBox } from '../types';
 import type { ChartData } from '../types/data';
 import type { SeriesConfig } from '../types/series';
-import { valToPos } from '../core/Scale';
+import { valToPos, isScaleReady } from '../core/Scale';
 import { round } from '../math/utils';
 
 /** Stroke width for the point indicator outline (CSS pixels) */
@@ -117,10 +117,10 @@ export function drawCursor(
         if (showPoint) {
           const xScaleId = getGroupXScaleKey(gi);
           const xScale = xScaleId != null ? getScale(xScaleId) : undefined;
-          const yScaleId = seriesConfigMap?.get(`${gi}:${si}`)?.yScale ?? findYScaleId(seriesConfigs, gi, si);
+          const yScaleId = matchedCfg?.yScale ?? findYScaleId(seriesConfigs, gi, si);
           const yScale = yScaleId != null ? getScale(yScaleId) : undefined;
 
-          if (xScale != null && yScale != null && xScale.min != null && xScale.max != null && yScale.min != null && yScale.max != null) {
+          if (xScale != null && yScale != null && isScaleReady(xScale) && isScaleReady(yScale)) {
             const px = round(valToPos(xVal, xScale, plotBox.width, plotBox.left) * pr);
             const py = round(valToPos(yVal, yScale, plotBox.height, plotBox.top) * pr);
             const r = cfg.pointRadius * pr;

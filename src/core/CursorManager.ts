@@ -1,7 +1,7 @@
 import type { CursorState, ScaleState, BBox } from '../types';
 import type { ChartData } from '../types/data';
 import type { SeriesConfig } from '../types/series';
-import { valToPos, posToVal } from './Scale';
+import { valToPos, posToVal, isScaleReady } from './Scale';
 import { closestIdx } from '../math/utils';
 
 /** Minimal store interface to avoid circular dependency with ChartStore. */
@@ -107,7 +107,7 @@ export class CursorManager {
       const xScaleId = getGroupXScaleKey(gi);
       if (xScaleId == null) continue;
       const xScale = getScale(xScaleId);
-      if (xScale == null || xScale.min == null || xScale.max == null) continue;
+      if (xScale == null || !isScaleReady(xScale)) continue;
 
       const [wi0, wi1] = getWindow(gi);
 
@@ -149,7 +149,7 @@ export class CursorManager {
             yScaleState = getScale(sc.yScale);
             yScaleCache.set(sc.yScale, yScaleState);
           }
-          if (yScaleState == null || yScaleState.min == null || yScaleState.max == null) continue;
+          if (yScaleState == null || !isScaleReady(yScaleState)) continue;
 
           const yDim = plotBox.height;
           const yOff = plotBox.top;
@@ -195,7 +195,7 @@ export class CursorManager {
     const xScaleKey = store.scaleManager.getGroupXScaleKey(0);
     if (xScaleKey == null) return;
     const xScale = store.scaleManager.getScale(xScaleKey);
-    if (xScale == null || xScale.min == null || xScale.max == null) return;
+    if (xScale == null || !isScaleReady(xScale)) return;
 
     const [wi0, wi1] = store.dataStore.getWindow(0);
     const dataIdx = closestIdx(xVal, group.x, wi0, wi1);
@@ -219,7 +219,7 @@ export class CursorManager {
       const yVal = yData[dataIdx];
       if (yVal == null) continue;
       const yScale = store.scaleManager.getScale(sc.yScale);
-      if (yScale == null || yScale.min == null || yScale.max == null) continue;
+      if (yScale == null || !isScaleReady(yScale)) continue;
 
       yPos = valToPos(yVal, yScale, store.plotBox.height, store.plotBox.top) - store.plotBox.top;
       bestSeriesIdx = sc.index;

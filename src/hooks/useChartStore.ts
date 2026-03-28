@@ -18,7 +18,7 @@ import { buildBandPath, drawBandPath } from '../rendering/drawBands';
 import type { BandConfig } from '../types/bands';
 import { Side, DirtyFlag } from '../types/common';
 import type { DrawContext, DrawCallback, CursorDrawCallback } from '../types/hooks';
-import { valToPos } from '../core/Scale';
+import { valToPos, isScaleReady } from '../core/Scale';
 import type { EventCallbacks } from '../types/events';
 
 /**
@@ -97,12 +97,12 @@ function buildDrawContext(
 ): DrawContext {
   const valToX = (val: number, scaleId = 'x'): number | null => {
     const s = getScale(scaleId);
-    if (s == null || s.min == null || s.max == null) return null;
+    if (s == null || !isScaleReady(s)) return null;
     return valToPos(val, s, plotBox.width, plotBox.left);
   };
   const valToY = (val: number, scaleId: string): number | null => {
     const s = getScale(scaleId);
-    if (s == null || s.min == null || s.max == null) return null;
+    if (s == null || !isScaleReady(s)) return null;
     return valToPos(val, s, plotBox.height, plotBox.top);
   };
   return { ctx, plotBox, pxRatio, getScale, valToX, valToY };
@@ -193,7 +193,7 @@ export interface ChartStore {
 }
 
 /** Rebuild the series config lookup map from the current seriesConfigs array. */
-function rebuildSeriesConfigMap(store: ChartStore): void {
+export function rebuildSeriesConfigMap(store: ChartStore): void {
   store.seriesConfigMap.clear();
   for (const cfg of store.seriesConfigs) {
     store.seriesConfigMap.set(`${cfg.group}:${cfg.index}`, cfg);
@@ -578,7 +578,7 @@ export function createChartStore(): ChartStore {
       // 14. Fire onScaleChange for scales whose ranges changed
       if (store._prevScaleRanges.size > 0 && store.eventCallbacks.onScaleChange != null) {
         for (const scale of scaleManager.getAllScales()) {
-          if (scale.min == null || scale.max == null) continue;
+          if (!isScaleReady(scale)) continue;
           const prev = store._prevScaleRanges.get(scale.id);
           if (prev == null || prev.min !== scale.min || prev.max !== scale.max) {
             try { store.eventCallbacks.onScaleChange(scale.id, scale.min, scale.max); } catch (err) { console.warn('[uPlot+] event callback error:', err); }
@@ -589,7 +589,7 @@ export function createChartStore(): ChartStore {
       // Update previous scale ranges snapshot
       store._prevScaleRanges.clear();
       for (const scale of scaleManager.getAllScales()) {
-        if (scale.min != null && scale.max != null) {
+        if (isScaleReady(scale)) {
           store._prevScaleRanges.set(scale.id, { min: scale.min, max: scale.max });
         }
       }

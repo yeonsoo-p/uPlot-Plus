@@ -5,6 +5,16 @@ import { valToPos } from './core/Scale';
 /** Vertical offset (px) above the data point for label text baseline */
 const LABEL_OFFSET_Y = 4;
 
+function applyStrokeStyle(ctx: CanvasRenderingContext2D, style: AnnotationStyle): void {
+  ctx.strokeStyle = style.stroke ?? 'red';
+  ctx.lineWidth = style.width ?? 1;
+  if (style.dash) ctx.setLineDash(style.dash);
+}
+
+function resetDash(ctx: CanvasRenderingContext2D, style: AnnotationStyle): void {
+  if (style.dash) ctx.setLineDash([]);
+}
+
 export interface AnnotationStyle {
   stroke?: string;
   width?: number;
@@ -27,11 +37,9 @@ export function drawHLine(
   ctx.beginPath();
   ctx.moveTo(plotBox.left, y);
   ctx.lineTo(plotBox.left + plotBox.width, y);
-  ctx.strokeStyle = style.stroke ?? 'red';
-  ctx.lineWidth = style.width ?? 1;
-  if (style.dash) ctx.setLineDash(style.dash);
+  applyStrokeStyle(ctx, style);
   ctx.stroke();
-  if (style.dash) ctx.setLineDash([]);
+  resetDash(ctx, style);
 }
 
 /** Draw a vertical line at an x-value.
@@ -48,11 +56,9 @@ export function drawVLine(
   ctx.beginPath();
   ctx.moveTo(x, plotBox.top);
   ctx.lineTo(x, plotBox.top + plotBox.height);
-  ctx.strokeStyle = style.stroke ?? 'red';
-  ctx.lineWidth = style.width ?? 1;
-  if (style.dash) ctx.setLineDash(style.dash);
+  applyStrokeStyle(ctx, style);
   ctx.stroke();
-  if (style.dash) ctx.setLineDash([]);
+  resetDash(ctx, style);
 }
 
 /** Draw a text label at data coordinates.
@@ -92,10 +98,8 @@ export function drawRegion(
   ctx.fillStyle = style.fill ?? 'rgba(255,0,0,0.1)';
   ctx.fillRect(plotBox.left, Math.min(top, btm), plotBox.width, Math.abs(btm - top));
   if (style.stroke) {
-    ctx.strokeStyle = style.stroke;
-    ctx.lineWidth = style.width ?? 1;
-    if (style.dash) ctx.setLineDash(style.dash);
+    applyStrokeStyle(ctx, style);
     ctx.strokeRect(plotBox.left, Math.min(top, btm), plotBox.width, Math.abs(btm - top));
-    if (style.dash) ctx.setLineDash([]);
+    resetDash(ctx, style);
   }
 }

@@ -1,6 +1,6 @@
 import type { DrawCallback } from '../types/hooks';
 import type { ScaleState } from '../types';
-import { valToPos } from '../core/Scale';
+import { valToPos, isScaleReady } from '../core/Scale';
 
 export interface CandlestickOpts {
   /** X values array */
@@ -45,8 +45,8 @@ export function drawCandlesticks(opts: CandlestickOpts): DrawCallback {
       wickWidth = 1,
     } = opts;
 
-    if (xScale.min == null || xScale.max == null) return;
-    if (yScale.min == null || yScale.max == null) return;
+    if (!isScaleReady(xScale)) return;
+    if (!isScaleReady(yScale)) return;
 
     const n = xValues.length;
     if (n === 0) return;

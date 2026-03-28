@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import type { SeriesConfig } from '../types';
 import { useChart } from '../hooks/useChart';
+import { rebuildSeriesConfigMap } from '../hooks/useChartStore';
 import { shallowEqual } from '../utils/shallowEqual';
 import { withAlpha } from '../colors';
 
@@ -73,10 +74,7 @@ export function Series(props: SeriesProps): null {
         ? resolveDefaults(props, i)
         : s,
     );
-    store.seriesConfigMap.clear();
-    for (const cfg of store.seriesConfigs) {
-      store.seriesConfigMap.set(`${cfg.group}:${cfg.index}`, cfg);
-    }
+    rebuildSeriesConfigMap(store);
     store.renderer.invalidateSeries(props.group, props.index);
     store.scheduleRedraw();
   });

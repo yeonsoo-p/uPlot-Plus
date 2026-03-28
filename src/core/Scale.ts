@@ -24,6 +24,11 @@ export function createScaleState(cfg: ScaleConfig): ScaleState {
   };
 }
 
+/** Check whether a scale has valid (non-null) min and max values. */
+export function isScaleReady(scale: ScaleState): scale is ScaleState & { min: number; max: number } {
+  return scale.min != null && scale.max != null;
+}
+
 /** Invalidate cached transformed min/max (call when min/max change) */
 export function invalidateScaleCache(scale: ScaleState): void {
   scale._min = null;
