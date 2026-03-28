@@ -39,6 +39,19 @@ body {
   padding: 0 16px 16px;
   border-bottom: 1px solid #333;
   margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.github-link {
+  color: #999;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.github-link:hover {
+  color: #fff;
 }
 
 .sidebar-search-wrap {
