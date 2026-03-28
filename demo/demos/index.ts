@@ -103,6 +103,7 @@ import ScrollSync from './ScrollSync';
 import StreamData from './StreamData';
 import RealtimeSine from './RealtimeSine';
 import LargeDataset from './LargeDataset';
+import FpsStressTest from './FpsStressTest';
 import UpdateCursorSelectResize from './UpdateCursorSelectResize';
 
 // --- Annotations & Drawing ---
@@ -246,6 +247,7 @@ export const demos: DemoEntry[] = [
   { id: 'stream-data', title: 'Stream Data', description: '3-series 60fps streaming with 2000-point sliding window and FPS counter.', category: 'Layout & Streaming', component: StreamData, sourceFile: 'StreamData' },
   { id: 'realtime-sine', title: 'Real-Time Sine', description: '10,000-point scrolling sine waves at 60fps — inspired by webgl-plot-react.', category: 'Layout & Streaming', component: RealtimeSine, sourceFile: 'RealtimeSine' },
   { id: 'large-dataset', title: 'Large Dataset', description: '2,000,000 points rendered with minimal configuration to test performance.', category: 'Layout & Streaming', component: LargeDataset, sourceFile: 'LargeDataset' },
+  { id: 'fps-stress-test', title: 'FPS Stress Test', description: 'Exponentially increasing point count (1K→2M) with live FPS measurement and performance curve.', category: 'Layout & Streaming', component: FpsStressTest, sourceFile: 'FpsStressTest' },
   { id: 'update-cursor-select-resize', title: 'Live Data Update', description: 'Live-updating data with cursor stability testing.', category: 'Layout & Streaming', component: UpdateCursorSelectResize, sourceFile: 'UpdateCursorSelectResize' },
 
   // --- Annotations & Drawing ---
