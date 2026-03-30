@@ -4,31 +4,11 @@ High-performance React charting library ripped off from [uPlot](https://github.c
 
 **[Live Demo (101 examples)](https://yeonsoo-p.github.io/uPlot-Plus/)**
 
-## Features
-
-- **Canvas 2D rendering** — no SVG or DOM elements for data visualization
-- **Native React components** — declarative `<Chart>`, `<Series>`, `<Scale>`, `<Axis>` API
-- **Multi-x-axis support** — multiple data groups with independent x-ranges on one chart
-- **TypeScript-first** — strict types, full type exports, no `any`
-- **8 path builders** — linear, stepped, bars, groupedBars, stackedBars, monotone cubic, Catmull-Rom, points
-- **Action map** — `Map<string|function, string|function>` maps gestures to reactions. Drag, click, dblclick, wheel, gutter, hover, touch — all configurable
-- **Cursor sync** — linked crosshairs and tooltips across multiple charts
-- **Compact bundle** — ~128KB (~36KB gzip), React 18+ peer dependency
-- **Dual output** — ES module + CommonJS
-
-## Installation
-
-```sh
-npm install uplot-plus
-```
-
-Peer dependencies:
-
-```sh
-npm install react react-dom
-```
-
 ## Quick Start
+
+```sh
+npm install uplot-plus react react-dom
+```
 
 Scales, axes, and colors are auto-injected when omitted — the simplest chart is just data + series:
 
@@ -37,13 +17,9 @@ import { Chart, Series } from 'uplot-plus';
 
 const data = { x: [1, 2, 3, 4, 5], y: [10, 25, 13, 30, 18] };
 
-function App() {
-  return (
-    <Chart width={800} height={400} data={data}>
-      <Series group={0} index={0} label="Revenue" />
-    </Chart>
-  );
-}
+<Chart width={800} height={400} data={data}>
+  <Series group={0} index={0} label="Revenue" />
+</Chart>
 ```
 
 For full control, declare scales, axes, and series explicitly:
@@ -51,29 +27,88 @@ For full control, declare scales, axes, and series explicitly:
 ```tsx
 import { Chart, Scale, Series, Axis } from 'uplot-plus';
 
-const data = [
-  {
-    x: [1, 2, 3, 4, 5],
-    series: [
-      [10, 25, 13, 30, 18],
-      [5, 15, 20, 12, 28],
-    ],
-  },
-];
+const data = [{ x: [1, 2, 3, 4, 5], series: [[10, 25, 13, 30, 18], [5, 15, 20, 12, 28]] }];
 
-function App() {
-  return (
-    <Chart width={800} height={400} data={data}>
-      <Scale id="x" />
-      <Scale id="y" />
-      <Axis scale="x" label="X-Axis" />
-      <Axis scale="y" label="Y-Axis" />
-      <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Series A" />
-      <Series group={0} index={1} yScale="y" stroke="#3498db" width={2} label="Series B" />
-    </Chart>
-  );
-}
+<Chart width={800} height={400} data={data}>
+  <Scale id="x" />
+  <Scale id="y" />
+  <Axis scale="x" label="X-Axis" />
+  <Axis scale="y" label="Y-Axis" />
+  <Series group={0} index={0} yScale="y" stroke="#e74c3c" label="Series A" />
+  <Series group={0} index={1} yScale="y" stroke="#3498db" label="Series B" />
+</Chart>
 ```
+
+## Chart Types
+
+All chart types are configured via the `paths` prop on `<Series>`, or via specialized components:
+
+```tsx
+import { Series, bars, stepped, monotoneCubic, points } from 'uplot-plus';
+
+<Series paths={bars()} />          // Bar / column charts
+<Series paths={stepped()} />       // Step charts
+<Series paths={monotoneCubic()} /> // Smooth curves
+<Series paths={points()} />        // Scatter plots
+```
+
+| Type | How to use |
+| ---- | ---------- |
+| Line / area | Default — just `<Series />` with optional `fill` |
+| Bar / column | `<Series paths={bars()} />` — also `groupedBars()`, `stackedBars()` |
+| Step | `<Series paths={stepped()} />` — step-after, step-before, mid-step |
+| Smooth curve | `<Series paths={monotoneCubic()} />` or `catmullRom()` |
+| Scatter | `<Series paths={points()} />` |
+| Candlestick | `<Candlestick />` — OHLC financial charts |
+| Box & whisker | `<BoxWhisker boxes={[...]} />` — quartile distributions |
+| Heatmap | `<Heatmap grid={[...]} />` — 2D colored grid |
+| Vector field | `<Vector directions={[...]} />` — directional arrows on data |
+| Timeline | `<Timeline lanes={[...]} />` — horizontal event lanes |
+| Sparkline | `<Sparkline data={data} />` — compact inline chart |
+
+## Interactions
+
+Every user gesture maps to a chart reaction via the **action map**. Default behavior works out of the box — drag to zoom, double-click to reset, y-axis gutter drag to pan:
+
+```tsx
+// Defaults: leftDrag→zoomX, leftDblclick→reset, wheel→zoomX, yGutterDrag→panY, xGutterDrag→panX
+<Chart data={data} width={800} height={400}>
+  <Series group={0} index={0} />
+</Chart>
+```
+
+Override any gesture by passing `[action, reaction]` tuples — merged with defaults internally:
+
+```tsx
+// Wheel zooms both axes, shift+wheel zooms Y only
+<Chart actions={[['wheel', 'zoomXY'], ['shiftWheel', 'zoomY']]} />
+
+// Middle-drag pans, disable double-click reset
+<Chart actions={[['middleDrag', 'panXY'], ['leftDblclick', 'none']]} />
+
+// Focus mode: hover dims non-nearest series
+import { focus } from 'uplot-plus';
+<Chart actions={[['hover', focus(0.15)]]} />
+```
+
+Custom function matchers for actions the built-in classifiers don't cover:
+
+```tsx
+<Chart actions={[
+  // String → function: built-in classifier handles shift+click
+  ['shiftLeftClick', (store) => { /* toggle series */ }],
+
+  // String → function: keyboard shortcut
+  ['shiftKeyX', (store) => { /* reset widths */ }],
+
+  // Function → function: truly custom (e.g. Q key held + click)
+  [(e, ctx) => isQHeld && ctx.action === 'leftClick', (store) => { /* custom */ }],
+]} />
+```
+
+**Built-in actions:** `{mod?}{Button}{Type}` — `leftDrag`, `shiftMiddleClick`, `ctrlRightDrag`, `wheel`, `shiftWheel`, `xGutterDrag`, `yGutterDrag`, `hover`, `touchDrag`, `pinch`, `key{Key}`, `shiftKey{Key}`
+
+**Built-in reactions:** `zoomX`, `zoomY`, `zoomXY`, `panX`, `panY`, `panXY`, `reset`, `none`
 
 ## Components
 
@@ -86,21 +121,21 @@ function App() {
 | `<Band>` | Fills a region between two series |
 | `<Legend>` | Interactive legend with live cursor values, click-to-toggle |
 | `<Tooltip>` | Floating tooltip at cursor position, auto-flips at edges |
-| `<FloatingLegend>` | Draggable or cursor-following legend panel with idle opacity fade |
+| `<FloatingLegend>` | Draggable or cursor-following legend panel |
 | `<HoverLabel>` | Shows nearest series info after a hover delay |
 | `<ZoomRanger>` | Overview mini-chart with draggable selection for zoom control |
 | `<Timeline>` | Horizontal lanes of colored event spans |
-| `<Sparkline>` | Compact inline chart for tables and dashboards (no axes, no interaction) |
+| `<Sparkline>` | Compact inline chart for tables and dashboards |
 | `<BoxWhisker>` | Box-and-whisker plot with quartiles, whiskers, and median |
 | `<Candlestick>` | OHLC financial candlestick chart |
 | `<Heatmap>` | 2D grid of colored cells with configurable color map |
 | `<Vector>` | Directional arrows overlaid on data points |
-| `<HLine>` | Declarative horizontal line annotation |
-| `<VLine>` | Declarative vertical line annotation |
-| `<Region>` | Declarative shaded region annotation |
-| `<AnnotationLabel>` | Declarative text label at data coordinates |
+| `<HLine>` | Horizontal line annotation |
+| `<VLine>` | Vertical line annotation |
+| `<Region>` | Shaded region annotation |
+| `<AnnotationLabel>` | Text label at data coordinates |
 
-> Full props reference, usage examples, and demo links: [docs/COMPONENTS.md](docs/COMPONENTS.md)
+> Full props reference: [docs/COMPONENTS.md](docs/COMPONENTS.md)
 
 ## Data Model
 
@@ -111,173 +146,23 @@ Three input forms — use whichever fits your data:
 const data = { x: [1, 2, 3, 4, 5], y: [10, 20, 30, 40, 50] };
 
 // Multiple series sharing one x-axis
-const data = [
-  {
-    x: [1, 2, 3, 4, 5],
-    series: [
-      [10, 20, 30, 40, 50],   // series 0
-      [5, 15, 25, 35, 45],    // series 1
-    ],
-  },
-];
+const data = [{ x: [1, 2, 3, 4, 5], series: [[10, 20, 30], [5, 15, 25]] }];
 
 // Multi x-axis — two groups with independent x-ranges
-const multiData = [
+const data = [
   { x: [0, 1, 2, 3], series: [[10, 20, 15, 25]] },
   { x: [0, 0.5, 1.5, 2.5, 3], series: [[8, 18, 22, 12, 30]] },
 ];
 ```
 
-Each series is referenced by a `(group, index)` tuple — `group` is the index into the `ChartData` array, `index` is the index into that group's `series` array.
-
-Null values in series arrays create gaps in the chart. Use `spanGaps` on `<Series>` to bridge them.
-
-## Path Builders
-
-| Builder | Import | Use case |
-|---------|--------|----------|
-| `linear()` | `linear` | Line/area charts (default). Pixel-level decimation for large datasets |
-| `stepped()` | `stepped` | Step charts — step-after, step-before, or mid-step |
-| `bars()` | `bars` | Bar/column charts with configurable width and gaps |
-| `groupedBars()` | `groupedBars` | Side-by-side grouped bar charts |
-| `stackedBars()` | `stackedBars` | Stacked bar charts |
-| `monotoneCubic()` | `monotoneCubic` | Smooth curves that preserve monotonicity (no overshoot) |
-| `catmullRom()` | `catmullRom` | Centripetal Catmull-Rom splines |
-| `points()` | `points` | Scatter plots — points only, no connecting lines |
-
-```tsx
-import { Series, bars } from 'uplot-plus';
-
-<Series group={0} index={0} yScale="y" paths={bars()} stroke="#3498db" fill="#3498db80" />
-```
-
-## Event Callbacks
-
-React-idiomatic event handling — all callbacks receive resolved chart data (nearest point, data values, coordinates).
-
-```tsx
-import { Chart, Scale, Series, Axis } from 'uplot-plus';
-
-<Chart
-  data={data} width={800} height={400}
-  onClick={(info) => {
-    if (info.point) {
-      console.log(`Clicked series ${info.point.seriesIdx} at y=${info.point.yVal}`);
-    }
-  }}
-  onContextMenu={(info) => {
-    // Right-click with resolved nearest point
-    showContextMenu(info.srcEvent, info.point);
-  }}
-  onDblClick={(info) => {
-    // Return false to prevent default zoom reset
-    return false;
-  }}
-  onSelect={(sel) => {
-    // Intercept drag selection — fetch detail data instead of zooming
-    fetchData(sel.ranges['x'].min, sel.ranges['x'].max);
-    return false; // prevent zoom
-  }}
-  onScaleChange={(scaleId, min, max) => {
-    console.log(`Scale ${scaleId} changed: [${min}, ${max}]`);
-  }}
-  onCursorMove={(info) => { /* fires on every mouse move */ }}
-  onCursorLeave={() => { /* cursor left the plot */ }}
->
-  <Scale id="x" />
-  <Scale id="y" />
-  <Axis scale="x" />
-  <Axis scale="y" />
-  <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Series A" />
-</Chart>
-```
-
-### Controlled Scales
-
-Control zoom and pan declaratively through React state — no imperative refs needed:
-
-```tsx
-import { useState, useCallback } from 'react';
-import { Chart, Scale, Series, Axis } from 'uplot-plus';
-
-function ZoomableChart({ data }) {
-  const [xRange, setXRange] = useState<[number, number] | null>(null);
-
-  const onScaleChange = useCallback((id: string, min: number, max: number) => {
-    if (id === 'x') setXRange([min, max]);
-  }, []);
-
-  return (
-    <>
-      <button onClick={() => setXRange(null)}>Reset Zoom</button>
-      <Chart data={data} width={800} height={400} onScaleChange={onScaleChange}>
-        <Scale id="x"
-          auto={xRange == null} min={xRange?.[0]} max={xRange?.[1]} />
-        <Scale id="y" />
-        {/* ... axes, series */}
-      </Chart>
-    </>
-  );
-}
-```
-
-## Hooks
-
-### `useChart()`
-
-Access the chart store from a child component of `<Chart>`. This is an advanced API for building custom chart sub-components that need direct store access — for most use cases, prefer event callbacks and controlled Scale props.
-
-```tsx
-import { useChart } from 'uplot-plus';
-
-function CustomControl() {
-  const store = useChart();
-  return <button onClick={() => store.toggleSeries(0, 0)}>Toggle</button>;
-}
-```
-
-### `useDrawHook()` / `useCursorDrawHook()`
-
-Register custom Canvas 2D draw callbacks from child components. For most cases, prefer the `onDraw` / `onCursorDraw` props on `<Chart>` — these hooks are useful when building reusable chart sub-components.
-
-```tsx
-import { useDrawHook } from 'uplot-plus';
-import type { DrawCallback } from 'uplot-plus';
-
-const onDraw: DrawCallback = (dc) => {
-  dc.ctx.fillStyle = 'rgba(255,0,0,0.2)';
-  dc.ctx.fillRect(dc.plotBox.left, dc.plotBox.top, dc.plotBox.width, dc.plotBox.height);
-};
-```
-
-### `useStreamingData()`
-
-Sliding-window data management for real-time charts:
-
-```tsx
-import { useStreamingData } from 'uplot-plus';
-
-const { data, push, pushGroup, start, stop, fps } = useStreamingData(initialData, {
-  window: 1000,   // keep last 1000 points
-  batchSize: 10,  // push 10 points per tick
-});
-
-// Push into group 0 (default):
-push([newX], [newY1], [newY2]);
-
-// Push into a specific group (for multi-x-axis charts):
-pushGroup(1, [newX], [newY1]);
-```
+Null values in series arrays create gaps. Use `spanGaps` on `<Series>` to bridge them.
 
 ## Annotations
-
-Declarative annotation components — place inside `<Chart>`:
 
 ```tsx
 import { HLine, VLine, Region, AnnotationLabel } from 'uplot-plus';
 
 <Chart data={data}>
-  {/* ... scales, axes, series */}
   <HLine value={65} yScale="y" stroke="#e74c3c" dash={[6, 4]} label="Threshold" />
   <VLine value={100} xScale="x" stroke="#8e44ad" dash={[4, 4]} />
   <Region yMin={40} yMax={60} yScale="y" fill="rgba(46,204,113,0.12)" />
@@ -285,22 +170,17 @@ import { HLine, VLine, Region, AnnotationLabel } from 'uplot-plus';
 </Chart>
 ```
 
-Imperative helpers are available for advanced draw hooks that need programmatic control:
-
-```tsx
-import { drawHLine, drawVLine, drawLabel, drawRegion } from 'uplot-plus';
-```
-
 ## Utilities
 
 | Category | Functions |
-| ---------- | ----------- |
+| -------- | --------- |
 | Axis formatters | `fmtCompact`, `fmtSuffix`, `fmtPrefix`, `fmtWrap`, `fmtHourMin`, `fmtMonthName`, `fmtDateStr`, `fmtLabels` |
 | Color helpers | `fadeGradient`, `withAlpha`, `palette` |
 | Data transforms | `stackGroup`, `alignData` |
-| Scale math | `valToPos`, `posToVal` |
 
-> Full API, signatures, and examples: [docs/UTILITIES.md](docs/UTILITIES.md)
+> Full API and examples: [docs/UTILITIES.md](docs/UTILITIES.md)
+
+> Advanced: [Event callbacks, hooks, controlled scales](docs/ADVANCED.md)
 
 ## Development
 
