@@ -610,10 +610,11 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
     // DOM event handlers
     // -----------------------------------------------------------------------
 
-    function onMouseDown(e: MouseEvent): void {
-      // Ensure container has focus for keyboard events
+    function onMouseEnter(): void {
       if (document.activeElement !== el) el.focus();
+    }
 
+    function onMouseDown(e: MouseEvent): void {
       const ctx = buildContext(e);
 
       // Gutter hit overrides plot-area classification
@@ -870,6 +871,7 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
       }
     }
 
+    el.addEventListener('mouseenter', onMouseEnter);
     el.addEventListener('mousemove', onMouseMove);
     el.addEventListener('mousedown', onMouseDown);
     el.addEventListener('mouseup', onMouseUp);
@@ -884,6 +886,7 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
     el.addEventListener('keydown', onKeyDown);
 
     return () => {
+      el.removeEventListener('mouseenter', onMouseEnter);
       el.removeEventListener('mousemove', onMouseMove);
       el.removeEventListener('mousedown', onMouseDown);
       el.removeEventListener('mouseup', onMouseUp);
