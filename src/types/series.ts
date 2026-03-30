@@ -47,7 +47,7 @@ export interface SeriesConfig {
   cap?: CanvasLineCap;
   /** Line join */
   join?: CanvasLineJoin;
-  /** Pixel alignment: 0=none, 1=round to pixel (default), other=snap to increment */
+  /** Pixel alignment: 0=none (default, smooth anti-aliased curves), 1=round to pixel (crisp lines), N=round to increment */
   pxAlign?: number;
   /** Fill-to value or function */
   fillTo?: number | ((min: number, max: number) => number);

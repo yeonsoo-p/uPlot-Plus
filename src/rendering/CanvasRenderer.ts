@@ -3,7 +3,7 @@ import { Distribution } from '../types';
 import type { SeriesPaths } from '../paths/types';
 import { linear } from '../paths/linear';
 import { drawSeriesPath } from './drawSeries';
-import { round } from '../math/utils';
+import { pxRoundGen } from '../math/utils';
 
 const defaultPathBuilder = linear();
 
@@ -222,7 +222,7 @@ export class CanvasRenderer {
     if (paths == null) {
       const pathBuilder = info.config.paths ?? defaultPathBuilder;
       const dir = info.xScale.dir;
-      const pxRound = (v: number) => round(v);
+      const pxRound = pxRoundGen(info.config.pxAlign ?? 0);
 
       // Expand window by ~10% on each side for "runway" during panning
       const span = i1 - i0;

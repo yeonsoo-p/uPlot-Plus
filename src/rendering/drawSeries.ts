@@ -79,7 +79,7 @@ export function drawSeriesPath(
     }
 
     // Pixel alignment: shift by half-pixel for odd-width lines to avoid anti-aliasing blur
-    const pxAlign = config.pxAlign ?? 1;
+    const pxAlign = config.pxAlign ?? 0;
     const offset = (lineWidth % 2) / 2;
     const doAlign = pxAlign === 1 && offset > 0;
 
