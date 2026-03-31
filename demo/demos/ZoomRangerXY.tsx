@@ -32,8 +32,8 @@ export default function ZoomRangerXYDemo() {
         <Series group={0} index={1} yScale="y2" stroke="#9c27b0" label="Signal B" />
       </Chart>
 
-      <div style={{ marginTop: 8 }}>
-        <h4 style={{ margin: '0 0 4px' }}>Overview (drag to select range)</h4>
+      <div className="mt-2">
+        <h4 className="m-0 mb-1">Overview (drag to select range)</h4>
         <ZoomRanger
           width={800}
           height={80}

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Series, Axis, Band, Legend, stackedBars, stackGroup, fmtLabels } from 'uplot-plus';
 import type { ChartData, BandConfig } from 'uplot-plus';
 
@@ -19,11 +19,11 @@ function makeStackedData() {
 }
 
 export default function StackedBars() {
-  const { data, bands } = useMemo(() => makeStackedData(), []);
+  const { data, bands } = makeStackedData();
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
+      <p className="text-demo text-muted mb-2">
         Stacked bars using <code>stackGroup()</code> to transform data and <code>Band</code> for shaded regions.
       </p>
       <Chart width={800} height={400} data={data} title="Stacked Bars" ylabel="Sales">

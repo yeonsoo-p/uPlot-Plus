@@ -82,6 +82,7 @@ export function Chart({
       store.setCanvas(null);
       store.scheduler.cancel();
       store.focusedSeries = null;
+      store.eventCallbacks = {};
     };
   }, [store]);
 

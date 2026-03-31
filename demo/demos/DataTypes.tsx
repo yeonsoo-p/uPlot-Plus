@@ -7,11 +7,11 @@ import { Chart, Series } from 'uplot-plus';
  */
 export default function DataTypes() {
   return (
-    <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+    <div className="flex gap-6 flex-wrap">
       {/* number[] — most common, promoted to Float64Array internally */}
       <div>
-        <h4 style={{ margin: '0 0 4px' }}>number[]</h4>
-        <p style={{ fontSize: 12, color: '#666', margin: '0 0 8px' }}>
+        <h4 className="mt-0 mb-1">number[]</h4>
+        <p className="text-xs text-muted mt-0 mb-2">
           Plain arrays — promoted to Float64Array internally
         </p>
         <Chart width={250} height={180} data={{ x: [1, 2, 3, 4, 5], y: [10, 40, 20, 50, 30] }}>
@@ -21,8 +21,8 @@ export default function DataTypes() {
 
       {/* Float64Array — passed through directly, zero copy */}
       <div>
-        <h4 style={{ margin: '0 0 4px' }}>Float64Array</h4>
-        <p style={{ fontSize: 12, color: '#666', margin: '0 0 8px' }}>
+        <h4 className="mt-0 mb-1">Float64Array</h4>
+        <p className="text-xs text-muted mt-0 mb-2">
           Typed arrays — passed through, zero copy
         </p>
         <Chart
@@ -39,8 +39,8 @@ export default function DataTypes() {
 
       {/* (number|null)[] — nulls create gaps in the series */}
       <div>
-        <h4 style={{ margin: '0 0 4px' }}>(number | null)[]</h4>
-        <p style={{ fontSize: 12, color: '#666', margin: '0 0 8px' }}>
+        <h4 className="mt-0 mb-1">(number | null)[]</h4>
+        <p className="text-xs text-muted mt-0 mb-2">
           Nullable arrays — nulls become gaps
         </p>
         <Chart width={250} height={180} data={{ x: [1, 2, 3, 4, 5], y: [10, null, 30, null, 50] }}>

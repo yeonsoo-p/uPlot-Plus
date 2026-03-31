@@ -1,14 +1,20 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Scale, Series, bars } from 'uplot-plus';
 import type { DrawCallback } from 'uplot-plus';
 
-export default function BarsValuesAutosize() {
-  const values = useMemo(() => Array.from({ length: 10 }, () => Math.round(Math.random() * 80 + 10)), []);
+function generateValues() {
+  return Array.from({ length: 10 }, () => Math.round(Math.random() * 80 + 10));
+}
 
-  const data = useMemo(() => {
-    const x = Array.from({ length: values.length }, (_, i) => i + 1);
-    return [{ x, series: [values] }];
-  }, [values]);
+function generateData(values: number[]) {
+  const x = Array.from({ length: values.length }, (_, i) => i + 1);
+  return [{ x, series: [values] }];
+}
+
+export default function BarsValuesAutosize() {
+  const values = generateValues();
+
+  const data = generateData(values);
 
   // Draw value labels above each bar
   const onDraw: DrawCallback = ({ ctx, valToX, valToY }) => {
@@ -30,7 +36,7 @@ export default function BarsValuesAutosize() {
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
+      <p className="text-demo text-muted mb-2">
         Bar chart with value labels drawn above each bar using the <code>onDraw</code> hook.
       </p>
       <Chart width={800} height={400} data={data} onDraw={onDraw} xlabel="Category" ylabel="Value">

@@ -121,14 +121,17 @@ export function SourceHighlight({ source }: { source: string }) {
   }, [source]);
 
   return (
-    <div className="demo-source">
-      <div className="demo-source-header">
+    <div className="flex-[1_1_0] min-w-75 flex flex-col rounded-md overflow-hidden bg-[#1e1e2e] max-[1200px]:max-h-100">
+      <div className="flex items-center justify-between py-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-[#8899aa] bg-[#16161e] border-b border-[#2a2a3e]">
         Source
-        <button className="demo-source-copy" onClick={handleCopy}>
+        <button
+          className="bg-white/8 border border-white/10 text-[#8899aa] py-0.5 px-2.5 rounded-sm text-[11px] cursor-pointer transition-colors hover:bg-white/15 hover:text-[#ccc]"
+          onClick={handleCopy}
+        >
           {copied ? 'Copied!' : 'Copy'}
         </button>
       </div>
-      <pre className="demo-source-code">
+      <pre className="thin-scrollbar flex-1 overflow-auto p-3 m-0 font-mono text-xs leading-normal text-[#cdd6f4] [tab-size:2]">
         <code dangerouslySetInnerHTML={{ __html: html }} />
       </pre>
     </div>

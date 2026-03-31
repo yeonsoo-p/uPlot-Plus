@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Series, Band, stackGroup } from 'uplot-plus';
 import type { ChartData, BandConfig } from 'uplot-plus';
 
@@ -13,17 +13,17 @@ function generateRawData() {
 }
 
 export default function StackedSeries() {
-  const { stackedData, bands } = useMemo(() => {
+  const { stackedData, bands } = (() => {
     const raw = generateRawData();
     const rawGroup = { x: raw.x, series: raw.series };
     const result = stackGroup(rawGroup);
     const data: ChartData = [result.group];
     return { stackedData: data, bands: result.bands };
-  }, []);
+  })();
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
+      <p className="text-demo text-muted mb-2">
         Stacked area chart using stackGroup() to compute cumulative sums and bands.
       </p>
       <Chart width={800} height={400} data={stackedData} xlabel="Sample" ylabel="Value">

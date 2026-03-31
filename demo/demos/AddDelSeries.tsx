@@ -26,18 +26,14 @@ export default function AddDelSeries() {
 
   return (
     <div>
-      <div style={{ marginBottom: 8, display: 'flex', gap: 6 }}>
+      <div className="mb-2 flex gap-1.5">
         {LABELS.map((label, i) => (
           <button
             key={label}
             onClick={() => toggle(i)}
+            className="text-white border-none px-3 py-1 rounded cursor-pointer"
             style={{
               background: visible[i] ? COLORS[i] : '#ccc',
-              color: '#fff',
-              border: 'none',
-              padding: '4px 12px',
-              borderRadius: 4,
-              cursor: 'pointer',
             }}
           >
             {visible[i] ? 'Hide' : 'Show'} {label}

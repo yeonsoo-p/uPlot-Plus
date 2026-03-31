@@ -10,10 +10,10 @@ export default function SimpleData() {
   const y2 = [30, 20, 40, 10, 50, 15, 55, 35];
 
   return (
-    <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+    <div className="flex gap-6 flex-wrap">
       {/* Form 1: { x, y } — single series, simplest possible */}
       <div>
-        <h4 style={{ margin: '0 0 8px' }}>{'{ x, y }'}</h4>
+        <h4 className="mt-0 mb-2">{'{ x, y }'}</h4>
         <Chart width={250} height={200} data={{ x, y: y1 }}>
           <Series group={0} index={0} />
         </Chart>
@@ -21,7 +21,7 @@ export default function SimpleData() {
 
       {/* Form 2: [{ x, y }] — array of single-series groups */}
       <div>
-        <h4 style={{ margin: '0 0 8px' }}>{'[{ x, y }]'}</h4>
+        <h4 className="mt-0 mb-2">{'[{ x, y }]'}</h4>
         <Chart width={250} height={200} data={[{ x, y: y1 }]}>
           <Series group={0} index={0} />
         </Chart>
@@ -29,7 +29,7 @@ export default function SimpleData() {
 
       {/* Form 3: [{ x, series }] — full multi-series form */}
       <div>
-        <h4 style={{ margin: '0 0 8px' }}>{'[{ x, series }]'}</h4>
+        <h4 className="mt-0 mb-2">{'[{ x, series }]'}</h4>
         <Chart width={250} height={200} data={[{ x, series: [y1, y2] }]}>
           <Series group={0} index={0} />
           <Series group={0} index={1} />

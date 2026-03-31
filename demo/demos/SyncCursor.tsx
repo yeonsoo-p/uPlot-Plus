@@ -18,10 +18,10 @@ export default function SyncCursor() {
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
+      <p className="text-demo text-muted mb-2">
         Move your cursor over either chart — the other will follow.
       </p>
-      <div style={{ marginBottom: 16 }}>
+      <div className="mb-4">
         <Chart width={800} height={200} data={data1} syncKey="demo-sync" xlabel="Time">
           <Axis scale="y" label="CPU" values={fmtSuffix('%')} />
           <Series group={0} index={0} fill="rgba(231,76,60,0.1)" label="CPU %" />

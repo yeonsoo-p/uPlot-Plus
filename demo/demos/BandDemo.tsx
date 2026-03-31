@@ -33,12 +33,7 @@ export default function BandDemo() {
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
-        The <code>Band</code> component fills the area between two series. Useful for confidence intervals,
-        ranges, and between-series highlighting.
-      </p>
-
-      <h4 style={{ margin: '12px 0 4px' }}>Confidence Interval</h4>
+      <h4 className="mt-3 mb-1">Confidence Interval</h4>
       <Chart width={800} height={280} data={confData} xlabel="Sample" ylabel="Value">
         <Series group={0} index={0} label="Mean" stroke="#2980b9" width={2} />
         <Series group={0} index={1} label="Upper" stroke="#85c1e9" width={1} dash={[4, 4]} />
@@ -47,7 +42,7 @@ export default function BandDemo() {
         <Legend />
       </Chart>
 
-      <h4 style={{ margin: '12px 0 4px' }}>Multiple Bands Between Series</h4>
+      <h4 className="mt-3 mb-1">Multiple Bands Between Series</h4>
       <Chart width={800} height={280} data={multiData} xlabel="Sample" ylabel="Value">
         <Series group={0} index={0} label="Series A" stroke="#e74c3c" />
         <Series group={0} index={1} label="Series B" stroke="#27ae60" />

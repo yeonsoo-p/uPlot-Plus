@@ -82,11 +82,11 @@ export default function RealtimeSine() {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 8 }}>
-        <span style={{ fontSize: 13, color: '#666' }}>
+      <div className="flex items-center gap-4 mb-2">
+        <span className="text-demo text-muted">
           {WINDOW.toLocaleString()} pts &middot; 3 sine waves (1 Hz, 2.5 Hz, 4 Hz) &middot; ~{BATCH * 60} samples/sec
         </span>
-        <span style={{ fontSize: 13, fontWeight: 'bold', color: fps > 50 ? '#27ae60' : fps > 30 ? '#f39c12' : '#e74c3c' }}>
+        <span className={`text-demo font-bold ${fps > 50 ? 'text-green-600' : fps > 30 ? 'text-amber-500' : 'text-red-500'}`}>
           {fps} FPS
         </span>
       </div>

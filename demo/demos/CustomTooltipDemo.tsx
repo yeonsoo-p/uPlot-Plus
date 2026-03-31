@@ -27,7 +27,7 @@ export default function CustomTooltipDemo() {
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
+      <p className="text-demo text-muted mb-2">
         Custom tooltip via <code>&lt;Tooltip&gt;&#123;(data) =&gt; ...&#125;&lt;/Tooltip&gt;</code> children
         render prop. Full control over tooltip layout and styling.
       </p>
@@ -38,31 +38,21 @@ export default function CustomTooltipDemo() {
         <Legend />
         <Tooltip>
           {(tooltipData) => (
-            <div style={{
-              background: '#fff',
-              border: '1px solid #ddd',
-              borderRadius: 6,
-              padding: '8px 12px',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-              fontSize: 13,
-              minWidth: 140,
-            }}>
-              <div style={{ fontWeight: 700, marginBottom: 4, borderBottom: '1px solid #eee', paddingBottom: 4 }}>
+            <div className="bg-white border border-border-light rounded-md px-3 py-2 shadow-lg text-demo min-w-35">
+              <div className="font-bold mb-1 border-b border-border-lighter pb-1">
                 Day {tooltipData.xLabel}
               </div>
               {tooltipData.items.map((item, i) => {
                 const val = item.value;
                 const isProfit = item.label === 'Profit';
                 return (
-                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', gap: 16, padding: '2px 0' }}>
-                    <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                      <span style={{ width: 8, height: 8, borderRadius: '50%', background: item.color, display: 'inline-block' }} />
+                  <div key={i} className="flex justify-between gap-4 py-0.5">
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full inline-block" style={{ background: item.color }} />
                       {item.label}
                     </span>
-                    <span style={{
-                      fontWeight: isProfit ? 700 : 400,
-                      color: isProfit && val != null ? (val >= 0 ? '#27ae60' : '#e74c3c') : '#333',
-                    }}>
+                    <span
+                      className={isProfit && val != null ? (val >= 0 ? 'font-bold text-green-600' : 'font-bold text-red-500') : 'text-gray-800'}>
                       {val != null ? `$${val.toFixed(1)}K` : '\u2014'}
                     </span>
                   </div>

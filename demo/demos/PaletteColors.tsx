@@ -20,12 +20,12 @@ export default function PaletteColors() {
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
+      <p className="text-demo text-muted mb-2">
         <code>palette({N})</code> generates {N} distinct colors via golden-angle HSL rotation.
         Uses <code>withAlpha</code> for semi-transparent fills and <code>fadeGradient</code> for gradient area fills.
       </p>
 
-      <h4 style={{ margin: '12px 0 4px' }}>palette() &mdash; {N} auto-generated colors</h4>
+      <h4 className="mt-3 mb-1">palette() &mdash; {N} auto-generated colors</h4>
       <Chart width={800} height={250} data={data}>
         {colors.map((c, i) => (
           <Series key={i} group={0} index={i} label={`S${i + 1}`} stroke={c} />
@@ -33,7 +33,7 @@ export default function PaletteColors() {
         <Legend />
       </Chart>
 
-      <h4 style={{ margin: '12px 0 4px' }}>withAlpha() &mdash; semi-transparent fills</h4>
+      <h4 className="mt-3 mb-1">withAlpha() &mdash; semi-transparent fills</h4>
       <Chart width={800} height={250} data={data}>
         {colors.slice(0, 4).map((c, i) => (
           <Series key={i} group={0} index={i} label={`S${i + 1}`} stroke={c} fill={withAlpha(c, 0.15)} />
@@ -41,7 +41,7 @@ export default function PaletteColors() {
         <Legend />
       </Chart>
 
-      <h4 style={{ margin: '12px 0 4px' }}>fadeGradient() &mdash; vertical gradient fills</h4>
+      <h4 className="mt-3 mb-1">fadeGradient() &mdash; vertical gradient fills</h4>
       <Chart width={800} height={250} data={data}>
         {colors.slice(0, 3).map((c, i) => (
           <Series key={i} group={0} index={i} label={`S${i + 1}`} stroke={c} fill={fadeGradient(c, 0.5, 0.0)} />
@@ -49,9 +49,9 @@ export default function PaletteColors() {
         <Legend />
       </Chart>
 
-      <div style={{ marginTop: 8, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+      <div className="mt-2 flex gap-2 flex-wrap">
         {colors.map((c, i) => (
-          <div key={i} style={{ width: 60, height: 24, background: c, borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 11 }}>
+          <div key={i} className="w-15 h-6 rounded flex items-center justify-center text-white text-2xs" style={{ background: c }}>
             {i + 1}
           </div>
         ))}

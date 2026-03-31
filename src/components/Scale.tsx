@@ -9,7 +9,7 @@ export type ScaleProps = ScaleConfig;
  */
 export function Scale(props: ScaleProps): null {
   useRegisterConfig(
-    { ...props },
+    props,
     [props.id],
     (store, cfg) => store.registerScale(cfg),
     (store, cfg) => store.unregisterScale(cfg.id),

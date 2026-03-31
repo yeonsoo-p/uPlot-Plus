@@ -1,17 +1,20 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Series, Legend, linear, monotoneCubic, catmullRom, stepped, bars, points } from 'uplot-plus';
+
+function generateData() {
+  const n = 25;
+  const x = Array.from({ length: n }, (_, i) => i);
+  const base = x.map(i => Math.sin(i * 0.3) * 20 + 50 + (Math.random() - 0.5) * 8);
+  // Same data for all series so differences are purely visual
+  return [{ x, series: [base, base, base, base, base, base] }];
+}
+
 export default function LinePaths() {
-  const data = useMemo(() => {
-    const n = 25;
-    const x = Array.from({ length: n }, (_, i) => i);
-    const base = x.map(i => Math.sin(i * 0.3) * 20 + 50 + (Math.random() - 0.5) * 8);
-    // Same data for all series so differences are purely visual
-    return [{ x, series: [base, base, base, base, base, base] }];
-  }, []);
+  const data = generateData();
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
+      <p className="text-demo text-muted mb-2">
         All path builder types rendering the same data for comparison.
       </p>
       <Chart width={800} height={500} data={data} xlabel="Index" ylabel="Value">

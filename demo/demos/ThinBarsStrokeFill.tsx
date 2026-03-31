@@ -1,20 +1,22 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Series, Legend, groupedBars } from 'uplot-plus';
 import type { ChartData } from 'uplot-plus';
 
+function generateData(): ChartData {
+  const n = 15;
+  const x = Array.from({ length: n }, (_, i) => i + 1);
+  const y1 = x.map(() => Math.round(Math.random() * 60 + 20));
+  const y2 = x.map(() => Math.round(Math.random() * 60 + 20));
+  const y3 = x.map(() => Math.round(Math.random() * 60 + 20));
+  return [{ x, series: [y1, y2, y3] }];
+}
+
 export default function ThinBarsStrokeFill() {
-  const data: ChartData = useMemo(() => {
-    const n = 15;
-    const x = Array.from({ length: n }, (_, i) => i + 1);
-    const y1 = x.map(() => Math.round(Math.random() * 60 + 20));
-    const y2 = x.map(() => Math.round(Math.random() * 60 + 20));
-    const y3 = x.map(() => Math.round(Math.random() * 60 + 20));
-    return [{ x, series: [y1, y2, y3] }];
-  }, []);
+  const data = generateData();
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
+      <p className="text-demo text-muted mb-2">
         Bar chart variations: stroke-only, fill-only, and stroke+fill with different widths.
       </p>
       <Chart width={800} height={400} data={data} xlabel="Item" ylabel="Value">

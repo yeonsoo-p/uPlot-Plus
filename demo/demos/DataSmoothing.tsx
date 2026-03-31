@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Series, Legend } from 'uplot-plus';
 
 function movingAverage(arr: number[], window: number): number[] {
@@ -35,7 +35,7 @@ function generateData() {
 }
 
 export default function DataSmoothing() {
-  const data = useMemo(() => generateData(), []);
+  const data = generateData();
 
   return (
     <Chart width={800} height={400} data={data} xlabel="Sample" ylabel="Value">

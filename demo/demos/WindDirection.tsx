@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Series, Axis, Vector, fmtSuffix } from 'uplot-plus';
 
 function generateWindData() {
@@ -26,7 +26,7 @@ function generateWindData() {
 }
 
 export default function WindDirection() {
-  const { directions, chartData } = useMemo(() => generateWindData(), []);
+  const { directions, chartData } = generateWindData();
 
   return (
     <Chart width={800} height={400} data={chartData} ylabel="Wind Speed (km/h)">

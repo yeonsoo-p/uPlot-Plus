@@ -1,26 +1,28 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Series, Legend } from 'uplot-plus';
 
+function generateData() {
+  const N = 500;
+  const x: number[] = [];
+  const y1: number[] = [];
+  const y2: number[] = [];
+
+  for (let i = 0; i < N; i++) {
+    const t = i * 0.02;
+    x.push(t);
+    y1.push(Math.sin(t * 3) * 40 + 50);
+    y2.push(Math.cos(t * 2) * 25 + 30);
+  }
+
+  return [{ x, series: [y1, y2] }];
+}
+
 export default function ZoomModifierKeys() {
-  const data = useMemo(() => {
-    const N = 500;
-    const x: number[] = [];
-    const y1: number[] = [];
-    const y2: number[] = [];
-
-    for (let i = 0; i < N; i++) {
-      const t = i * 0.02;
-      x.push(t);
-      y1.push(Math.sin(t * 3) * 40 + 50);
-      y2.push(Math.cos(t * 2) * 25 + 30);
-    }
-
-    return [{ x, series: [y1, y2] }];
-  }, []);
+  const data = generateData();
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
+      <p className="text-demo text-muted mb-2">
         <strong>Shift + Scroll</strong> to zoom X axis &middot;{' '}
         <strong>Alt + Scroll</strong> to zoom Y axis &middot;{' '}
         <strong>Drag</strong> to zoom a region &middot;{' '}

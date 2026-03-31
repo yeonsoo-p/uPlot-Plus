@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Series, Legend, points } from 'uplot-plus';
 
 function generateScatterData() {
@@ -35,7 +35,7 @@ function generateScatterData() {
 }
 
 export default function ScatterPlot() {
-  const data = useMemo(() => generateScatterData(), []);
+  const data = generateScatterData();
 
   return (
     <Chart width={800} height={400} data={data} actions={[['wheel', 'zoomXY']]} xlabel="X" ylabel="Y">

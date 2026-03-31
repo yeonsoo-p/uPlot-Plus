@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Chart, Series, Legend } from 'uplot-plus';
 import type { ChartData } from 'uplot-plus';
 
@@ -20,6 +20,12 @@ export default function ZoomFetch() {
   const [data, setData] = useState<ChartData>(() => generateData(0, 100, 200));
   const [loading, setLoading] = useState(false);
   const prevRange = useRef<[number, number]>([0, 100]);
+  const dataRef = useRef(data);
+  dataRef.current = data;
+  const timerRef = useRef(0);
+
+  // Clean up pending timeout on unmount
+  useEffect(() => () => { window.clearTimeout(timerRef.current); }, []);
 
   // Watch for data range changes (simulating zoom-triggered re-fetch)
   useEffect(() => {
@@ -37,11 +43,12 @@ export default function ZoomFetch() {
     }
   }, [data]);
 
-  const handleZoomFetch = () => {
+  const handleZoomFetch = useCallback(() => {
     setLoading(true);
+    window.clearTimeout(timerRef.current);
     // Simulate network delay then load higher-resolution data for zoomed range
-    setTimeout(() => {
-      const group = data[0];
+    timerRef.current = window.setTimeout(() => {
+      const group = dataRef.current[0];
       if (group) {
         const xArr = group.x;
         const min = Number(xArr[0]);
@@ -54,7 +61,7 @@ export default function ZoomFetch() {
       }
       setLoading(false);
     }, 600);
-  };
+  }, []);
 
   const handleReset = () => {
     setData(generateData(0, 100, 200));
@@ -62,10 +69,10 @@ export default function ZoomFetch() {
 
   return (
     <div>
-      <div style={{ marginBottom: 8, display: 'flex', gap: 8, alignItems: 'center' }}>
+      <div className="mb-2 flex gap-2 items-center">
         <button onClick={handleZoomFetch}>Zoom In (fetch detail)</button>
         <button onClick={handleReset}>Reset</button>
-        {loading && <span style={{ color: '#e67e22', fontWeight: 'bold' }}>Loading...</span>}
+        {loading && <span className="text-[#e67e22] font-bold">Loading...</span>}
       </div>
       <Chart width={800} height={400} data={data} xlabel="X" ylabel="Value">
         <Series group={0} index={0} label="Signal" />

@@ -7,8 +7,8 @@ const H = 200;
 
 function SmallChart({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ display: 'inline-block', margin: 4 }}>
-      <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 2 }}>{title}</div>
+    <div className="inline-block m-1">
+      <div className="text-xs font-semibold mb-0.5">{title}</div>
       {children}
     </div>
   );
@@ -50,10 +50,10 @@ export default function FormattersShowcase() {
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
+      <p className="text-demo text-muted mb-2">
         All six axis formatter functions side-by-side. Each formats axis labels differently.
       </p>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+      <div className="flex flex-wrap gap-1">
         <SmallChart title="fmtCompact — SI suffixes (K, M, B)">
           <Chart width={W} height={H} data={compactData}>
             <Scale id="y" auto />

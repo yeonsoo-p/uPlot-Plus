@@ -4,6 +4,10 @@ import type { TooltipProps, TooltipData, TooltipItem } from '../types/tooltip';
 import { Panel, SeriesRow } from './overlay/SeriesPanel';
 import { clamp } from '../math/utils';
 
+const DEFAULT_OFFSET: { x?: number; y?: number } = {};
+const tooltipPanelStyle: React.CSSProperties = { pointerEvents: 'none', zIndex: 100 };
+const xLabelStyle: React.CSSProperties = { fontWeight: 600, marginBottom: 2, padding: '0 4px' };
+
 /**
  * Tooltip component that shows data values at the cursor position.
  * Uses the shared Panel/SeriesRow visuals from FloatingLegend.
@@ -13,7 +17,7 @@ export function Tooltip({
   show = true,
   className,
   children,
-  offset = {},
+  offset = DEFAULT_OFFSET,
 }: TooltipProps): React.ReactElement | null {
   const store = useStore();
   const snap = useSyncExternalStore(store.subscribeCursor, store.getSnapshot);
@@ -83,8 +87,8 @@ export function Tooltip({
 
   // Default: use shared Panel + SeriesRow
   return (
-    <Panel ref={tooltipRef} left={posLeft} top={posTop} className={className} style={{ pointerEvents: 'none', zIndex: 100 }}>
-      <div style={{ fontWeight: 600, marginBottom: 2, padding: '0 4px' }}>{xLabel}</div>
+    <Panel ref={tooltipRef} left={posLeft} top={posTop} className={className} style={tooltipPanelStyle}>
+      <div style={xLabelStyle}>{xLabel}</div>
       {items.map((item) => (
         <SeriesRow
           key={`${item.group}:${item.index}`}

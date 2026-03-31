@@ -1,17 +1,19 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Series, Axis, Side } from 'uplot-plus';
 
+function generateData() {
+  const n = 80;
+  const x = Array.from({ length: n }, (_, i) => i);
+  const y = x.map(i => Math.sin(i * 0.1) * 40 + 50);
+  return [{ x, series: [y] }];
+}
+
 export default function AxisIndicators() {
-  const data = useMemo(() => {
-    const n = 80;
-    const x = Array.from({ length: n }, (_, i) => i);
-    const y = x.map(i => Math.sin(i * 0.1) * 40 + 50);
-    return [{ x, series: [y] }];
-  }, []);
+  const data = generateData();
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
+      <p className="text-demo text-muted mb-2">
         Each axis has different grid, tick, and border styles with custom colors, widths, and dash patterns.
       </p>
       <Chart width={800} height={400} data={data}>

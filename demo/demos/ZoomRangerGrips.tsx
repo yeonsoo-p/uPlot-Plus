@@ -28,7 +28,7 @@ export default function ZoomRangerGripsDemo() {
         <Series group={0} index={0} label="Value" />
       </Chart>
 
-      <div style={{ marginTop: 8 }}>
+      <div className="mt-2">
         <ZoomRanger
           width={800}
           height={60}

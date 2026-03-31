@@ -139,31 +139,28 @@ export default function FpsStressTest() {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+      <div className="flex items-center gap-3 mb-2">
         <button
           onClick={running ? stop : start}
-          style={{ padding: '4px 16px', fontSize: 13, cursor: 'pointer' }}
+          className="px-4 py-1 text-demo cursor-pointer"
         >
           {running ? 'Stop' : 'Start'}
         </button>
         <button
           onClick={reset}
           disabled={running}
-          style={{ padding: '4px 12px', fontSize: 13, cursor: running ? 'default' : 'pointer', opacity: running ? 0.5 : 1 }}
+          className={`px-3 py-1 text-demo ${running ? 'cursor-default opacity-50' : 'cursor-pointer'}`}
         >
           Reset
         </button>
-        <span style={{ fontSize: 13, color: '#666' }}>
+        <span className="text-demo text-muted">
           {pointCount.toLocaleString()} pts
         </span>
-        <span style={{
-          fontSize: 13,
-          fontWeight: 'bold',
-          color: currentFps > 50 ? '#27ae60' : currentFps > 30 ? '#f39c12' : '#e74c3c',
-        }}>
+        <span
+          className={`text-demo font-bold ${currentFps > 50 ? 'text-green-600' : currentFps > 30 ? 'text-amber-500' : 'text-red-500'}`}>
           {currentFps} FPS
         </span>
-        <span style={{ fontSize: 12, color: '#999' }}>
+        <span className="text-xs text-muted-lighter">
           {frameTime} ms/frame
         </span>
       </div>
@@ -175,7 +172,7 @@ export default function FpsStressTest() {
       )}
 
       {hasFpsData && (
-        <div style={{ marginTop: 16 }}>
+        <div className="mt-4">
           <Chart width={800} height={250} data={fpsChartData} xlabel="Points" ylabel="FPS">
             <Scale id="x" distr={Distribution.Log} log={10} />
             <Axis scale="x" values={fmtCompact()} />

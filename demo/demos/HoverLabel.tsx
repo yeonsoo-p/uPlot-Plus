@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Series, HoverLabel, focus } from 'uplot-plus';
 
 function generateData() {
@@ -22,13 +22,10 @@ function generateData() {
  * Uses the HoverLabel component which renders on the canvas cursor overlay.
  */
 export default function HoverLabelDemo() {
-  const data = useMemo(generateData, []);
+  const data = generateData();
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
-        Hover over a series for 1 second to reveal its label.
-      </p>
       <Chart
         width={800}
         height={400}

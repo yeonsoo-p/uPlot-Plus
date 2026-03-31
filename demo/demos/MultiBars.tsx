@@ -18,7 +18,7 @@ export default function MultiBars() {
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
+      <p className="text-demo text-muted mb-2">
         Grouped bar chart: 3 product lines shown side-by-side per quarter.
       </p>
       <Chart width={800} height={400} data={data}>

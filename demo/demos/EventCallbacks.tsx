@@ -51,13 +51,13 @@ export default function EventCallbacks() {
 
   return (
     <div>
-      <div style={{ marginBottom: 8, display: 'flex', gap: 8 }}>
+      <div className="mb-2 flex gap-2">
         <button onClick={handleZoomIn}>Zoom In</button>
         <button onClick={handleZoomOut}>Zoom Out</button>
         <button onClick={() => setXRange(null)}>Reset</button>
       </div>
 
-      <div style={{ position: 'relative' }}>
+      <div className="relative">
         <Chart
           width={800}
           height={400}
@@ -77,40 +77,32 @@ export default function EventCallbacks() {
 
         {menu && (
           <div
+            className="fixed bg-white border border-gray-300 rounded py-1.5 shadow-lg z-1000 text-demo min-w-40"
             style={{
-              position: 'fixed',
               left: menu.x,
               top: menu.y,
-              background: '#fff',
-              border: '1px solid #ccc',
-              borderRadius: 4,
-              padding: '6px 0',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-              zIndex: 1000,
-              fontSize: 13,
-              minWidth: 160,
             }}
             onClick={() => setMenu(null)}
           >
             {menu.info.point ? (
               <>
-                <div style={{ padding: '4px 12px', fontWeight: 'bold', borderBottom: '1px solid #eee' }}>
+                <div className="px-3 py-1 font-bold border-b border-border-lighter">
                   Series {menu.info.point.seriesIdx}
                 </div>
-                <div style={{ padding: '4px 12px' }}>X: {menu.info.point.xVal.toFixed(2)}</div>
-                <div style={{ padding: '4px 12px' }}>Y: {menu.info.point.yVal.toFixed(2)}</div>
-                <div style={{ padding: '4px 12px', color: '#999' }}>
+                <div className="px-3 py-1">X: {menu.info.point.xVal.toFixed(2)}</div>
+                <div className="px-3 py-1">Y: {menu.info.point.yVal.toFixed(2)}</div>
+                <div className="px-3 py-1 text-muted-lighter">
                   Index: {menu.info.point.dataIdx}
                 </div>
               </>
             ) : (
-              <div style={{ padding: '4px 12px', color: '#999' }}>No nearby point</div>
+              <div className="px-3 py-1 text-muted-lighter">No nearby point</div>
             )}
           </div>
         )}
       </div>
 
-      <div style={{ marginTop: 8, padding: '6px 10px', background: '#f5f5f5', borderRadius: 4, fontSize: 13, fontFamily: 'monospace' }}>
+      <div className="mt-2 px-2.5 py-1.5 bg-surface rounded text-demo font-mono">
         {status}
       </div>
     </div>

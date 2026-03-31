@@ -36,11 +36,11 @@ export default function UpdateCursorSelectResize() {
 
   return (
     <div>
-      <div style={{ marginBottom: 8, display: 'flex', gap: 8 }}>
+      <div className="mb-2 flex gap-2">
         <button onClick={() => setRunning(r => !r)}>
           {running ? 'Pause' : 'Resume'}
         </button>
-        <span style={{ fontSize: 13, color: '#666', lineHeight: '28px' }}>
+        <span className="text-demo text-muted leading-7">
           Data updates every 200ms. Hover to test cursor stability during updates.
         </span>
       </div>

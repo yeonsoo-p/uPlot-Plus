@@ -24,9 +24,6 @@ export default function TooltipsClosest() {
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
-        Tooltip shows only the single closest series value to the cursor.
-      </p>
       <Chart width={800} height={400} data={data} xlabel="Time" ylabel="Value">
         <Series group={0} index={0} label="Alpha" />
         <Series group={0} index={1} label="Beta" />
@@ -55,30 +52,16 @@ export default function TooltipsClosest() {
 
             return (
               <div
-                style={{
-                  background: 'rgba(0,0,0,0.85)',
-                  color: '#fff',
-                  padding: '6px 10px',
-                  borderRadius: 4,
-                  fontSize: 12,
-                  fontFamily: 'sans-serif',
-                  whiteSpace: 'nowrap',
-                  lineHeight: 1.5,
-                }}
+                className="bg-[rgba(0,0,0,0.85)] text-white px-2.5 py-1.5 rounded text-xs font-sans whitespace-nowrap leading-normal"
               >
-                <div style={{ fontWeight: 600, marginBottom: 2 }}>{data.xLabel}</div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div className="font-semibold mb-0.5">{data.xLabel}</div>
+                <div className="flex items-center gap-1.5">
                   <span
-                    style={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      backgroundColor: closest.color,
-                      display: 'inline-block',
-                    }}
+                    className="w-2 h-2 rounded-full inline-block"
+                    style={{ backgroundColor: closest.color }}
                   />
                   <span>{closest.label}:</span>
-                  <span style={{ fontWeight: 600 }}>
+                  <span className="font-semibold">
                     {closest.value != null ? closest.value.toPrecision(4) : '\u2014'}
                   </span>
                 </div>

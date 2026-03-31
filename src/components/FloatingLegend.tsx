@@ -20,6 +20,8 @@ export interface FloatingLegendProps {
 
 /** Padding from plot edges for corner-anchored positions */
 const CORNER_PAD = 8;
+const DEFAULT_OFFSET = { x: 12, y: -12 };
+const cursorPanelStyle: React.CSSProperties = { pointerEvents: 'none' };
 
 /**
  * Resolve initial position for draggable mode.
@@ -54,7 +56,7 @@ function resolveInitialPos(
 export function FloatingLegend({
   mode = 'draggable',
   position = 'top-right',
-  offset = { x: 12, y: -12 },
+  offset = DEFAULT_OFFSET,
   idleOpacity = 0.3,
   show = true,
   className,
@@ -63,7 +65,8 @@ export function FloatingLegend({
   const snap = useSyncExternalStore(store.subscribeCursor, store.getSnapshot);
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   const [hovered, setHovered] = useState(false);
-  const dragging = useRef(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const draggingRef = useRef(false);
   const didDrag = useRef(false);
   const dragOffset = useRef({ dx: 0, dy: 0 });
   const [initialized, setInitialized] = useState(false);
@@ -90,7 +93,8 @@ export function FloatingLegend({
     if (mode !== 'draggable') return;
     e.stopPropagation();
     e.preventDefault();
-    dragging.current = true;
+    draggingRef.current = true;
+    setIsDragging(true);
     didDrag.current = false;
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     dragOffset.current = { dx: e.clientX - rect.left, dy: e.clientY - rect.top };
@@ -99,14 +103,14 @@ export function FloatingLegend({
   useEffect(() => {
     if (!show || mode !== 'draggable') return;
     const onMove = (e: MouseEvent) => {
-      if (!dragging.current) return;
+      if (!draggingRef.current) return;
       didDrag.current = true;
       const container = store.canvas?.parentElement;
       if (!container) return;
       const r = container.getBoundingClientRect();
       setPos({ x: e.clientX - r.left - dragOffset.current.dx, y: e.clientY - r.top - dragOffset.current.dy });
     };
-    const onUp = () => { dragging.current = false; };
+    const onUp = () => { draggingRef.current = false; setIsDragging(false); };
     window.addEventListener('mousemove', onMove);
     window.addEventListener('mouseup', onUp);
     return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
@@ -142,7 +146,7 @@ export function FloatingLegend({
     const pB = snap.plotTop + snap.plotHeight;
     const x = clamp(cursorLeft + snap.plotLeft + offset.x, snap.plotLeft, pR - mW);
     const y = clamp(cursorTop + snap.plotTop + offset.y, snap.plotTop, pB - mH);
-    return <Panel ref={panelRef} left={x} top={y} className={className} style={{ pointerEvents: 'none' }}>{rows}</Panel>;
+    return <Panel ref={panelRef} left={x} top={y} className={className} style={cursorPanelStyle}>{rows}</Panel>;
   }
 
   // --- Draggable mode ---
@@ -158,8 +162,8 @@ export function FloatingLegend({
       onMouseLeave={() => { setHovered(false); didDrag.current = false; }}
       style={{
         pointerEvents: 'auto',
-        cursor: dragging.current ? 'grabbing' : 'grab',
-        opacity: hovered || dragging.current ? 1 : idleOpacity,
+        cursor: isDragging ? 'grabbing' : 'grab',
+        opacity: hovered || isDragging ? 1 : idleOpacity,
         transition: 'opacity 0.2s ease',
       }}
     >

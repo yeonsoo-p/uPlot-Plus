@@ -13,9 +13,6 @@ export default function Annotations() {
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
-        Declarative annotation components: horizontal lines, vertical markers, shaded regions, and labels.
-      </p>
       <Chart width={800} height={400} data={data} xlabel="Sample" ylabel="Value">
         <Scale id="y" auto={false} min={10} max={90} />
         <Series group={0} index={0} label="Signal" />

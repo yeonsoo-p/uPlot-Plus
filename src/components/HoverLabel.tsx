@@ -3,6 +3,8 @@ import { useStore } from '../hooks/useChart';
 import { Panel, SeriesRow } from './overlay/SeriesPanel';
 import { clamp } from '../math/utils';
 
+const hoverPanelStyle: React.CSSProperties = { pointerEvents: 'none' };
+
 export interface HoverLabelProps {
   /** Delay in milliseconds before label appears (default: 1000) */
   delay?: number;
@@ -62,7 +64,7 @@ export function HoverLabel({
   const y = clamp(cy - mH - 12, snap.plotTop, snap.plotTop + snap.plotHeight - mH);
 
   return (
-    <Panel ref={panelRef} left={x} top={y} className={className} style={{ pointerEvents: 'none' }}>
+    <Panel ref={panelRef} left={x} top={y} className={className} style={hoverPanelStyle}>
       <SeriesRow label={cfg.label} color={color} />
     </Panel>
   );

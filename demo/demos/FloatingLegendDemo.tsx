@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Series, FloatingLegend } from 'uplot-plus';
 
 function generateData() {
@@ -23,12 +23,12 @@ function generateData() {
  * 2. Draggable mode — fixed position, drag to move, fades when not hovered
  */
 export default function FloatingLegendDemo() {
-  const data = useMemo(generateData, []);
+  const data = generateData();
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+    <div className="flex flex-col gap-6">
       <div>
-        <h4 style={{ margin: '0 0 8px' }}>Cursor mode — follows cursor</h4>
+        <h4 className="mt-0 mb-2">Cursor mode — follows cursor</h4>
         <Chart width={800} height={350} data={data} xlabel="Time" ylabel="Value">
           <Series group={0} index={0} label="Temperature" />
           <Series group={0} index={1} label="Humidity" />
@@ -38,7 +38,7 @@ export default function FloatingLegendDemo() {
       </div>
 
       <div>
-        <h4 style={{ margin: '0 0 8px' }}>Draggable mode — fades when idle, drag to reposition</h4>
+        <h4 className="mt-0 mb-2">Draggable mode — fades when idle, drag to reposition</h4>
         <Chart width={800} height={350} data={data} xlabel="Time" ylabel="Value">
           <Series group={0} index={0} label="Sensor A" />
           <Series group={0} index={1} label="Sensor B" />

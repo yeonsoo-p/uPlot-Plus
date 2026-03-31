@@ -1,25 +1,27 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Series, Legend } from 'uplot-plus';
 
-export default function NearestNonNull() {
-  const data = useMemo(() => {
-    const n = 60;
-    const x = Array.from({ length: n }, (_, i) => i);
-    const y: (number | null)[] = x.map(i => Math.sin(i * 0.15) * 30 + 50);
+function generateData() {
+  const n = 60;
+  const x = Array.from({ length: n }, (_, i) => i);
+  const y: (number | null)[] = x.map(i => Math.sin(i * 0.15) * 30 + 50);
 
-    // Sprinkle lots of nulls
-    for (let i = 0; i < n; i++) {
-      if (Math.random() < 0.4) {
-        y[i] = null;
-      }
+  // Sprinkle lots of nulls
+  for (let i = 0; i < n; i++) {
+    if (Math.random() < 0.4) {
+      y[i] = null;
     }
+  }
 
-    return [{ x, series: [y] }];
-  }, []);
+  return [{ x, series: [y] }];
+}
+
+export default function NearestNonNull() {
+  const data = generateData();
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
+      <p className="text-demo text-muted mb-2">
         Sparse data with ~40% null values. Cursor snaps to the nearest non-null point,
         skipping over null gaps.
       </p>

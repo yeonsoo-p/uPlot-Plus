@@ -14,7 +14,7 @@ export default function ResizeDemo() {
 
   return (
     <div>
-      <div style={{ marginBottom: 12, display: 'flex', gap: 24, alignItems: 'center' }}>
+      <div className="mb-3 flex gap-6 items-center">
         <label>
           Width: {width}px
           <input
@@ -23,7 +23,7 @@ export default function ResizeDemo() {
             max={1200}
             value={width}
             onChange={e => setWidth(Number(e.target.value))}
-            style={{ marginLeft: 8, width: 200 }}
+            className="ml-2 w-50"
           />
         </label>
         <label>
@@ -34,11 +34,11 @@ export default function ResizeDemo() {
             max={600}
             value={height}
             onChange={e => setHeight(Number(e.target.value))}
-            style={{ marginLeft: 8, width: 200 }}
+            className="ml-2 w-50"
           />
         </label>
       </div>
-      <div style={{ border: '1px dashed #ccc', display: 'inline-block' }}>
+      <div className="inline-block border border-dashed border-gray-300">
         <Chart width={width} height={height} data={data} xlabel="Index" ylabel="Value">
           <Series group={0} index={0} label="Signal" />
           <Legend />

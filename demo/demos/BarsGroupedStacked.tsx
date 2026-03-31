@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Series, Axis, Legend, groupedBars, fmtLabels } from 'uplot-plus';
 import type { ChartData } from 'uplot-plus';
 
@@ -17,11 +17,11 @@ function makeGroupedData(): ChartData {
 }
 
 export default function BarsGroupedStacked() {
-  const data = useMemo(() => makeGroupedData(), []);
+  const data = makeGroupedData();
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
+      <p className="text-demo text-muted mb-2">
         Side-by-side grouped bars using the <code>groupedBars()</code> path builder.
       </p>
       <Chart width={800} height={400} data={data} title="Grouped Bars" ylabel="Sales">

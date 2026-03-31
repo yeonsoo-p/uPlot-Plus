@@ -1,34 +1,40 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Series, Axis } from 'uplot-plus';
+
+function generateHourlyData() {
+  const base = new Date(2024, 5, 1, 0, 0, 0).getTime() / 1000;
+  const x = Array.from({ length: 48 }, (_, i) => base + i * 3600);
+  const y = x.map((_, i) => 20 + Math.sin(i * 0.26) * 8 + (Math.random() - 0.5) * 2);
+  return [{ x, series: [y] }];
+}
+
+function generateDailyData() {
+  const base = new Date(2024, 0, 1).getTime() / 1000;
+  const x = Array.from({ length: 60 }, (_, i) => base + i * 86400);
+  const y = x.map((_, i) => 100 + Math.sin(i * 0.1) * 30 + (Math.random() - 0.5) * 10);
+  return [{ x, series: [y] }];
+}
+
+function generateMonthlyData() {
+  const x: number[] = [];
+  const y: number[] = [];
+  for (let i = 0; i < 36; i++) {
+    const d = new Date(2022, i, 1);
+    x.push(d.getTime() / 1000);
+    y.push(500 + Math.sin(i * 0.17) * 200 + (Math.random() - 0.5) * 50);
+  }
+  return [{ x, series: [y] }];
+}
 
 export default function TimePeriods() {
   // Hourly data: 48 hours
-  const hourly = useMemo(() => {
-    const base = new Date(2024, 5, 1, 0, 0, 0).getTime() / 1000;
-    const x = Array.from({ length: 48 }, (_, i) => base + i * 3600);
-    const y = x.map((_, i) => 20 + Math.sin(i * 0.26) * 8 + (Math.random() - 0.5) * 2);
-    return [{ x, series: [y] }];
-  }, []);
+  const hourly = generateHourlyData();
 
   // Daily data: 60 days
-  const daily = useMemo(() => {
-    const base = new Date(2024, 0, 1).getTime() / 1000;
-    const x = Array.from({ length: 60 }, (_, i) => base + i * 86400);
-    const y = x.map((_, i) => 100 + Math.sin(i * 0.1) * 30 + (Math.random() - 0.5) * 10);
-    return [{ x, series: [y] }];
-  }, []);
+  const daily = generateDailyData();
 
   // Monthly data: 36 months
-  const monthly = useMemo(() => {
-    const x: number[] = [];
-    const y: number[] = [];
-    for (let i = 0; i < 36; i++) {
-      const d = new Date(2022, i, 1);
-      x.push(d.getTime() / 1000);
-      y.push(500 + Math.sin(i * 0.17) * 200 + (Math.random() - 0.5) * 50);
-    }
-    return [{ x, series: [y] }];
-  }, []);
+  const monthly = generateMonthlyData();
 
   const fmtHour = (splits: number[]) =>
     splits.map(s => {
@@ -50,16 +56,13 @@ export default function TimePeriods() {
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
-        Time series at different granularities: hourly, daily, and monthly.
-      </p>
-      <div style={{ marginBottom: 16 }}>
+      <div className="mb-4">
         <Chart width={800} height={160} data={hourly} title="Hourly (48h)">
           <Axis scale="x" values={fmtHour} />
           <Series group={0} index={0} label="Hourly" />
         </Chart>
       </div>
-      <div style={{ marginBottom: 16 }}>
+      <div className="mb-4">
         <Chart width={800} height={160} data={daily} title="Daily (60d)">
           <Axis scale="x" values={fmtDay} />
           <Series group={0} index={0} label="Daily" />

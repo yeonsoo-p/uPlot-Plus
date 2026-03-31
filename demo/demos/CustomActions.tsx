@@ -2,6 +2,8 @@ import React, { useMemo, useState, useCallback, useRef } from 'react';
 import { Chart, Series, Legend } from 'uplot-plus';
 import type { ActionEntry } from 'uplot-plus';
 
+const FADE = ['opacity-100', 'opacity-90', 'opacity-80', 'opacity-70', 'opacity-60', 'opacity-50', 'opacity-40', 'opacity-30'];
+
 function generateData() {
   const n = 200;
   const x = Array.from({ length: n }, (_, i) => i);
@@ -81,7 +83,7 @@ export default function CustomActions() {
     <div
       onKeyUp={(e) => { if (e.key === 'q' || e.key === 'Q') qHeld.current = false; }}
     >
-      <p style={{ margin: '0 0 8px', fontSize: 13, color: '#666' }}>
+      <p className="mt-0 mb-2 text-demo text-muted">
         <b>Shift+click</b> toggles stroke width.{' '}
         <b>Ctrl+click</b> logs data point.{' '}
         <b>Shift+X</b> resets widths.{' '}
@@ -94,8 +96,8 @@ export default function CustomActions() {
         <Legend />
       </Chart>
       {log.length > 0 && (
-        <div style={{ marginTop: 8, padding: '6px 10px', background: '#f5f5f5', borderRadius: 4, fontSize: 12, fontFamily: 'monospace' }}>
-          {log.map((msg, i) => <div key={i} style={{ opacity: 1 - i * 0.1 }}>{msg}</div>)}
+        <div className="mt-2 px-2.5 py-1.5 bg-surface rounded text-xs font-mono">
+          {log.map((msg, i) => <div key={i} className={FADE[i]}>{msg}</div>)}
         </div>
       )}
     </div>

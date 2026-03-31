@@ -61,10 +61,6 @@ export default function DrawHooksComposable() {
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
-        Composable child components using <code>useDrawHook</code> (threshold zones) and{' '}
-        <code>useCursorDrawHook</code> (crosshair label). Each component registers its own canvas drawing.
-      </p>
       <Chart width={800} height={400} data={data} xlabel="Sample" ylabel="Value">
         <Series group={0} index={0} label="Signal" stroke="#2980b9" />
         <ThresholdOverlay />

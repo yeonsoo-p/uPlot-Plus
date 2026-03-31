@@ -8,7 +8,7 @@ const allNulls: ChartData = [{ x: [0, 1, 2, 3], series: [[null, null, null, null
 
 function MiniChart({ title, data }: { title: string; data: ChartData }) {
   return (
-    <div style={{ display: 'inline-block', marginRight: 16, marginBottom: 16, verticalAlign: 'top' }}>
+    <div className="inline-block mr-4 mb-4 align-top">
       <Chart width={240} height={180} data={data} title={title}>
         <Series group={0} index={0}
           points={{ show: true, size: 6, fill: '#2980b9' }} />

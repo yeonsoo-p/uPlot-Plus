@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Series } from 'uplot-plus';
 
 function generateData() {
@@ -34,7 +34,7 @@ function generateData() {
 }
 
 export default function LargeDataset() {
-  const data = useMemo(generateData, []);
+  const data = generateData();
 
   return (
     <Chart width={800} height={400} data={data} xlabel="Index" ylabel="Value">

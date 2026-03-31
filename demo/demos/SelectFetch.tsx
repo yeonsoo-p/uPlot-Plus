@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Chart, Series, Legend } from 'uplot-plus';
 import type { ChartData, SelectEventInfo } from 'uplot-plus';
 
@@ -26,15 +26,20 @@ export default function SelectFetch() {
   const [data, setData] = useState<ChartData>(() => generateData(0, 100, 200));
   const [loading, setLoading] = useState(false);
   const [rangeText, setRangeText] = useState('');
+  const timerRef = useRef(0);
+
+  // Clean up pending timeout on unmount
+  useEffect(() => () => { window.clearTimeout(timerRef.current); }, []);
 
   const onSelect = useCallback((sel: SelectEventInfo): false => {
     const xRange = sel.ranges['x'];
     if (!xRange) return false;
 
     setLoading(true);
+    window.clearTimeout(timerRef.current);
 
     // Simulate a network fetch for higher-resolution data in the selected range
-    setTimeout(() => {
+    timerRef.current = window.setTimeout(() => {
       setData(generateData(0, 100, 400));
       setLoading(false);
     }, 500);
@@ -55,14 +60,14 @@ export default function SelectFetch() {
 
   return (
     <div>
-      <div style={{ marginBottom: 8, display: 'flex', gap: 8, alignItems: 'center' }}>
+      <div className="mb-2 flex gap-2 items-center">
         <button onClick={handleReset}>Reset to full range</button>
-        {loading && <span style={{ color: '#e67e22', fontWeight: 'bold' }}>Fetching detail data...</span>}
+        {loading && <span className="text-[#e67e22] font-bold">Fetching detail data...</span>}
         {rangeText && !loading && (
-          <span style={{ fontSize: 13, fontFamily: 'monospace', color: '#666' }}>{rangeText}</span>
+          <span className="text-demo font-mono text-muted">{rangeText}</span>
         )}
       </div>
-      <p style={{ fontSize: 13, color: '#666', margin: '0 0 8px' }}>
+      <p className="mt-0 text-demo text-muted mb-2">
         Drag to select a region — instead of zooming, the chart fetches higher-resolution data for that range.
         The onScaleChange callback displays the current x-range.
       </p>

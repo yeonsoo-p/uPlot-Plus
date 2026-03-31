@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Scale, Series, Axis, bars, Distribution, fmtSuffix } from 'uplot-plus';
 
 function generateMassSpecData() {
@@ -56,7 +56,7 @@ const fmtIntensity = (splits: number[]) =>
   });
 
 export default function MassSpectrum() {
-  const data = useMemo(() => generateMassSpecData(), []);
+  const data = generateMassSpecData();
 
   return (
     <Chart width={800} height={400} data={data}>

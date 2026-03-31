@@ -16,7 +16,7 @@ export default function LegendDemo() {
 
   return (
     <div>
-      <div style={{ marginBottom: 16 }}>
+      <div className="mb-4">
         <Chart width={800} height={250} data={data} title="Legend at bottom (default)">
           <Series group={0} index={0} label="Alpha" />
           <Series group={0} index={1} label="Beta" />

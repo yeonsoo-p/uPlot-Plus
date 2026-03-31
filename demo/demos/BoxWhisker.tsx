@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Scale, Axis, BoxWhisker, fmtLabels } from 'uplot-plus';
 import type { ChartData } from 'uplot-plus';
 
@@ -42,7 +42,7 @@ function generateBoxData(): { boxes: BoxData[]; chartData: ChartData; yMin: numb
 const categoryLabels = Array.from({ length: 10 }, (_, i) => `Cat ${i + 1}`);
 
 export default function BoxWhiskerDemo() {
-  const { boxes, chartData, yMin, yMax } = useMemo(() => generateBoxData(), []);
+  const { boxes, chartData, yMin, yMax } = generateBoxData();
 
   return (
     <Chart width={800} height={400} data={chartData} ylabel="Value">

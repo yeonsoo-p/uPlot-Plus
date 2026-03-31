@@ -47,7 +47,7 @@ export default function GridOverSeries() {
 
   return (
     <div>
-      <div style={{ marginBottom: 16 }}>
+      <div className="mb-4">
         <Chart width={800} height={200} data={data} title="Default (grid behind series)">
           <Series group={0} index={0} stroke="#e74c3c" fill="rgba(231,76,60,0.3)" label="Series A" />
           <Series group={0} index={1} stroke="#3498db" fill="rgba(52,152,219,0.3)" label="Series B" />

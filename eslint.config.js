@@ -29,6 +29,6 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ['dist/**', 'node_modules/**', '*.config.*', 'demo/vite.config.ts'],
+    ignores: ['dist/**', 'demo/dist/**', 'node_modules/**', '*.config.*', 'demo/vite.config.ts'],
   },
 );

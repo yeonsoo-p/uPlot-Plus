@@ -91,7 +91,7 @@ export default function MeasureDatums() {
 
   return (
     <div>
-      <p style={{ margin: '0 0 8px', fontSize: 13, color: '#666' }}>
+      <p className="mt-0 mb-2 text-demo text-muted">
         Click to set a reference point, click again to clear. Move cursor to measure distance.
       </p>
       <Chart width={800} height={400} data={data} onCursorDraw={onCursorDraw} actions={actions} xlabel="Sample" ylabel="Value">

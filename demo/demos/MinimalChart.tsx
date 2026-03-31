@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Series } from 'uplot-plus';
 
 function generateData() {
@@ -19,13 +19,13 @@ function generateData() {
  * Shows progressive complexity — from minimal (just data) to fully customized.
  */
 export default function MinimalChart() {
-  const { x, y1, y2 } = useMemo(generateData, []);
+  const { x, y1, y2 } = generateData();
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+    <div className="flex flex-col gap-6">
       {/* 1. Minimal — auto scales, axes, and colors */}
       <div>
-        <h4 style={{ margin: '0 0 8px' }}>Minimal: just data + series</h4>
+        <h4 className="mt-0 mb-2">Minimal: just data + series</h4>
         <Chart width={800} height={180} data={{ x, y: y1 }}>
           <Series group={0} index={0} />
         </Chart>
@@ -33,7 +33,7 @@ export default function MinimalChart() {
 
       {/* 2. Custom axis labels via Chart props */}
       <div>
-        <h4 style={{ margin: '0 0 8px' }}>Custom labels via xlabel / ylabel props</h4>
+        <h4 className="mt-0 mb-2">Custom labels via xlabel / ylabel props</h4>
         <Chart width={800} height={180} data={{ x, y: y1 }} xlabel="Time (s)" ylabel="Temperature">
           <Series group={0} index={0} label="Sensor A" />
         </Chart>
@@ -41,7 +41,7 @@ export default function MinimalChart() {
 
       {/* 3. Full control when needed */}
       <div>
-        <h4 style={{ margin: '0 0 8px' }}>Full control with explicit children</h4>
+        <h4 className="mt-0 mb-2">Full control with explicit children</h4>
         <Chart width={800} height={200} data={[{ x, series: [y1, y2] }]} xlabel="Time (s)" ylabel="Temperature">
           <Series group={0} index={0} label="Indoor" />
           <Series group={0} index={1} label="Outdoor" />

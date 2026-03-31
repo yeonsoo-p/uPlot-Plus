@@ -22,9 +22,6 @@ export default function Gradients() {
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
-        Area chart with linear gradient fills fading from top to bottom.
-      </p>
       <Chart width={800} height={400} data={data} xlabel="Time" ylabel="Value">
         <Series group={0} index={0} stroke="#4285f4" fill={fadeGradient('#4285f4')} label="Blue Series" />
         <Series group={0} index={1} stroke="#9c27b0" fill={fadeGradient('#9c27b0', 0.7)} label="Purple Series" />

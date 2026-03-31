@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Series, Legend } from 'uplot-plus';
 
 function makeData(offset: number) {
@@ -11,16 +11,16 @@ function makeData(offset: number) {
 const LABELS = ['CPU', 'Memory', 'Disk I/O', 'Network', 'GPU', 'Swap'];
 
 export default function ScrollSync() {
-  const datasets = useMemo(() => LABELS.map((_, i) => makeData(i * 0.7)), []);
+  const datasets = LABELS.map((_, i) => makeData(i * 0.7));
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
+      <p className="text-demo text-muted mb-2">
         Multiple synced charts in a scrollable container. All share <code>syncKey=&quot;scroll&quot;</code>.
       </p>
-      <div style={{ maxHeight: 500, overflowY: 'auto', border: '1px solid #ddd', padding: 8 }}>
+      <div className="max-h-[500px] overflow-y-auto border border-border-light p-2">
         {LABELS.map((label, i) => (
-          <div key={label} style={{ marginBottom: 12 }}>
+          <div key={label} className="mb-3">
             <Chart width={760} height={150} data={datasets[i] ?? []} syncKey="scroll" ylabel={label}>
               <Series group={0} index={0} label={label} />
               <Legend />

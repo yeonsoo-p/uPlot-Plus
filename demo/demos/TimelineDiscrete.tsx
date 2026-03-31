@@ -1,20 +1,19 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Scale, Axis, Timeline, Side } from 'uplot-plus';
 import type { ChartData, TimelineLane } from 'uplot-plus';
 
-export default function TimelineDiscreteDemo() {
-  const data: ChartData = useMemo(() => {
-    // X values spanning 24 hours (in seconds from midnight)
-    const x: number[] = [];
-    for (let i = 0; i <= 86400; i += 3600) {
-      x.push(i);
-    }
-    // Dummy y-series (not drawn, just needed for scale auto-ranging)
-    const y = x.map(() => 0);
-    return [{ x, series: [y] }];
-  }, []);
+function generateData(): ChartData {
+  // X values spanning 24 hours (in seconds from midnight)
+  const x: number[] = [];
+  for (let i = 0; i <= 86400; i += 3600) {
+    x.push(i);
+  }
+  // Dummy y-series (not drawn, just needed for scale auto-ranging)
+  const y = x.map(() => 0);
+  return [{ x, series: [y] }];
+}
 
-  const lanes: TimelineLane[] = useMemo(() => [
+const lanes: TimelineLane[] = [
     {
       label: 'Server A',
       segments: [
@@ -51,7 +50,10 @@ export default function TimelineDiscreteDemo() {
         { start: 46800, end: 86400, color: '#4caf50', label: 'Running' },
       ],
     },
-  ], []);
+];
+
+export default function TimelineDiscreteDemo() {
+  const data = generateData();
 
   return (
     <Chart width={900} height={200} data={data}>

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Scale, Axis, Heatmap, fmtSuffix } from 'uplot-plus';
 import type { ChartData } from 'uplot-plus';
 
@@ -32,7 +32,7 @@ const fmtHour = (splits: number[]) => splits.map(v => {
 });
 
 export default function HeatmapDemo() {
-  const { grid, chartData } = useMemo(() => generateHeatmapData(), []);
+  const { grid, chartData } = generateHeatmapData();
 
   return (
     <Chart width={800} height={400} data={chartData}>

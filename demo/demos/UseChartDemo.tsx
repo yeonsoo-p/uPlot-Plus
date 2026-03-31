@@ -24,31 +24,31 @@ function ChartInfoPanel() {
   const cursorY = chart.top >= 0 ? chart.top.toFixed(0) : '—';
   const activeIdx = chart.activeDataIdx >= 0 ? chart.activeDataIdx : '—';
 
-  const cellStyle: React.CSSProperties = { padding: '2px 8px', fontSize: 12, fontFamily: 'monospace' };
-  const labelStyle: React.CSSProperties = { ...cellStyle, color: '#888', textAlign: 'right' };
+  const cellClass = 'px-2 py-0.5 text-xs font-mono';
+  const labelClass = `${cellClass} text-muted-light text-right`;
 
   return (
-    <div style={{ border: '1px solid #ddd', borderRadius: 4, padding: 8, marginTop: 8, background: '#fafafa' }}>
-      <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 4 }}>useChart() Store Inspector</div>
-      <table style={{ borderCollapse: 'collapse' }}>
+    <div className="border border-border-light rounded p-2 mt-2 bg-surface-light">
+      <div className="text-xs font-semibold mb-1">useChart() Store Inspector</div>
+      <table className="border-collapse">
         <tbody>
           <tr>
-            <td style={labelStyle}>X scale range:</td>
-            <td style={cellStyle}>[{xMin}, {xMax}]</td>
-            <td style={labelStyle}>Y scale range:</td>
-            <td style={cellStyle}>[{yMin}, {yMax}]</td>
+            <td className={labelClass}>X scale range:</td>
+            <td className={cellClass}>[{xMin}, {xMax}]</td>
+            <td className={labelClass}>Y scale range:</td>
+            <td className={cellClass}>[{yMin}, {yMax}]</td>
           </tr>
           <tr>
-            <td style={labelStyle}>Cursor pixel:</td>
-            <td style={cellStyle}>({cursorX}, {cursorY})</td>
-            <td style={labelStyle}>Active data idx:</td>
-            <td style={cellStyle}>{activeIdx}</td>
+            <td className={labelClass}>Cursor pixel:</td>
+            <td className={cellClass}>({cursorX}, {cursorY})</td>
+            <td className={labelClass}>Active data idx:</td>
+            <td className={cellClass}>{activeIdx}</td>
           </tr>
           <tr>
-            <td style={labelStyle}>Plot box:</td>
-            <td style={cellStyle}>{chart.plotWidth}x{chart.plotHeight}</td>
-            <td style={labelStyle}>Series count:</td>
-            <td style={cellStyle}>{chart.seriesCount}</td>
+            <td className={labelClass}>Plot box:</td>
+            <td className={cellClass}>{chart.plotWidth}x{chart.plotHeight}</td>
+            <td className={labelClass}>Series count:</td>
+            <td className={cellClass}>{chart.seriesCount}</td>
           </tr>
         </tbody>
       </table>
@@ -61,10 +61,6 @@ export default function UseChartDemo() {
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
-        The <code>useChart()</code> hook gives child components read-only access to chart state.
-        The panel below reads scale ranges, cursor position, and layout info in real time.
-      </p>
       <Chart width={800} height={350} data={data} >
         <Series group={0} index={0} label="Sine" stroke="#e74c3c" />
         <Series group={0} index={1} label="Cosine" stroke="#3498db" />

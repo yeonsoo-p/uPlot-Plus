@@ -31,7 +31,7 @@ export default function ZoomRangerDemo() {
         <Series group={0} index={1} label="Signal B" />
       </Chart>
 
-      <div style={{ marginTop: 8 }}>
+      <div className="mt-2">
         <ZoomRanger
           width={800}
           height={60}

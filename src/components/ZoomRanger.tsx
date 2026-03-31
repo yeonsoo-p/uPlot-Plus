@@ -180,7 +180,7 @@ export function ZoomRanger({
         <Axis scale="y" show={false} />
         {Array.from({ length: seriesCount }, (_, i) => (
           <Series
-            key={i}
+            key={`0:${i}`}
             group={0}
             index={i}
             yScale="y"

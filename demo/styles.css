@@ -1,7 +1,15 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@import "tailwindcss";
+
+@theme {
+  --font-size-2xs: 11px;
+  --font-size-demo: 13px;
+  --color-muted: #666;
+  --color-muted-light: #888;
+  --color-muted-lighter: #999;
+  --color-surface: #f5f5f5;
+  --color-surface-light: #fafafa;
+  --color-border-light: #ddd;
+  --color-border-lighter: #eee;
 }
 
 body {
@@ -10,326 +18,31 @@ body {
   color: #333;
 }
 
-.demo-app {
-  display: flex;
-  min-height: 100vh;
-}
-
-.sidebar {
-  width: 240px;
-  background: #1a1a2e;
-  color: #eee;
-  padding: 16px 0;
-  flex-shrink: 0;
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  overflow-y: auto;
+/* Scrollbar utilities — no Tailwind equivalent */
+.no-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
-
-.sidebar::-webkit-scrollbar {
+.no-scrollbar::-webkit-scrollbar {
   display: none;
 }
 
-.sidebar h1 {
-  font-size: 18px;
-  padding: 0 16px 16px;
-  border-bottom: 1px solid #333;
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.github-link {
-  color: #999;
-  line-height: 1;
-  transition: color 0.15s;
-}
-
-.github-link:hover {
-  color: #fff;
-}
-
-.sidebar-search-wrap {
-  position: relative;
-  padding: 0 16px 8px;
-}
-
-.sidebar-search {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #eee;
-  padding: 6px 28px 6px 10px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-family: inherit;
-  outline: none;
-  transition: border-color 0.15s;
-}
-
-.sidebar-search::placeholder {
-  color: #667;
-}
-
-.sidebar-search:focus {
-  border-color: #4fc3f7;
-}
-
-.sidebar-search-clear {
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(calc(-50% - 4px));
-  background: none;
-  border: none;
-  color: #889;
-  font-size: 16px;
-  cursor: pointer;
-  padding: 0 4px;
-  line-height: 1;
-}
-
-.sidebar-search-clear:hover {
-  color: #ccc;
-}
-
-.sidebar-controls {
-  display: flex;
-  gap: 8px;
-  padding: 0 16px 12px;
-}
-
-.sidebar-controls button {
-  flex: 1;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #8899aa;
-  padding: 4px 0;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 11px;
-  font-family: inherit;
-  transition: background 0.15s, color 0.15s;
-}
-
-.sidebar-controls button:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #ccc;
-}
-
-.sidebar-group {
-  margin-bottom: 2px;
-}
-
-.sidebar-category {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  text-align: left;
-  background: rgba(255, 255, 255, 0.04);
-  border: none;
-  color: #8899aa;
-  padding: 8px 16px;
-  cursor: pointer;
-  font-size: 11px;
-  font-weight: 600;
-  font-family: inherit;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  transition: background 0.15s, color 0.15s;
-}
-
-.sidebar-category:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #aabbcc;
-}
-
-.sidebar-chevron {
-  display: inline-block;
-  width: 0;
-  height: 0;
-  border-left: 4px solid transparent;
-  border-right: 4px solid transparent;
-  border-top: 5px solid currentColor;
-  margin-right: 8px;
-  transition: transform 0.15s;
-}
-
-.sidebar-category.collapsed .sidebar-chevron {
-  transform: rotate(-90deg);
-}
-
-.sidebar-count {
-  margin-left: auto;
-  font-size: 10px;
-  color: #556677;
-  font-weight: 400;
-}
-
-.sidebar-item {
-  display: block;
-  width: 100%;
-  text-align: left;
-  background: none;
-  border: none;
-  color: #ccc;
-  padding: 8px 16px 8px 28px;
-  cursor: pointer;
-  font-size: 13px;
-  font-family: inherit;
-  transition: background 0.15s;
-}
-
-.sidebar-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-}
-
-.sidebar-item.active {
-  background: rgba(255, 255, 255, 0.15);
-  color: #fff;
-  border-left: 3px solid #4fc3f7;
-  padding-left: 25px;
-}
-
-.content {
-  margin-left: 240px;
-  flex: 1;
-  padding: 24px 32px;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.demo-card {
-  background: #fff;
-  border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-}
-
-.demo-card h2 {
-  font-size: 20px;
-  margin-bottom: 4px;
-}
-
-.demo-description {
-  color: #666;
-  font-size: 14px;
-  margin-bottom: 16px;
-}
-
-.sparkline-table {
-  border-collapse: collapse;
-}
-
-.sparkline-table th {
-  text-align: right;
-  padding: 4px 8px;
-  font-size: 13px;
-  color: #555;
-}
-
-.sparkline-table td {
-  padding: 2px 4px;
-}
-
-/* Demo layout: chart + source side by side */
-.demo-layout {
-  display: flex;
-  gap: 16px;
-  align-items: stretch;
-  min-height: 500px;
-}
-
-.demo-chart {
-  flex: 0 1 auto;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.demo-source {
-  flex: 1 1 0;
-  min-width: 300px;
-  display: flex;
-  flex-direction: column;
-  border-radius: 6px;
-  overflow: hidden;
-  background: #1e1e2e;
-}
-
-.demo-source-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #8899aa;
-  background: #16161e;
-  border-bottom: 1px solid #2a2a3e;
-}
-
-.demo-source-copy {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #8899aa;
-  padding: 2px 10px;
-  border-radius: 3px;
-  font-size: 11px;
-  font-family: inherit;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-}
-
-.demo-source-copy:hover {
-  background: rgba(255, 255, 255, 0.15);
-  color: #ccc;
-}
-
-.demo-source-code {
-  flex: 1;
-  overflow: auto;
-  padding: 12px;
-  margin: 0;
-  font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
-  font-size: 12px;
-  line-height: 1.5;
-  color: #cdd6f4;
-  tab-size: 2;
+.thin-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: #444 transparent;
 }
-
-.demo-source-code::-webkit-scrollbar {
+.thin-scrollbar::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
-
-.demo-source-code::-webkit-scrollbar-thumb {
+.thin-scrollbar::-webkit-scrollbar-thumb {
   background: #444;
   border-radius: 3px;
 }
 
-/* Syntax highlighting */
+/* Syntax highlighting — applied via innerHTML, can't use Tailwind */
 .hl-keyword { color: #cba6f7; }
 .hl-string { color: #a6e3a1; }
 .hl-number { color: #fab387; }
 .hl-comment { color: #6c7086; font-style: italic; }
 .hl-tag { color: #89b4fa; }
-
-@media (max-width: 1200px) {
-  .demo-layout {
-    flex-direction: column;
-  }
-  .demo-source {
-    max-height: 400px;
-  }
-}

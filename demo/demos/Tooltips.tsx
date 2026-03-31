@@ -24,9 +24,6 @@ export default function Tooltips() {
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
-        Hover over the chart to see the tooltip with all series values.
-      </p>
       <Chart width={800} height={400} data={data} xlabel="Time" ylabel="Value">
         <Series group={0} index={0} label="Alpha" />
         <Series group={0} index={1} label="Beta" />

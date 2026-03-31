@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Series, Candlestick } from 'uplot-plus';
 
 function generateOHLC() {
@@ -29,7 +29,7 @@ function generateOHLC() {
 }
 
 export default function CandlestickOHLC() {
-  const data = useMemo(() => generateOHLC(), []);
+  const data = generateOHLC();
 
   return (
     <Chart width={800} height={400} data={data} xlabel="Day" ylabel="Price">

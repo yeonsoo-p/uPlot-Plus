@@ -1,18 +1,20 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Scale, Series, Axis, Legend, Side } from 'uplot-plus';
 
+function generateData() {
+  const n = 100;
+  const x = Array.from({ length: n }, (_, i) => i);
+  const y1 = x.map(i => Math.sin(i * 0.08) * 30 + 40);
+  const y2 = x.map(i => Math.cos(i * 0.06) * 200 + 300);
+  return [{ x, series: [y1, y2] }];
+}
+
 export default function SyncYZero() {
-  const data = useMemo(() => {
-    const n = 100;
-    const x = Array.from({ length: n }, (_, i) => i);
-    const y1 = x.map(i => Math.sin(i * 0.08) * 30 + 40);
-    const y2 = x.map(i => Math.cos(i * 0.06) * 200 + 300);
-    return [{ x, series: [y1, y2] }];
-  }, []);
+  const data = generateData();
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
+      <p className="text-demo text-muted mb-2">
         Two y-scales both pinned to zero with <code>min=0</code>. Different magnitudes but both start at zero.
       </p>
       <Chart width={800} height={400} data={data} xlabel="Index">

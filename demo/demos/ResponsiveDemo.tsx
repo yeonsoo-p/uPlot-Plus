@@ -52,7 +52,7 @@ export default function ResponsiveDemo() {
 
   return (
     <div>
-      <div style={{ marginBottom: 12 }}>
+      <div className="mb-3">
         <label>
           <input
             type="checkbox"
@@ -62,18 +62,14 @@ export default function ResponsiveDemo() {
           {' '}Lock aspect ratio ({aspectRatio}:1)
         </label>
         {size != null && (
-          <span style={{ marginLeft: 16, color: '#888' }}>
+          <span className="ml-4 text-muted-light">
             {size.width} x {size.height}px
           </span>
         )}
       </div>
       <div
         ref={containerRef}
-        style={{
-          width: '100%',
-          height: useAspectRatio ? 'auto' : 400,
-          border: '1px dashed #ccc',
-        }}
+        className={`w-full border border-dashed border-gray-300 ${useAspectRatio ? 'h-auto' : 'h-100'}`}
       >
         {size != null && (
           <Chart width={size.width} height={size.height} data={data} xlabel="Index" ylabel="Value">

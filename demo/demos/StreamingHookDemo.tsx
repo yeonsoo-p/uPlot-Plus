@@ -60,14 +60,11 @@ export default function StreamingHookDemo() {
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
-        Streaming with plain <code>useState</code> for sliding-window data with FPS tracking.
-      </p>
-      <div style={{ marginBottom: 8, display: 'flex', gap: 8, alignItems: 'center' }}>
+      <div className="mb-2 flex gap-2 items-center">
         <button onClick={() => setRunning(r => !r)}>
           {running ? 'Stop' : 'Start'}
         </button>
-        <span style={{ fontSize: 13, color: '#999' }}>
+        <span className="text-demo text-muted-lighter">
           {running ? `${fps} FPS` : 'Paused'} &middot; window: {WINDOW}
         </span>
       </div>

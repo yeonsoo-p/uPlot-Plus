@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Series } from 'uplot-plus';
 import type { DrawCallback } from 'uplot-plus';
 
@@ -17,10 +17,10 @@ function generateData() {
 }
 
 export default function Trendlines() {
-  const data = useMemo(() => generateData(), []);
+  const data = generateData();
 
   // Pre-compute regression (data doesn't change)
-  const regression = useMemo(() => {
+  const regression = (() => {
     const group = data[0];
     if (group == null) return { slope: 0, intercept: 0 };
     const xArr = group.x;
@@ -44,7 +44,7 @@ export default function Trendlines() {
     const slope = den !== 0 ? num / den : 0;
     const intercept = meanY - slope * meanX;
     return { slope, intercept };
-  }, [data]);
+  })();
 
   const onDraw: DrawCallback = ({ ctx, valToX, valToY }) => {
     const group = data[0];

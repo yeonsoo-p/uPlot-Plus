@@ -1,20 +1,19 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Chart, Scale, Series } from 'uplot-plus';
 
+function generateData() {
+  const n = 80;
+  const x = Array.from({ length: n }, (_, i) => i);
+  const y = x.map(i => Math.sin(i * 0.1) * 30 + 50);
+  return [{ x, series: [y] }];
+}
+
 export default function ScalePadding() {
-  const data = useMemo(() => {
-    const n = 80;
-    const x = Array.from({ length: n }, (_, i) => i);
-    const y = x.map(i => Math.sin(i * 0.1) * 30 + 50);
-    return [{ x, series: [y] }];
-  }, []);
+  const data = generateData();
 
   return (
     <div>
-      <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
-        Scale with range padding adds extra space around the data range (10% on each side).
-      </p>
-      <div style={{ marginBottom: 16 }}>
+      <div className="mb-4">
         <Chart width={800} height={200} data={data} title="With padding (10%)">
           <Scale
             id="y"

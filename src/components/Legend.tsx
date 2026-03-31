@@ -31,6 +31,13 @@ const itemStyleVisible: React.CSSProperties = { ...baseItemStyle, opacity: 1 };
 const itemStyleHidden: React.CSSProperties = { ...baseItemStyle, opacity: 0.4 };
 const swatchStyleCache = new Map<string, React.CSSProperties>();
 
+const wrapperStyleTop: React.CSSProperties = {
+  display: 'flex', flexWrap: 'wrap', justifyContent: 'center', order: -1, padding: '4px 0',
+};
+const wrapperStyleBottom: React.CSSProperties = {
+  display: 'flex', flexWrap: 'wrap', justifyContent: 'center', order: 1, padding: '4px 0',
+};
+
 interface LegendItemProps {
   group: number;
   index: number;
@@ -75,13 +82,7 @@ export function Legend({ show = true, position = 'bottom', className }: LegendPr
   return (
     <div
       className={className}
-      style={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'center',
-        order: position === 'top' ? -1 : 1,
-        padding: '4px 0',
-      }}
+      style={position === 'top' ? wrapperStyleTop : wrapperStyleBottom}
     >
       {store.seriesConfigs.map((cfg) => {
         if (cfg.legend === false) return null;
