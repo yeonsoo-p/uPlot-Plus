@@ -281,10 +281,8 @@ function startGutterPan(
     onMove(_store: ChartStore, moveE: Event) {
       const plotBox = store.plotBox;
       const me = moveE as MouseEvent;
-      const r = (me.target as HTMLElement).closest('div')?.getBoundingClientRect();
-      if (r == null) return;
       const dim = isVert ? plotBox.height : plotBox.width;
-      const pos = isVert ? me.clientY - r.top : me.clientX - r.left;
+      const pos = isVert ? me.clientY - rect.top : me.clientX - rect.left;
       const deltaFrac = (pos - startPos) / dim;
       const sign = isVert ? 1 : -1;
       const range = startMax - startMin;
@@ -487,6 +485,53 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
       return { cx, cy, inPlot: isInPlot(cx, cy) };
     }
 
+    // -----------------------------------------------------------------------
+    // Document-level listeners for drag survival outside chart
+    // -----------------------------------------------------------------------
+
+    function onDocumentMouseMove(e: MouseEvent): void {
+      if (activeDrag == null) { removeDocumentListeners(); return; }
+      // Inside chart — element-level handler processes it
+      if (el.contains(e.target as Node)) return;
+      didDrag = true;
+      activeDrag.onMove(store, e, buildContext(e));
+      updateCursor(e, e);
+    }
+
+    function onDocumentMouseUp(e: MouseEvent): void {
+      removeDocumentListeners();
+      if (activeDrag == null) return;
+      // Inside chart — element-level onMouseUp handles it
+      if (el.contains(e.target as Node)) return;
+      activeDrag.onEnd(store, e, buildContext(e));
+      activeDrag = null;
+      // Mouse is outside chart — hide cursor
+      lastCursorCx = -1;
+      lastCursorCy = -1;
+      store.cursorManager.hide();
+      if (store.focusedSeries != null) store.setFocus(null);
+      store.scheduleCursorRedraw();
+    }
+
+    function attachDocumentListeners(): void {
+      document.addEventListener('mousemove', onDocumentMouseMove);
+      document.addEventListener('mouseup', onDocumentMouseUp);
+    }
+
+    function removeDocumentListeners(): void {
+      document.removeEventListener('mousemove', onDocumentMouseMove);
+      document.removeEventListener('mouseup', onDocumentMouseUp);
+    }
+
+    function onWindowBlur(): void {
+      if (activeDrag != null) {
+        activeDrag = null;
+        removeDocumentListeners();
+        store.cursorManager.hide();
+        store.scheduleCursorRedraw();
+      }
+    }
+
     /** Build a ChartEventInfo from the current cursor state and a DOM event. */
     function buildEventInfo(e: MouseEvent | TouchEvent, cx: number, cy: number): ChartEventInfo {
       const cursor = store.cursorManager.state;
@@ -639,6 +684,7 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
       if (cont != null) {
         activeDrag = cont;
         didDrag = false;
+        attachDocumentListeners();
       }
     }
 
@@ -706,6 +752,9 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
     }
 
     function onMouseLeave(_e: MouseEvent): void {
+      // During active drag, document-level listeners handle tracking
+      if (activeDrag != null) return;
+
       lastCursorCx = -1;
       lastCursorCy = -1;
 
@@ -713,10 +762,6 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
 
       if (store.focusedSeries != null) {
         store.setFocus(null);
-      }
-
-      if (activeDrag != null) {
-        activeDrag = null;
       }
 
       store.scheduleCursorRedraw();
@@ -884,8 +929,10 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
     el.addEventListener('touchmove', onTouchMove, { passive: false });
     el.addEventListener('touchend', onTouchEnd);
     el.addEventListener('keydown', onKeyDown);
+    window.addEventListener('blur', onWindowBlur);
 
     return () => {
+      removeDocumentListeners();
       el.removeEventListener('mouseenter', onMouseEnter);
       el.removeEventListener('mousemove', onMouseMove);
       el.removeEventListener('mousedown', onMouseDown);
@@ -899,5 +946,6 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
       el.removeEventListener('touchmove', onTouchMove);
       el.removeEventListener('touchend', onTouchEnd);
       el.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('blur', onWindowBlur);
     };
 }
