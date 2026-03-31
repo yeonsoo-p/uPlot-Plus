@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import type { ScaleConfig, SeriesConfig, BBox } from '../types';
+import type { ScaleConfig, SeriesConfig, BBox, ChartData } from '../types';
 import type { ActionKey, ReactionValue } from '../types/interaction';
 import { DEFAULT_ACTIONS } from '../types/interaction';
 import type { AxisConfig, AxisState } from '../types/axes';
@@ -244,10 +244,36 @@ export interface ChartStore {
   /** Pre-built lookup map for series config by "group:index" key */
   seriesConfigMap: Map<string, SeriesConfig>;
   redraw: () => void;
+  /** Stable snapshot getter for useSyncExternalStore (no useCallback needed) */
+  getSnapshot: () => ChartSnapshot;
+  /** Synchronous redraw — cancels pending RAF, draws immediately */
+  redrawSync: () => void;
+
+  // --- Config facade methods ---
+  /** Update a scale config in-place (replaces scaleConfigs entry + syncs manager + clears cache) */
+  updateScale: (cfg: ScaleConfig) => void;
+  /** Update a series config in-place (replaces seriesConfigs entry + rebuilds map + invalidates render) */
+  updateSeries: (cfg: SeriesConfig) => void;
+  /** Register an axis config (deduplicates by scale+side) */
+  registerAxis: (cfg: AxisConfig) => void;
+  /** Unregister an axis config by scale+side */
+  unregisterAxis: (scale: string, side: Side) => void;
+  /** Update an axis config in-place */
+  updateAxis: (cfg: AxisConfig) => void;
+  /** Register a band config */
+  registerBand: (cfg: BandConfig) => void;
+  /** Unregister a band config by reference identity */
+  unregisterBand: (cfg: BandConfig) => void;
+  /** Set chart data (syncs DataStore + clears render cache) */
+  setData: (data: ChartData) => void;
+  /** Set the canvas element */
+  setCanvas: (node: HTMLCanvasElement | null) => void;
+  /** Set title and axis labels */
+  setLabels: (title?: string, xlabel?: string, ylabel?: string) => void;
 }
 
 /** Rebuild the series config lookup map from the current seriesConfigs array. */
-export function rebuildSeriesConfigMap(store: ChartStore): void {
+function rebuildSeriesConfigMap(store: ChartStore): void {
   store.seriesConfigMap.clear();
   for (const cfg of store.seriesConfigs) {
     store.seriesConfigMap.set(`${cfg.group}:${cfg.index}`, cfg);
@@ -313,6 +339,7 @@ export function createChartStore(): ChartStore {
       );
       store.seriesConfigs.push(cfg);
       rebuildSeriesConfigMap(store);
+      store.renderer.clearGroupCache(cfg.group);
     },
 
     unregisterSeries(group: number, index: number) {
@@ -320,6 +347,7 @@ export function createChartStore(): ChartStore {
         s => !(s.group === group && s.index === index),
       );
       rebuildSeriesConfigMap(store);
+      store.renderer.clearGroupCache(group);
     },
 
     toggleSeries(group: number, index: number) {
@@ -340,6 +368,7 @@ export function createChartStore(): ChartStore {
     },
 
     setSize(w: number, h: number) {
+      if (store.width === w && store.height === h) return;
       store.width = w;
       store.height = h;
       if (store.canvas) {
@@ -349,7 +378,6 @@ export function createChartStore(): ChartStore {
         store.canvas.style.height = `${h}px`;
       }
       store.renderer.clearCache();
-      store.scheduleRedraw();
     },
 
     scheduleRedraw() {
@@ -651,6 +679,69 @@ export function createChartStore(): ChartStore {
         }
       }
 
+    },
+
+    getSnapshot: () => store.snapshot,
+
+    // --- Config facade methods ---
+
+    updateScale(cfg: ScaleConfig) {
+      store.scaleConfigs = store.scaleConfigs.map(s => s.id === cfg.id ? cfg : s);
+      store.scaleManager.addScale(cfg);
+      store.renderer.clearCache();
+    },
+
+    updateSeries(cfg: SeriesConfig) {
+      store.seriesConfigs = store.seriesConfigs.map(s =>
+        (s.group === cfg.group && s.index === cfg.index) ? cfg : s,
+      );
+      rebuildSeriesConfigMap(store);
+      store.renderer.invalidateSeries(cfg.group, cfg.index);
+    },
+
+    registerAxis(cfg: AxisConfig) {
+      store.axisConfigs = store.axisConfigs.filter(a => !(a.scale === cfg.scale && a.side === cfg.side));
+      store.axisConfigs.push(cfg);
+    },
+
+    unregisterAxis(scale: string, side: Side) {
+      store.axisConfigs = store.axisConfigs.filter(a => !(a.scale === scale && a.side === side));
+    },
+
+    updateAxis(cfg: AxisConfig) {
+      store.axisConfigs = store.axisConfigs.map(a =>
+        (a.scale === cfg.scale && a.side === cfg.side) ? cfg : a,
+      );
+    },
+
+    registerBand(cfg: BandConfig) {
+      store.bandConfigs.push(cfg);
+    },
+
+    unregisterBand(cfg: BandConfig) {
+      store.bandConfigs = store.bandConfigs.filter(b => b !== cfg);
+    },
+
+    setData(data: ChartData) {
+      store.dataStore.setData(data);
+      store.renderer.clearCache();
+    },
+
+    setCanvas(node: HTMLCanvasElement | null) {
+      store.canvas = node;
+    },
+
+    setLabels(title?: string, xlabel?: string, ylabel?: string) {
+      store.title = title;
+      store.xlabel = xlabel;
+      store.ylabel = ylabel;
+    },
+
+    redrawSync() {
+      store.scheduler.cancel();
+      store.scheduler.mark(DirtyFlag.Full);
+      store.redraw();
+      store.scheduler.clear();
     },
   };
 

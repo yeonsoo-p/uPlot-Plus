@@ -1,5 +1,5 @@
-import { useRef, useEffect, useCallback, useState, useMemo } from 'react';
-import type { ChartProps } from '../types';
+import { useRef, useEffect, useLayoutEffect, useState } from 'react';
+import type { ChartProps, ChartData, DataInput } from '../types';
 import { DEFAULT_ACTIONS } from '../types/interaction';
 import type { DrawCallback, CursorDrawCallback } from '../types/hooks';
 import { useChartStore } from '../hooks/useChartStore';
@@ -33,24 +33,18 @@ export function Chart({
 
   // Sync title and axis labels to store (in effect, not render)
   useEffect(() => {
-    store.title = title;
-    store.xlabel = xlabel;
-    store.ylabel = ylabel;
+    store.setLabels(title, xlabel, ylabel);
   }, [store, title, xlabel, ylabel]);
 
-  // Sync event callback props via refs to avoid excessive effect runs
-  const eventCallbacksRef = useRef(store.eventCallbacks);
-  eventCallbacksRef.current = store.eventCallbacks;
-  useEffect(() => {
-    const cbs = eventCallbacksRef.current;
-    cbs.onClick = onClick;
-    cbs.onContextMenu = onContextMenu;
-    cbs.onDblClick = onDblClick;
-    cbs.onCursorMove = onCursorMove;
-    cbs.onCursorLeave = onCursorLeave;
-    cbs.onScaleChange = onScaleChange;
-    cbs.onSelect = onSelect;
-  });
+  // Sync event callback props — written during render, read only by imperative handlers
+  const cbs = store.eventCallbacks;
+  cbs.onClick = onClick;
+  cbs.onContextMenu = onContextMenu;
+  cbs.onDblClick = onDblClick;
+  cbs.onCursorMove = onCursorMove;
+  cbs.onCursorLeave = onCursorLeave;
+  cbs.onScaleChange = onScaleChange;
+  cbs.onSelect = onSelect;
 
   // Attach mouse/touch interaction handlers
   useInteraction(store, containerEl);
@@ -58,27 +52,34 @@ export function Chart({
   // Cursor sync across charts with same key
   useSyncGroup(store, syncKey);
 
-  // Callback ref for canvas — single assignment point
-  const canvasRef = useCallback((node: HTMLCanvasElement | null) => {
-    store.canvas = node;
+  // Ref-gated canvas callback — avoids useCallback, gates on identity
+  const canvasElRef = useRef<HTMLCanvasElement | null>(null);
+  const canvasRef = (node: HTMLCanvasElement | null) => {
+    if (canvasElRef.current === node) return;
+    canvasElRef.current = node;
+    store.setCanvas(node);
     if (node) store.scheduleRedraw();
-  }, [store]);
+  };
 
-  // Callback ref for container — drives useInteraction and ResizeObserver via state
-  const containerRef = useCallback((node: HTMLDivElement | null) => {
+  // Ref-gated container callback
+  const containerElRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = (node: HTMLDivElement | null) => {
+    if (containerElRef.current === node) return;
+    containerElRef.current = node;
     setContainerEl(node);
-  }, []);
+  };
 
-  // Update store dimensions
-  useEffect(() => {
+  // Synchronous size update — useLayoutEffect runs before paint
+  useLayoutEffect(() => {
     store.pxRatio = pxRatio;
     store.setSize(width, height);
+    store.redrawSync();
   }, [store, width, height, pxRatio]);
 
   // Clean up on unmount
   useEffect(() => {
     return () => {
-      store.canvas = null;
+      store.setCanvas(null);
       store.scheduler.cancel();
       store.focusedSeries = null;
     };
@@ -94,6 +95,7 @@ export function Chart({
       const { width: w, height: h } = entry.contentRect;
       if (w > 0 && h > 0 && (w !== store.width || h !== store.height)) {
         store.setSize(Math.round(w), Math.round(h));
+        store.scheduleRedraw();
       }
     });
 
@@ -101,17 +103,22 @@ export function Chart({
     return () => { observer.disconnect(); };
   }, [store, containerEl]);
 
-  // Normalize flexible input → internal ChartData
-  const normalized = useMemo(() => normalizeData(data), [data]);
+  // Normalize flexible input → internal ChartData (ref-based identity check, no useMemo)
+  const prevDataRef = useRef<DataInput | undefined>(undefined);
+  const normalizedRef = useRef<ChartData>(normalizeData(data));
+  if (data !== prevDataRef.current) {
+    prevDataRef.current = data;
+    normalizedRef.current = normalizeData(data);
+  }
+  const normalized = normalizedRef.current;
 
   // Update store data
-  const prevDataRef = useRef(data);
+  const prevStoreDataRef = useRef(data);
   useEffect(() => {
-    if (data === prevDataRef.current && store.dataStore.data.length > 0) return;
-    prevDataRef.current = data;
+    if (data === prevStoreDataRef.current && store.dataStore.data.length > 0) return;
+    prevStoreDataRef.current = data;
 
-    store.dataStore.setData(normalized);
-    store.renderer.clearCache();
+    store.setData(normalized);
     store.scheduleRedraw();
   }, [store, data, normalized]);
 

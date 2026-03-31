@@ -94,19 +94,3 @@ function ThresholdZone() {
   return null;
 }
 ```
-
-### `useStreamingData()`
-
-Sliding-window data management for real-time charts:
-
-```tsx
-import { useStreamingData } from 'uplot-plus';
-
-const { data, push, pushGroup, start, stop, fps } = useStreamingData(initialData, {
-  window: 1000,
-  batchSize: 10,
-});
-
-push([newX], [newY1], [newY2]);
-pushGroup(1, [newX], [newY1]); // push to specific group
-```

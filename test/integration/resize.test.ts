@@ -22,13 +22,23 @@ describe('setSize', () => {
     expect(cleared).toBe(true);
   });
 
-  it('schedules a full redraw', () => {
+  it('does not auto-schedule a redraw (caller decides sync vs async)', () => {
     const store = createChartStore();
     let scheduled = false;
     store.scheduleRedraw = () => { scheduled = true; };
 
     store.setSize(800, 600);
-    expect(scheduled).toBe(true);
+    expect(scheduled).toBe(false);
+  });
+
+  it('bails out when dimensions are unchanged', () => {
+    const store = createChartStore();
+    store.setSize(800, 600);
+    let cleared = false;
+    store.renderer.clearCache = () => { cleared = true; };
+
+    store.setSize(800, 600);
+    expect(cleared).toBe(false);
   });
 
   it('updates canvas element dimensions if present', () => {

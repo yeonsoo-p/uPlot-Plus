@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { Chart, Series, Legend, useStreamingData } from 'uplot-plus';
+import React, { useState, useRef, useEffect } from 'react';
+import { Chart, Series, Legend } from 'uplot-plus';
 
 const WINDOW = 500;
 
@@ -11,40 +11,60 @@ function initData() {
 }
 
 export default function StreamingHookDemo() {
-  const { data, push, start, stop, running, fps } = useStreamingData(initData(), {
-    window: WINDOW,
-    autoStart: false,
-  });
+  const [data, setData] = useState(initData);
+  const [running, setRunning] = useState(false);
+  const [fps, setFps] = useState(0);
 
   const counterRef = useRef(50);
-
-  // Push new points on every animation frame while running
   const tickRef = useRef(0);
-  React.useEffect(() => {
+  const fpsFrames = useRef(0);
+  const fpsLast = useRef(0);
+
+  useEffect(() => {
     if (!running) {
       if (tickRef.current) cancelAnimationFrame(tickRef.current);
       return;
     }
-    const tick = () => {
+    fpsLast.current = performance.now();
+    fpsFrames.current = 0;
+
+    const tick = (now: number) => {
       const i = counterRef.current++;
-      push(
-        [i],
-        [Math.sin(i * 0.1) * 30 + 50 + (Math.random() - 0.5) * 8],
-        [Math.cos(i * 0.1) * 20 + 50 + (Math.random() - 0.5) * 8],
-      );
+      setData(prev => {
+        const group = prev[0];
+        if (group == null) return prev;
+        const prevX = Array.from(group.x);
+        const newX = prevX.concat(i);
+        const s0 = group.series[0];
+        const s1 = group.series[1];
+        if (s0 == null || s1 == null) return prev;
+        const newY1 = Array.from(s0).concat(Math.sin(i * 0.1) * 30 + 50 + (Math.random() - 0.5) * 8);
+        const newY2 = Array.from(s1).concat(Math.cos(i * 0.1) * 20 + 50 + (Math.random() - 0.5) * 8);
+        const drop = Math.max(0, newX.length - WINDOW);
+        return [{ x: newX.slice(drop), series: [newY1.slice(drop), newY2.slice(drop)] }];
+      });
+
+      fpsFrames.current++;
+      const elapsed = now - fpsLast.current;
+      if (elapsed >= 1000) {
+        setFps(Math.round((fpsFrames.current * 1000) / elapsed));
+        fpsFrames.current = 0;
+        fpsLast.current = now;
+      }
+
       tickRef.current = requestAnimationFrame(tick);
     };
     tickRef.current = requestAnimationFrame(tick);
     return () => { if (tickRef.current) cancelAnimationFrame(tickRef.current); };
-  }, [running, push]);
+  }, [running]);
 
   return (
     <div>
       <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
-        Uses the <code>useStreamingData</code> hook for sliding-window streaming with built-in FPS tracking.
+        Streaming with plain <code>useState</code> for sliding-window data with FPS tracking.
       </p>
       <div style={{ marginBottom: 8, display: 'flex', gap: 8, alignItems: 'center' }}>
-        <button onClick={running ? stop : start}>
+        <button onClick={() => setRunning(r => !r)}>
           {running ? 'Stop' : 'Start'}
         </button>
         <span style={{ fontSize: 13, color: '#999' }}>

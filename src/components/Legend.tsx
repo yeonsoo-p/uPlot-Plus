@@ -1,6 +1,5 @@
-import React, { useCallback } from 'react';
-import { useChart } from '../hooks/useChart';
-import { useChartSnapshot } from '../hooks/useChartSnapshot';
+import React, { useSyncExternalStore } from 'react';
+import { useStore } from '../hooks/useChart';
 import type { LegendConfig } from '../types/legend';
 import type { ChartStore } from '../hooks/useChartStore';
 
@@ -43,10 +42,6 @@ interface LegendItemProps {
 }
 
 function LegendItem({ group, index, label, color, isHidden, valueStr, store }: LegendItemProps) {
-  const handleClick = useCallback(() => {
-    store.toggleSeries(group, index);
-  }, [store, group, index]);
-
   let cachedSwatch = swatchStyleCache.get(color);
   if (cachedSwatch == null) {
     cachedSwatch = { ...swatchStyle, backgroundColor: color };
@@ -55,7 +50,7 @@ function LegendItem({ group, index, label, color, isHidden, valueStr, store }: L
 
   return (
     <span
-      onClick={handleClick}
+      onClick={() => store.toggleSeries(group, index)}
       style={isHidden ? itemStyleHidden : itemStyleVisible}
     >
       <span style={cachedSwatch} />
@@ -70,8 +65,8 @@ function LegendItem({ group, index, label, color, isHidden, valueStr, store }: L
  * Updates live as the cursor moves. Click to toggle series visibility.
  */
 export function Legend({ show = true, position = 'bottom', className }: LegendProps): React.ReactElement | null {
-  const store = useChart();
-  const snap = useChartSnapshot();
+  const store = useStore();
+  const snap = useSyncExternalStore(store.subscribeCursor, store.getSnapshot);
 
   if (!show) return null;
 

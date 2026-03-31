@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useChart } from '../hooks/useChart';
-import { useChartSnapshot } from '../hooks/useChartSnapshot';
+import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useStore } from '../hooks/useChart';
 import { Panel, SeriesRow } from './overlay/SeriesPanel';
 import { clamp } from '../math/utils';
 
@@ -22,8 +21,8 @@ export function HoverLabel({
   show = true,
   className,
 }: HoverLabelProps): React.ReactElement | null {
-  const store = useChart();
-  const snap = useChartSnapshot('full');
+  const store = useStore();
+  const snap = useSyncExternalStore(store.subscribe, store.getSnapshot);
   const [visible, setVisible] = useState(false);
   const trackedSeries = useRef(-1);
   const timerRef = useRef(0);

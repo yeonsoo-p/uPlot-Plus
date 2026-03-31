@@ -1,5 +1,5 @@
 import React from 'react';
-import { Chart, Series, Legend, useChart, useChartSnapshot } from 'uplot-plus';
+import { Chart, Series, Legend, useChart } from 'uplot-plus';
 
 function generateData() {
   const n = 200;
@@ -9,21 +9,20 @@ function generateData() {
   return [{ x, series: [y1, y2] }];
 }
 
-/** Child component that reads chart store state via useChart() */
+/** Child component that reads chart state via useChart() */
 function ChartInfoPanel() {
-  const store = useChart();
-  const snap = useChartSnapshot();
+  const chart = useChart();
 
-  const xScale = store.scaleManager.getScale('x');
-  const yScale = store.scaleManager.getScale('y');
+  const xScale = chart.getScale('x');
+  const yScale = chart.getScale('y');
 
   const xMin = xScale?.min?.toFixed(1) ?? '—';
   const xMax = xScale?.max?.toFixed(1) ?? '—';
   const yMin = yScale?.min?.toFixed(1) ?? '—';
   const yMax = yScale?.max?.toFixed(1) ?? '—';
-  const cursorX = snap.left >= 0 ? snap.left.toFixed(0) : '—';
-  const cursorY = snap.top >= 0 ? snap.top.toFixed(0) : '—';
-  const activeIdx = snap.activeDataIdx >= 0 ? snap.activeDataIdx : '—';
+  const cursorX = chart.left >= 0 ? chart.left.toFixed(0) : '—';
+  const cursorY = chart.top >= 0 ? chart.top.toFixed(0) : '—';
+  const activeIdx = chart.activeDataIdx >= 0 ? chart.activeDataIdx : '—';
 
   const cellStyle: React.CSSProperties = { padding: '2px 8px', fontSize: 12, fontFamily: 'monospace' };
   const labelStyle: React.CSSProperties = { ...cellStyle, color: '#888', textAlign: 'right' };
@@ -47,9 +46,9 @@ function ChartInfoPanel() {
           </tr>
           <tr>
             <td style={labelStyle}>Plot box:</td>
-            <td style={cellStyle}>{snap.plotWidth}x{snap.plotHeight}</td>
+            <td style={cellStyle}>{chart.plotWidth}x{chart.plotHeight}</td>
             <td style={labelStyle}>Series count:</td>
-            <td style={cellStyle}>{snap.seriesCount}</td>
+            <td style={cellStyle}>{chart.seriesCount}</td>
           </tr>
         </tbody>
       </table>
@@ -63,7 +62,7 @@ export default function UseChartDemo() {
   return (
     <div>
       <p style={{ fontSize: 13, color: '#666', marginBottom: 8 }}>
-        The <code>useChart()</code> hook gives child components access to the chart store.
+        The <code>useChart()</code> hook gives child components read-only access to chart state.
         The panel below reads scale ranges, cursor position, and layout info in real time.
       </p>
       <Chart width={800} height={350} data={data} >

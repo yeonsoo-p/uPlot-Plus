@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type { BandConfig } from '../types/bands';
-import { useChart } from '../hooks/useChart';
+import { useStore } from '../hooks/useChart';
 
 /**
  * Renderless component that registers a band config with the chart store.
@@ -10,7 +10,7 @@ import { useChart } from '../hooks/useChart';
  * Destructures series tuple to primitives for stable dependency comparison.
  */
 export function Band({ series, group, fill, dir }: BandConfig): null {
-  const store = useChart();
+  const store = useStore();
   const cfgRef = useRef<BandConfig | null>(null);
 
   // Destructure tuple to primitives for stable deps
@@ -23,15 +23,17 @@ export function Band({ series, group, fill, dir }: BandConfig): null {
 
     // Remove previous config if re-running due to prop change
     if (cfgRef.current != null) {
-      store.bandConfigs = store.bandConfigs.filter(b => b !== cfgRef.current);
+      store.unregisterBand(cfgRef.current);
     }
 
     cfgRef.current = cfg;
-    store.bandConfigs.push(cfg);
+    store.registerBand(cfg);
     store.scheduleRedraw();
 
     return () => {
-      store.bandConfigs = store.bandConfigs.filter(b => b !== cfgRef.current);
+      if (cfgRef.current != null) {
+        store.unregisterBand(cfgRef.current);
+      }
       cfgRef.current = null;
       store.scheduleRedraw();
     };

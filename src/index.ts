@@ -20,9 +20,8 @@ export { HLine, VLine, Region, AnnotationLabel } from './components/annotations'
 
 // Hooks
 export { useChart } from './hooks/useChart';
-export { useChartSnapshot } from './hooks/useChartSnapshot';
+export type { ChartAPI } from './hooks/useChart';
 export { useDrawHook, useCursorDrawHook } from './hooks/useDrawHook';
-export { useStreamingData } from './hooks/useStreamingData';
 
 // Types
 export type {
@@ -71,8 +70,6 @@ export type { HLineProps, VLineProps, RegionProps, AnnotationLabelProps } from '
 export type { BoxWhiskerProps } from './components/BoxWhisker';
 export type { HeatmapProps } from './components/Heatmap';
 export type { VectorProps } from './components/Vector';
-export type { StreamingOptions, StreamingResult } from './hooks/useStreamingData';
-
 // Path builders
 export { linear } from './paths/linear';
 export { stepped } from './paths/stepped';

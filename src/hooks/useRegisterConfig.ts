@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useChart } from './useChart';
+import { useStore } from './useChart';
 import { shallowEqual } from '../utils/shallowEqual';
 import type { ChartStore } from './useChartStore';
 
@@ -23,7 +23,7 @@ export function useRegisterConfig<T extends object>(
   unregister: (store: ChartStore, cfg: T) => void,
   sync: (store: ChartStore, cfg: T) => void,
 ): void {
-  const store = useChart();
+  const store = useStore();
   const configRef = useRef(config);
   configRef.current = config;
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type { DrawCallback, CursorDrawCallback } from '../types/hooks';
-import { useChart } from './useChart';
+import { useStore } from './useChart';
 
 /**
  * Register a draw callback that fires after all series are drawn
@@ -8,7 +8,7 @@ import { useChart } from './useChart';
  * Uses a ref wrapper so the callback can be an inline function.
  */
 export function useDrawHook(fn: DrawCallback): void {
-  const store = useChart();
+  const store = useStore();
   const fnRef = useRef(fn);
   fnRef.current = fn;
 
@@ -39,7 +39,7 @@ export function useDrawHook(fn: DrawCallback): void {
  * ```
  */
 export function useCursorDrawHook(fn: CursorDrawCallback): void {
-  const store = useChart();
+  const store = useStore();
   const fnRef = useRef(fn);
   fnRef.current = fn;
 

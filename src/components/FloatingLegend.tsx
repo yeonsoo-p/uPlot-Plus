@@ -1,6 +1,5 @@
-import React, { useCallback, useRef, useState, useEffect, useLayoutEffect } from 'react';
-import { useChart } from '../hooks/useChart';
-import { useChartSnapshot } from '../hooks/useChartSnapshot';
+import React, { useRef, useState, useEffect, useLayoutEffect, useSyncExternalStore } from 'react';
+import { useStore } from '../hooks/useChart';
 import { Panel, SeriesRow, formatSeriesValue } from './overlay/SeriesPanel';
 import { clamp } from '../math/utils';
 
@@ -60,43 +59,34 @@ export function FloatingLegend({
   show = true,
   className,
 }: FloatingLegendProps): React.ReactElement | null {
-  const store = useChart();
-  const snap = useChartSnapshot();
+  const store = useStore();
+  const snap = useSyncExternalStore(store.subscribeCursor, store.getSnapshot);
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   const [hovered, setHovered] = useState(false);
   const dragging = useRef(false);
   const didDrag = useRef(false);
   const dragOffset = useRef({ dx: 0, dy: 0 });
-  const initialized = useRef(false);
+  const [initialized, setInitialized] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  // Initialize draggable position once plot box is known (top-left anchor; corrected after measure)
-  if (mode === 'draggable' && !initialized.current && snap.plotWidth > 0) {
-    initialized.current = true;
-    if (pos == null) setPos(resolveInitialPos(position, store.plotBox, 0, 0));
-  }
-
-  // After first render, re-resolve position using measured panel dimensions
+  // Initialize and correct draggable position once plot box is known
   useLayoutEffect(() => {
-    if (mode !== 'draggable' || !initialized.current || panelRef.current == null) return;
+    if (mode !== 'draggable' || initialized || snap.plotWidth <= 0) return;
+    setInitialized(true);
     const el = panelRef.current;
-    const w = el.offsetWidth;
-    const h = el.offsetHeight;
-    if (w === 0 && h === 0) return;
-    // Only correct once — skip if user has already dragged
-    if (typeof position === 'object') return;
+    const w = el?.offsetWidth ?? 0;
+    const h = el?.offsetHeight ?? 0;
     setPos(resolveInitialPos(position, store.plotBox, w, h));
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once after first measure; ref.current is intentional trigger
-  }, [initialized.current]);
+  }, [mode, initialized, snap.plotWidth, position, store.plotBox]);
 
   // Toggle handler — only fires if no drag occurred
-  const handleToggle = useCallback((group: number, index: number) => {
+  const handleToggle = (group: number, index: number) => {
     if (didDrag.current) return;
     store.toggleSeries(group, index);
-  }, [store]);
+  };
 
-  // Drag handlers
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+  // Drag handler
+  const handleMouseDown = (e: React.MouseEvent) => {
     if (mode !== 'draggable') return;
     e.stopPropagation();
     e.preventDefault();
@@ -104,7 +94,7 @@ export function FloatingLegend({
     didDrag.current = false;
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     dragOffset.current = { dx: e.clientX - rect.left, dy: e.clientY - rect.top };
-  }, [mode]);
+  };
 
   useEffect(() => {
     if (!show || mode !== 'draggable') return;

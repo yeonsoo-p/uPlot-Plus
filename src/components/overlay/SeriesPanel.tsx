@@ -33,6 +33,24 @@ const rowStyle: React.CSSProperties = {
   padding: '1px 4px',
 };
 
+// Pre-computed row style variants to avoid object spreads on every render
+const rowVisiblePointer: React.CSSProperties = { ...rowStyle, opacity: 1, cursor: 'pointer' };
+const rowVisibleDefault: React.CSSProperties = { ...rowStyle, opacity: 1, cursor: 'default' };
+const rowHiddenPointer: React.CSSProperties = { ...rowStyle, opacity: 0.4, cursor: 'pointer' };
+const rowHiddenDefault: React.CSSProperties = { ...rowStyle, opacity: 0.4, cursor: 'default' };
+
+// Swatch style cache keyed by color string
+const swatchStyleCache = new Map<string, React.CSSProperties>();
+
+function getSwatchStyle(color: string): React.CSSProperties {
+  let cached = swatchStyleCache.get(color);
+  if (cached == null) {
+    cached = { ...swatchStyle, backgroundColor: color };
+    swatchStyleCache.set(color, cached);
+  }
+  return cached;
+}
+
 // --- Series row item ---
 
 export interface SeriesRowProps {
@@ -46,16 +64,13 @@ export interface SeriesRowProps {
 export function SeriesRow({
   label, color, value, isHidden, onClick,
 }: SeriesRowProps): React.ReactElement {
+  const style = isHidden
+    ? (onClick ? rowHiddenPointer : rowHiddenDefault)
+    : (onClick ? rowVisiblePointer : rowVisibleDefault);
+
   return (
-    <div
-      onClick={onClick}
-      style={{
-        ...rowStyle,
-        opacity: isHidden ? 0.4 : 1,
-        cursor: onClick ? 'pointer' : 'default',
-      }}
-    >
-      <span style={{ ...swatchStyle, backgroundColor: color }} />
+    <div onClick={onClick} style={style}>
+      <span style={getSwatchStyle(color)} />
       <span>{label}</span>
       {value && <span style={valueStyle}>{value}</span>}
     </div>

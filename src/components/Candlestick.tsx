@@ -1,5 +1,5 @@
 import { useDrawHook } from '../hooks/useDrawHook';
-import { useChart } from '../hooks/useChart';
+import { useStore } from '../hooks/useChart';
 import { drawRangeBox } from '../rendering/drawRangeBox';
 
 export interface CandlestickProps {
@@ -28,7 +28,7 @@ export function Candlestick({
   bodyWidth = 0.6,
   wickWidth = 1,
 }: CandlestickProps): null {
-  const store = useChart();
+  const store = useStore();
 
   useDrawHook(({ ctx, plotBox, valToX, valToY }) => {
     const dataGroup = store.dataStore.data[group];

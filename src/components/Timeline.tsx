@@ -1,5 +1,5 @@
 import { useDrawHook } from '../hooks/useDrawHook';
-import { useChart } from '../hooks/useChart';
+import { useStore } from '../hooks/useChart';
 import { valToPos, isScaleReady } from '../core/Scale';
 import type { TimelineProps } from '../types/timeline';
 
@@ -14,7 +14,7 @@ export function Timeline({
   gap = 2,
   scaleId = 'x',
 }: TimelineProps): null {
-  const store = useChart();
+  const store = useStore();
 
   useDrawHook(({ ctx, plotBox, pxRatio }) => {
     const scale = store.scaleManager.getScale(scaleId);

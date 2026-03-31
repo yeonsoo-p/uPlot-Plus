@@ -1,5 +1,5 @@
 import { useDrawHook } from '../hooks/useDrawHook';
-import { useChart } from '../hooks/useChart';
+import { useStore } from '../hooks/useChart';
 
 export interface VectorProps {
   /** Direction angles in degrees (0=N, 90=E). One per data point. */
@@ -62,7 +62,7 @@ export function Vector({
   minSize = 4,
   maxSize = 10,
 }: VectorProps): null {
-  const store = useChart();
+  const store = useStore();
 
   useDrawHook(({ ctx, valToX, valToY }) => {
     const dataGroup = store.dataStore.data[group];

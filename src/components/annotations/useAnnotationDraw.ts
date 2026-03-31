@@ -13,7 +13,7 @@ export function useAnnotationDraw<T>(
   draw: (dc: DrawContext, scale: ScaleState, props: T) => void,
 ): void {
   const propsRef = useRef(props);
-  useLayoutEffect(() => { propsRef.current = props; });
+  useLayoutEffect(() => { propsRef.current = props; }, [props]);
 
   useDrawHook((dc) => {
     const scale = dc.getScale(scaleId);

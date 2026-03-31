@@ -1,6 +1,5 @@
-import React, { useRef } from 'react';
-import { useChart } from '../hooks/useChart';
-import { useChartSnapshot } from '../hooks/useChartSnapshot';
+import React, { useRef, useSyncExternalStore } from 'react';
+import { useStore } from '../hooks/useChart';
 import type { TooltipProps, TooltipData, TooltipItem } from '../types/tooltip';
 import { Panel, SeriesRow } from './overlay/SeriesPanel';
 import { clamp } from '../math/utils';
@@ -16,8 +15,8 @@ export function Tooltip({
   children,
   offset = {},
 }: TooltipProps): React.ReactElement | null {
-  const store = useChart();
-  const snap = useChartSnapshot();
+  const store = useStore();
+  const snap = useSyncExternalStore(store.subscribeCursor, store.getSnapshot);
   const tooltipRef = useRef<HTMLDivElement>(null);
 
   if (!show) return null;

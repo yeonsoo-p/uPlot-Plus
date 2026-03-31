@@ -18,18 +18,9 @@ export function Axis(props: AxisProps): null {
   useRegisterConfig(
     resolved,
     [resolved.scale, resolved.side],
-    (store, cfg) => {
-      store.axisConfigs = store.axisConfigs.filter(a => !(a.scale === cfg.scale && a.side === cfg.side));
-      store.axisConfigs.push(cfg);
-    },
-    (store, cfg) => {
-      store.axisConfigs = store.axisConfigs.filter(a => !(a.scale === cfg.scale && a.side === cfg.side));
-    },
-    (store, cfg) => {
-      store.axisConfigs = store.axisConfigs.map(a =>
-        (a.scale === cfg.scale && a.side === cfg.side) ? cfg : a,
-      );
-    },
+    (store, cfg) => store.registerAxis(cfg),
+    (store, cfg) => store.unregisterAxis(cfg.scale, cfg.side),
+    (store, cfg) => store.updateAxis(cfg),
   );
   return null;
 }

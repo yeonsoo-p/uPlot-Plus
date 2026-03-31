@@ -1,6 +1,5 @@
 import type { SeriesConfig } from '../types';
 import { useRegisterConfig } from '../hooks/useRegisterConfig';
-import { rebuildSeriesConfigMap } from '../hooks/useChartStore';
 import { withAlpha } from '../colors';
 
 /** Series component props — yScale defaults to 'y' if omitted. */
@@ -41,20 +40,11 @@ export function Series(props: SeriesProps): null {
   useRegisterConfig(
     props,
     [props.group, props.index],
+    (store, p) => store.registerSeries(resolveDefaults(p, store.seriesConfigs.length)),
+    (store, p) => store.unregisterSeries(p.group, p.index),
     (store, p) => {
-      store.registerSeries(resolveDefaults(p, store.seriesConfigs.length));
-      store.renderer.clearGroupCache(p.group);
-    },
-    (store, p) => {
-      store.unregisterSeries(p.group, p.index);
-      store.renderer.clearGroupCache(p.group);
-    },
-    (store, p) => {
-      store.seriesConfigs = store.seriesConfigs.map((s, i) =>
-        (s.group === p.group && s.index === p.index) ? resolveDefaults(p, i) : s,
-      );
-      rebuildSeriesConfigMap(store);
-      store.renderer.invalidateSeries(p.group, p.index);
+      const idx = store.seriesConfigs.findIndex(s => s.group === p.group && s.index === p.index);
+      store.updateSeries(resolveDefaults(p, idx >= 0 ? idx : store.seriesConfigs.length));
     },
   );
   return null;

@@ -66,8 +66,6 @@ Root container. Creates two canvas layers (persistent data + cursor overlay), in
 | `onCursorLeave` | `() => void` | — | Cursor leaves plot area |
 | `onScaleChange` | `ScaleChangeCallback` | — | Scale range changes (zoom, pan) |
 | `onSelect` | `(sel: SelectEventInfo) => boolean \| void` | — | Drag selection completes (return `false` to prevent zoom) |
-| `onReady` | `(ref: ChartRef) => void` | — | Fires after initial render |
-| `chartRef` | `React.Ref<ChartRef>` | — | Imperative chart access |
 
 **`actions`** — array of `[ActionKey, ReactionValue]` tuples, merged with `DEFAULT_ACTIONS` internally. Override specific gestures without repeating defaults:
 
@@ -91,17 +89,6 @@ import { focus } from 'uplot-plus';
 Built-in action strings: `{mod?}{Button}{Type}` — e.g. `leftDrag`, `shiftMiddleClick`, `ctrlRightDrag`, `wheel`, `shiftWheel`, `xGutterDrag`, `yGutterDrag`, `hover`, `touchDrag`, `pinch`.
 
 Built-in reaction strings: `zoomX`, `zoomY`, `zoomXY`, `panX`, `panY`, `panXY`, `reset`, `none`.
-
-**`ChartRef`** (imperative handle via `chartRef`):
-
-| Method | Signature | Description |
-|--------|-----------|-------------|
-| `setScale` | `(id, min, max) => void` | Set scale range programmatically |
-| `resetScales` | `() => void` | Reset all scales to declarative state |
-| `getScale` | `(id) => { min, max } \| null` | Get current scale range |
-| `getPlotBox` | `() => BBox` | Get plot bounding box |
-| `redraw` | `() => void` | Force a full redraw |
-| `getCursor` | `() => CursorState` | Get cursor state |
 
 ```tsx
 import { Chart, Scale, Series, Axis } from 'uplot-plus';
@@ -193,7 +180,7 @@ Registers a data series with the chart store. Each series references a `(group, 
 | `fill` | `ColorValue` | — | Fill color (string or gradient) |
 | `width` | `number` | — | Stroke width in CSS pixels |
 | `alpha` | `number` | `1` | Opacity 0–1 |
-| `paths` | `PathBuilder` | `linear()` | Path builder function |
+| `paths` | `PathBuilder` | `lttbLinear()` | Path builder function (internal default: LTTB downsampling + pixel decimation) |
 | `points` | `PointsConfig` | — | Point marker config |
 | `dash` | `number[]` | — | Dash pattern |
 | `cap` | `CanvasLineCap` | — | Line cap style |

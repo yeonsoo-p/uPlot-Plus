@@ -13,11 +13,7 @@ export function Scale(props: ScaleProps): null {
     [props.id],
     (store, cfg) => store.registerScale(cfg),
     (store, cfg) => store.unregisterScale(cfg.id),
-    (store, cfg) => {
-      store.scaleConfigs = store.scaleConfigs.map(s => s.id === cfg.id ? cfg : s);
-      store.scaleManager.addScale(cfg);
-      store.renderer.clearCache();
-    },
+    (store, cfg) => store.updateScale(cfg),
   );
   return null;
 }
