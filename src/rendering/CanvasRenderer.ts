@@ -1,11 +1,11 @@
 import type { SeriesConfig, ScaleState, BBox } from '../types';
 import { Distribution } from '../types';
 import type { SeriesPaths } from '../paths/types';
-import { linear } from '../paths/linear';
+import { lttbLinear } from '../paths/lttbLinear';
 import { drawSeriesPath } from './drawSeries';
 import { pxRoundGen } from '../math/utils';
 
-const defaultPathBuilder = linear();
+const defaultPathBuilder = lttbLinear();
 
 export interface RenderableSeriesInfo {
   config: SeriesConfig;

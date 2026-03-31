@@ -1,5 +1,5 @@
 import React from 'react';
-import { Chart, Series } from '../../src';
+import { Chart, Series } from 'uplot-plus';
 
 function randomWalk(n: number, start: number): number[] {
   const vals: number[] = [start];

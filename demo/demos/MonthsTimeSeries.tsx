@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Series, Axis, Legend, fmtMonthName } from '../../src';
+import { Chart, Series, Axis, Legend, fmtMonthName } from 'uplot-plus';
 
 export default function MonthsTimeSeries() {
   const data = useMemo(() => {

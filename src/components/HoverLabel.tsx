@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState, useCallback, useSyncExternalStore } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useChart } from '../hooks/useChart';
+import { useChartSnapshot } from '../hooks/useChartSnapshot';
 import { Panel, SeriesRow } from './overlay/SeriesPanel';
 import { clamp } from '../math/utils';
 
@@ -12,17 +13,6 @@ export interface HoverLabelProps {
   className?: string;
 }
 
-interface Snapshot {
-  cursorLeft: number;
-  cursorTop: number;
-  activeSeriesIdx: number;
-  activeGroup: number;
-  plotLeft: number;
-  plotTop: number;
-  plotWidth: number;
-  plotHeight: number;
-}
-
 /**
  * Shows the focused series label as a floating tag after hovering for a delay.
  * Uses the shared Panel/SeriesRow visuals. Must be a child of <Chart>.
@@ -33,31 +23,11 @@ export function HoverLabel({
   className,
 }: HoverLabelProps): React.ReactElement | null {
   const store = useChart();
-  const snapRef = useRef<Snapshot | null>(null);
+  const snap = useChartSnapshot('full');
   const [visible, setVisible] = useState(false);
   const trackedSeries = useRef(-1);
   const timerRef = useRef(0);
   const panelRef = useRef<HTMLDivElement>(null);
-
-  const subscribe = useCallback((cb: () => void) => store.subscribe(cb), [store]);
-
-  const getSnapshot = useCallback((): Snapshot => {
-    const { left: cursorLeft, top: cursorTop, activeSeriesIdx, activeGroup } = store.cursorManager.state;
-    const { left: plotLeft, top: plotTop, width: plotWidth, height: plotHeight } = store.plotBox;
-    const prev = snapRef.current;
-    if (
-      prev != null &&
-      prev.cursorLeft === cursorLeft && prev.cursorTop === cursorTop &&
-      prev.activeSeriesIdx === activeSeriesIdx && prev.activeGroup === activeGroup &&
-      prev.plotLeft === plotLeft && prev.plotTop === plotTop &&
-      prev.plotWidth === plotWidth && prev.plotHeight === plotHeight
-    ) return prev;
-    const next: Snapshot = { cursorLeft, cursorTop, activeSeriesIdx, activeGroup, plotLeft, plotTop, plotWidth, plotHeight };
-    snapRef.current = next;
-    return next;
-  }, [store]);
-
-  const snap = useSyncExternalStore(subscribe, getSnapshot);
 
   // Track series changes and manage timer
   useEffect(() => {
@@ -75,7 +45,7 @@ export function HoverLabel({
   // Cleanup
   useEffect(() => () => { window.clearTimeout(timerRef.current); }, []);
 
-  if (!show || !visible || snap.cursorLeft < 0) return null;
+  if (!show || !visible || snap.left < 0) return null;
 
   const cfg = store.seriesConfigs.find(
     (s) => s.group === snap.activeGroup && s.index === snap.activeSeriesIdx,
@@ -87,8 +57,8 @@ export function HoverLabel({
   // Position above cursor, clamped to plot
   const mW = panelRef.current?.offsetWidth ?? 80;
   const mH = panelRef.current?.offsetHeight ?? 24;
-  const cx = snap.cursorLeft + snap.plotLeft;
-  const cy = snap.cursorTop + snap.plotTop;
+  const cx = snap.left + snap.plotLeft;
+  const cy = snap.top + snap.plotTop;
   const x = clamp(cx - mW / 2, snap.plotLeft, snap.plotLeft + snap.plotWidth - mW);
   const y = clamp(cy - mH - 12, snap.plotTop, snap.plotTop + snap.plotHeight - mH);
 

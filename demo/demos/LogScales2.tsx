@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis, Distribution } from '../../src';
+import { Chart, Scale, Series, Axis, Distribution } from 'uplot-plus';
 
 export default function LogScales2() {
   const data = useMemo(() => {

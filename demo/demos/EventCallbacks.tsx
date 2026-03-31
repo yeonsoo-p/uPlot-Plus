@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useCallback } from 'react';
-import { Chart, Scale, Series, Legend } from '../../src';
-import type { ChartEventInfo } from '../../src';
+import { Chart, Scale, Series, Legend } from 'uplot-plus';
+import type { ChartEventInfo } from 'uplot-plus';
 
 function generateData() {
   const n = 200;

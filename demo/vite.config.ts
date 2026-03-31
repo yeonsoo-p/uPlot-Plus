@@ -1,14 +1,14 @@
 import react from '@vitejs/plugin-react';
-import {resolve} from 'path';
-import {defineConfig} from 'vite';
+import { defineConfig } from 'vite';
 
 export default defineConfig({
   plugins: [react()],
   base: '/uPlot-Plus/',
-  root: resolve(__dirname),
+  root: import.meta.dirname,
   resolve: {
     alias: {
-      '@': resolve(__dirname, '../src'),
+      '@': import.meta.dirname + '/../src',
+      'uplot-plus': import.meta.dirname + '/../src',
     },
   },
 });

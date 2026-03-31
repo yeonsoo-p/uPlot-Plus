@@ -1,6 +1,6 @@
 import React from 'react';
-import { Chart, Scale, Series, HLine, Region } from '../../src';
-import type { CursorDrawCallback } from '../../src';
+import { Chart, Scale, Series, HLine, Region } from 'uplot-plus';
+import type { CursorDrawCallback } from 'uplot-plus';
 
 function generateData() {
   const n = 200;

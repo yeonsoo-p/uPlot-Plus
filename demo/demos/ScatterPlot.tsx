@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Series, Legend, points } from '../../src';
+import { Chart, Series, Legend, points } from 'uplot-plus';
 
 function generateScatterData() {
   const n1 = 80;

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis, bars, Distribution, fmtSuffix } from '../../src';
+import { Chart, Scale, Series, Axis, bars, Distribution, fmtSuffix } from 'uplot-plus';
 
 function generateMassSpecData() {
   // Mass spectrum: sharp peaks at specific m/z values

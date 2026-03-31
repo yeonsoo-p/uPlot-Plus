@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Series, Axis } from '../../src';
+import { Chart, Series, Axis } from 'uplot-plus';
 
 export default function TimePeriods() {
   // Hourly data: 48 hours

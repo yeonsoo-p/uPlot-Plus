@@ -1,5 +1,5 @@
 import React from 'react';
-import { Chart, Series } from '../../src';
+import { Chart, Series } from 'uplot-plus';
 
 /**
  * Demonstrates the three data input formats accepted by Chart.

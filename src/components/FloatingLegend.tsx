@@ -1,5 +1,6 @@
-import React, { useSyncExternalStore, useCallback, useRef, useState, useEffect, useLayoutEffect } from 'react';
+import React, { useCallback, useRef, useState, useEffect, useLayoutEffect } from 'react';
 import { useChart } from '../hooks/useChart';
+import { useChartSnapshot } from '../hooks/useChartSnapshot';
 import { Panel, SeriesRow, formatSeriesValue } from './overlay/SeriesPanel';
 import { clamp } from '../math/utils';
 
@@ -16,19 +17,6 @@ export interface FloatingLegendProps {
   show?: boolean;
   /** CSS class for custom styling */
   className?: string;
-}
-
-interface Snapshot {
-  activeGroup: number;
-  activeDataIdx: number;
-  cursorLeft: number;
-  cursorTop: number;
-  seriesCount: number;
-  revision: number;
-  plotLeft: number;
-  plotTop: number;
-  plotWidth: number;
-  plotHeight: number;
 }
 
 /** Padding from plot edges for corner-anchored positions */
@@ -73,7 +61,7 @@ export function FloatingLegend({
   className,
 }: FloatingLegendProps): React.ReactElement | null {
   const store = useChart();
-  const snapRef = useRef<Snapshot | null>(null);
+  const snap = useChartSnapshot();
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   const [hovered, setHovered] = useState(false);
   const dragging = useRef(false);
@@ -81,32 +69,6 @@ export function FloatingLegend({
   const dragOffset = useRef({ dx: 0, dy: 0 });
   const initialized = useRef(false);
   const panelRef = useRef<HTMLDivElement>(null);
-
-  const subscribe = useCallback((cb: () => void) => store.subscribeCursor(cb), [store]);
-
-  const getSnapshot = useCallback((): Snapshot => {
-    const { activeGroup, activeDataIdx, left: cursorLeft, top: cursorTop } = store.cursorManager.state;
-    const seriesCount = store.seriesConfigs.length;
-    const { revision } = store;
-    const { left: plotLeft, top: plotTop, width: plotWidth, height: plotHeight } = store.plotBox;
-    const prev = snapRef.current;
-    if (
-      prev != null &&
-      prev.activeGroup === activeGroup && prev.activeDataIdx === activeDataIdx &&
-      prev.cursorLeft === cursorLeft && prev.cursorTop === cursorTop &&
-      prev.seriesCount === seriesCount && prev.revision === revision &&
-      prev.plotLeft === plotLeft && prev.plotTop === plotTop &&
-      prev.plotWidth === plotWidth && prev.plotHeight === plotHeight
-    ) return prev;
-    const next: Snapshot = {
-      activeGroup, activeDataIdx, cursorLeft, cursorTop,
-      seriesCount, revision, plotLeft, plotTop, plotWidth, plotHeight,
-    };
-    snapRef.current = next;
-    return next;
-  }, [store]);
-
-  const snap = useSyncExternalStore(subscribe, getSnapshot);
 
   // Initialize draggable position once plot box is known (top-left anchor; corrected after measure)
   if (mode === 'draggable' && !initialized.current && snap.plotWidth > 0) {
@@ -124,7 +86,7 @@ export function FloatingLegend({
     // Only correct once — skip if user has already dragged
     if (typeof position === 'object') return;
     setPos(resolveInitialPos(position, store.plotBox, w, h));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once after first measure; ref.current is intentional trigger
   }, [initialized.current]);
 
   // Toggle handler — only fires if no drag occurred
@@ -162,7 +124,7 @@ export function FloatingLegend({
 
   if (!show) return null;
 
-  const { activeGroup, activeDataIdx, cursorLeft, cursorTop } = snap;
+  const { activeGroup, activeDataIdx, left: cursorLeft, top: cursorTop } = snap;
 
   // Build rows
   const rows = store.seriesConfigs.filter(c => c.legend !== false).map((cfg) => {

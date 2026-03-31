@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Series, Candlestick } from '../../src';
+import { Chart, Series, Candlestick } from 'uplot-plus';
 
 function generateOHLC() {
   const n = 60;

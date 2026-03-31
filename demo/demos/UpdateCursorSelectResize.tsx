@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Chart, Series, Legend } from '../../src';
+import { Chart, Series, Legend } from 'uplot-plus';
 
 const WINDOW = 100;
 
@@ -24,7 +24,7 @@ export default function UpdateCursorSelectResize() {
         const prevY = group.series[0] as number[];
         const lastY = prevY[prevY.length - 1] ?? 50;
         const newIdx = counterRef.current++;
-        const newX = [...(group.x as number[]).slice(1), newIdx];
+        const newX = [...Array.from(group.x).slice(1), newIdx];
         const newY = [...prevY.slice(1), lastY + (Math.random() - 0.5) * 6];
 
         return [{ x: newX, series: [newY] }];

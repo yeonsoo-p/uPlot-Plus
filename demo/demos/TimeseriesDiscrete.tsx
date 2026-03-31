@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis, Legend, stepped } from '../../src';
+import { Chart, Scale, Series, Axis, Legend, stepped } from 'uplot-plus';
 
 export default function TimeseriesDiscrete() {
   const data = useMemo(() => {

@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback } from 'react';
-import { Chart, Scale, Series, Axis, ZoomRanger, Side } from '../../src';
+import { Chart, Scale, Series, Axis, ZoomRanger, Side } from 'uplot-plus';
 
 function generateData() {
   const n = 400;

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Legend } from '../../src';
+import { Chart, Scale, Series, Legend } from 'uplot-plus';
 
 export default function SoftMinMax() {
   const data = useMemo(() => {

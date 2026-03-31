@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { Chart, Series, Legend } from '../../src';
+import { Chart, Series, Legend } from 'uplot-plus';
 
 /**
  * Example: responsive chart sizing via ResizeObserver.

@@ -110,6 +110,56 @@ function buildDrawContext(
 }
 
 /**
+ * Immutable snapshot of the chart state fields that UI subscribers need.
+ * Rebuilt by the store before notifying listeners; the reference only
+ * changes when at least one field differs from the previous snapshot.
+ */
+export interface ChartSnapshot {
+  // Cursor
+  left: number;
+  top: number;
+  activeGroup: number;
+  activeSeriesIdx: number;
+  activeDataIdx: number;
+  // Layout
+  plotLeft: number;
+  plotTop: number;
+  plotWidth: number;
+  plotHeight: number;
+  // Metadata
+  seriesCount: number;
+  revision: number;
+}
+
+const EMPTY_SNAPSHOT: ChartSnapshot = {
+  left: -10, top: -10, activeGroup: -1, activeSeriesIdx: -1, activeDataIdx: -1,
+  plotLeft: 0, plotTop: 0, plotWidth: 0, plotHeight: 0,
+  seriesCount: 0, revision: -1,
+};
+
+/** Rebuild store.snapshot if any tracked field changed. */
+export function rebuildSnapshot(store: ChartStore): void {
+  const { left, top, activeGroup, activeSeriesIdx, activeDataIdx } = store.cursorManager.state;
+  const { left: plotLeft, top: plotTop, width: plotWidth, height: plotHeight } = store.plotBox;
+  const seriesCount = store.seriesConfigs.length;
+  const { revision } = store;
+  const prev = store.snapshot;
+  if (
+    prev.left === left && prev.top === top &&
+    prev.activeGroup === activeGroup && prev.activeSeriesIdx === activeSeriesIdx &&
+    prev.activeDataIdx === activeDataIdx &&
+    prev.plotLeft === plotLeft && prev.plotTop === plotTop &&
+    prev.plotWidth === plotWidth && prev.plotHeight === plotHeight &&
+    prev.seriesCount === seriesCount && prev.revision === revision
+  ) return;
+  store.snapshot = {
+    left, top, activeGroup, activeSeriesIdx, activeDataIdx,
+    plotLeft, plotTop, plotWidth, plotHeight,
+    seriesCount, revision,
+  };
+}
+
+/**
  * Mutable chart store — holds all chart state outside of React state.
  * Canvas operations subscribe to this store and are triggered imperatively,
  * not through React re-renders.
@@ -166,6 +216,9 @@ export interface ChartStore {
   xlabel: string | undefined;
   /** Y-axis label for default axis */
   ylabel: string | undefined;
+
+  // Immutable snapshot for UI subscribers (rebuilt before notifications)
+  snapshot: ChartSnapshot;
 
   // Revision counter — incremented on visibility toggles to trigger subscriber re-renders
   revision: number;
@@ -237,6 +290,7 @@ export function createChartStore(): ChartStore {
     title: undefined,
     xlabel: undefined,
     ylabel: undefined,
+    snapshot: EMPTY_SNAPSHOT,
     revision: 0,
     eventCallbacks: {},
     _prevScaleRanges: new Map(),
@@ -356,6 +410,7 @@ export function createChartStore(): ChartStore {
           }
           ctx.restore();
         }
+        rebuildSnapshot(store);
         for (const fn of store.cursorListeners) fn();
         return;
       }
@@ -573,6 +628,7 @@ export function createChartStore(): ChartStore {
       }
 
       // 13. Notify subscribers (Legend, Tooltip, etc.)
+      rebuildSnapshot(store);
       for (const fn of store.listeners) fn();
       for (const fn of store.cursorListeners) fn();
 

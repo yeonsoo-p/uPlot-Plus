@@ -1,5 +1,5 @@
 import React from 'react';
-import { Chart, Series } from '../../src';
+import { Chart, Series } from 'uplot-plus';
 
 function generateData() {
   // Group 0: 100 points over [0, 10]

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Series, Legend, linear, monotoneCubic, catmullRom, stepped, bars, points } from '../../src';
+import { Chart, Series, Legend, linear, monotoneCubic, catmullRom, stepped, bars, points } from 'uplot-plus';
 export default function LinePaths() {
   const data = useMemo(() => {
     const n = 25;

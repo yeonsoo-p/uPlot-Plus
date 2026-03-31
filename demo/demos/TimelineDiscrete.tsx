@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Axis, Timeline, Side } from '../../src';
-import type { ChartData, TimelineLane } from '../../src';
+import { Chart, Scale, Axis, Timeline, Side } from 'uplot-plus';
+import type { ChartData, TimelineLane } from 'uplot-plus';
 
 export default function TimelineDiscreteDemo() {
   const data: ChartData = useMemo(() => {

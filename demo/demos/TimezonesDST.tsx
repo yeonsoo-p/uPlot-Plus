@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Series, Axis, Legend } from '../../src';
+import { Chart, Series, Axis, Legend } from 'uplot-plus';
 
 export default function TimezonesDST() {
   const data = useMemo(() => {

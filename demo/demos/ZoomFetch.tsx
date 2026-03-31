@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Chart, Series, Legend } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series, Legend } from 'uplot-plus';
+import type { ChartData } from 'uplot-plus';
 
 function generateData(min: number, max: number, n: number): ChartData {
   const x: number[] = [];

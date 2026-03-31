@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series } from '../../src';
+import { Chart, Scale, Series } from 'uplot-plus';
 
 export default function ScalePadding() {
   const data = useMemo(() => {

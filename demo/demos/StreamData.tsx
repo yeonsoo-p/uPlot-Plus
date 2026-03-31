@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Chart, Series, Legend } from '../../src';
+import { Chart, Series, Legend } from 'uplot-plus';
 
 const WINDOW = 2000;
 const BATCH = 4; // points per frame
@@ -35,10 +35,10 @@ export default function StreamData() {
       const group = prev[0];
       if (!group) return prev;
 
-      const xArr = group.x as number[];
-      const y1 = group.series[0] as number[];
-      const y2 = group.series[1] as number[];
-      const y3 = group.series[2] as number[];
+      const xArr = group.x;
+      const y1 = group.series[0] ?? [];
+      const y2 = group.series[1] ?? [];
+      const y3 = group.series[2] ?? [];
 
       // Remove oldest BATCH points, push BATCH new points
       const newX = xArr.slice(BATCH);

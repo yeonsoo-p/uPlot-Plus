@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Series } from '../../src';
+import { Chart, Series } from 'uplot-plus';
 
 export default function NiceScale() {
   const data1 = useMemo(() => {

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Series, alignData } from '../../src';
+import { Chart, Series, alignData } from 'uplot-plus';
 
 export default function AlignData() {
   const data = useMemo(() => {

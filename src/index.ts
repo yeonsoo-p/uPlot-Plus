@@ -20,6 +20,7 @@ export { HLine, VLine, Region, AnnotationLabel } from './components/annotations'
 
 // Hooks
 export { useChart } from './hooks/useChart';
+export { useChartSnapshot } from './hooks/useChartSnapshot';
 export { useDrawHook, useCursorDrawHook } from './hooks/useDrawHook';
 export { useStreamingData } from './hooks/useStreamingData';
 
@@ -52,12 +53,14 @@ export type {
   ColorValue,
 } from './types';
 
+export type { ChartSnapshot } from './hooks/useChartStore';
 export type { BandConfig } from './types/bands';
 export type { LegendConfig } from './types/legend';
 export type { TooltipProps, TooltipData, TooltipItem } from './types/tooltip';
 export type { DrawContext, DrawCallback, CursorDrawCallback } from './types/hooks';
 export type { ChartEventInfo, NearestPoint, SelectEventInfo, ScaleChangeCallback, SelectCallback, EventCallbacks } from './types/events';
 export type { AnnotationStyle } from './annotations';
+export type { LttbResult } from './types/downsample';
 export type { ZoomRangerProps } from './components/ZoomRanger';
 export type { TimelineProps, TimelineLane, TimelineSegment } from './types/timeline';
 export type { CandlestickProps } from './components/Candlestick';
@@ -82,6 +85,7 @@ export { Candlestick } from './components/Candlestick';
 // Data utilities
 export { stackGroup } from './math/stack';
 export { alignData } from './math/align';
+export { lttb, lttbGroup } from './math/lttb';
 
 // Annotation helpers
 export { drawHLine, drawVLine, drawLabel, drawRegion } from './annotations';

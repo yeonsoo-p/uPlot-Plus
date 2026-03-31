@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Chart, Scale, Series, Axis } from '../../src';
-import { Distribution } from '../../src/types/common';
-import { fmtCompact } from '../../src/formatters';
+import { Chart, Scale, Series, Axis } from 'uplot-plus';
+import { Distribution } from 'uplot-plus';
+import { fmtCompact } from 'uplot-plus';
 
 const START_POINTS = 1000;
 const MAX_POINTS = 100_000_000;

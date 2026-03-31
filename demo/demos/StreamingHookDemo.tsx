@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Chart, Series, Legend, useStreamingData } from '../../src';
+import { Chart, Series, Legend, useStreamingData } from 'uplot-plus';
 
 const WINDOW = 500;
 

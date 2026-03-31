@@ -1,5 +1,5 @@
 import React from 'react';
-import { Chart, Scale, Series, Axis, Legend, fmtHourMin, fmtCompact, withAlpha, Side } from '../../src';
+import { Chart, Scale, Series, Axis, Legend, fmtHourMin, fmtCompact, withAlpha, Side } from 'uplot-plus';
 
 function generateData() {
   const n = 288; // 24 hours at 5-min intervals

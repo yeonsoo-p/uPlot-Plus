@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useCallback } from 'react';
-import { Chart, Series } from '../../src';
-import type { CursorDrawCallback, ActionEntry } from '../../src';
+import { Chart, Series } from 'uplot-plus';
+import type { CursorDrawCallback, ActionEntry } from 'uplot-plus';
 
 function generateData() {
   const n = 200;

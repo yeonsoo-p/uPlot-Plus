@@ -1,4 +1,4 @@
-import React from 'react';
+import type React from 'react';
 
 // --- Getting Started ---
 import BasicLine from './BasicLine';
@@ -128,7 +128,7 @@ import WindDirection from './WindDirection';
 import MassSpectrum from './MassSpectrum';
 
 // Load all demo source files as raw strings at build time
-const sourceModules = import.meta.glob('./*.tsx', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+const sourceModules: Record<string, string> = import.meta.glob('./*.tsx', { query: '?raw', import: 'default', eager: true });
 
 // Build lookup: filename (without extension) -> source text
 const sourceByFile: Record<string, string> = {};

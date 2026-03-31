@@ -59,7 +59,7 @@ function highlightLine(line: string): string {
     }
 
     // Number
-    if (/\d/.test(ch(i)) && (i === 0 || /[\s,(\[{=:+\-*/<>!&|]/.test(ch(i - 1)))) {
+    if (/\d/.test(ch(i)) && (i === 0 || /[\s,([{=:+\-*/<>!&|]/.test(ch(i - 1)))) {
       let j = i;
       while (j < line.length && /[\d._eExXa-fA-F]/.test(ch(j))) j++;
       result += `<span class="hl-number">${escapeHtml(line.slice(i, j))}</span>`;
@@ -114,7 +114,7 @@ export function SourceHighlight({ source }: { source: string }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(source).then(() => {
+    void navigator.clipboard.writeText(source).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     });

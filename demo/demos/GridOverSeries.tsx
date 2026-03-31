@@ -1,6 +1,6 @@
 import React from 'react';
-import { Chart, Series, Axis } from '../../src';
-import type { DrawCallback } from '../../src';
+import { Chart, Series, Axis } from 'uplot-plus';
+import type { DrawCallback } from 'uplot-plus';
 
 function generateData() {
   const n = 60;

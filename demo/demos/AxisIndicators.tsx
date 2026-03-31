@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Series, Axis, Side } from '../../src';
+import { Chart, Series, Axis, Side } from 'uplot-plus';
 
 export default function AxisIndicators() {
   const data = useMemo(() => {

@@ -1,16 +1,9 @@
-import React, { useSyncExternalStore, useCallback, useRef } from 'react';
+import React, { useRef } from 'react';
 import { useChart } from '../hooks/useChart';
+import { useChartSnapshot } from '../hooks/useChartSnapshot';
 import type { TooltipProps, TooltipData, TooltipItem } from '../types/tooltip';
 import { Panel, SeriesRow } from './overlay/SeriesPanel';
 import { clamp } from '../math/utils';
-
-interface TooltipSnapshot {
-  left: number;
-  top: number;
-  activeGroup: number;
-  activeDataIdx: number;
-  revision: number;
-}
 
 /**
  * Tooltip component that shows data values at the cursor position.
@@ -24,39 +17,8 @@ export function Tooltip({
   offset = {},
 }: TooltipProps): React.ReactElement | null {
   const store = useChart();
-  const snapRef = useRef<TooltipSnapshot>({ left: -10, top: -10, activeGroup: -1, activeDataIdx: -1, revision: -1 });
+  const snap = useChartSnapshot();
   const tooltipRef = useRef<HTMLDivElement>(null);
-
-  const subscribe = useCallback(
-    (cb: () => void) => store.subscribeCursor(cb),
-    [store],
-  );
-
-  const getSnapshot = useCallback((): TooltipSnapshot => {
-    const cursor = store.cursorManager.state;
-    const { revision } = store;
-    const prev = snapRef.current;
-    if (
-      prev.left === cursor.left &&
-      prev.top === cursor.top &&
-      prev.activeGroup === cursor.activeGroup &&
-      prev.activeDataIdx === cursor.activeDataIdx &&
-      prev.revision === revision
-    ) {
-      return prev;
-    }
-    const next: TooltipSnapshot = {
-      left: cursor.left,
-      top: cursor.top,
-      activeGroup: cursor.activeGroup,
-      activeDataIdx: cursor.activeDataIdx,
-      revision,
-    };
-    snapRef.current = next;
-    return next;
-  }, [store]);
-
-  const snap = useSyncExternalStore(subscribe, getSnapshot);
 
   if (!show) return null;
   if (snap.activeDataIdx < 0 || snap.activeGroup < 0) return null;

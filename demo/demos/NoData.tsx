@@ -1,6 +1,6 @@
 import React from 'react';
-import { Chart, Series } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series } from 'uplot-plus';
+import type { ChartData } from 'uplot-plus';
 
 const singlePoint: ChartData = [{ x: [1], series: [[42]] }];
 const twoPoints: ChartData = [{ x: [0, 1], series: [[10, 20]] }];

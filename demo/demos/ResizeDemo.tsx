@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Chart, Series, Legend } from '../../src';
+import { Chart, Series, Legend } from 'uplot-plus';
 
 export default function ResizeDemo() {
   const [width, setWidth] = useState(800);

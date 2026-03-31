@@ -1,6 +1,6 @@
 import React from 'react';
-import { Sparkline, bars, withAlpha } from '../../src';
-import type { ChartData } from '../../src';
+import { Sparkline, bars, withAlpha } from 'uplot-plus';
+import type { ChartData } from 'uplot-plus';
 
 const ITEMS = ['Revenue', 'Expenses', 'Profit', 'Users', 'Sessions', 'Bounce Rate'];
 

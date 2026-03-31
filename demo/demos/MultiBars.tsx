@@ -1,5 +1,5 @@
 import React from 'react';
-import { Chart, Series, Axis, groupedBars, fmtPrefix, fmtWrap } from '../../src';
+import { Chart, Series, Axis, groupedBars, fmtPrefix, fmtWrap } from 'uplot-plus';
 
 function generateData() {
   const quarters = [1, 2, 3, 4];

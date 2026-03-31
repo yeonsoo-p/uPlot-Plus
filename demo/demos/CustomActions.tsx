@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useCallback, useRef } from 'react';
-import { Chart, Series, Legend } from '../../src';
-import type { ActionEntry } from '../../src';
+import { Chart, Series, Legend } from 'uplot-plus';
+import type { ActionEntry } from 'uplot-plus';
 
 function generateData() {
   const n = 200;

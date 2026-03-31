@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, Axis, Legend, Side } from '../../src';
+import { Chart, Scale, Series, Axis, Legend, Side } from 'uplot-plus';
 
 export default function YScaleDrag() {
   const data = useMemo(() => {

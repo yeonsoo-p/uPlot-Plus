@@ -1,17 +1,11 @@
-import React, { useSyncExternalStore, useCallback, useRef, memo } from 'react';
+import React, { useCallback } from 'react';
 import { useChart } from '../hooks/useChart';
+import { useChartSnapshot } from '../hooks/useChartSnapshot';
 import type { LegendConfig } from '../types/legend';
 import type { ChartStore } from '../hooks/useChartStore';
 
 interface LegendProps extends LegendConfig {
   className?: string;
-}
-
-interface LegendSnapshot {
-  activeGroup: number;
-  activeDataIdx: number;
-  seriesCount: number;
-  revision: number;
 }
 
 // Static styles hoisted out of render to avoid re-allocation
@@ -48,7 +42,7 @@ interface LegendItemProps {
   store: ChartStore;
 }
 
-const LegendItem = memo(function LegendItem({ group, index, label, color, isHidden, valueStr, store }: LegendItemProps) {
+function LegendItem({ group, index, label, color, isHidden, valueStr, store }: LegendItemProps) {
   const handleClick = useCallback(() => {
     store.toggleSeries(group, index);
   }, [store, group, index]);
@@ -69,7 +63,7 @@ const LegendItem = memo(function LegendItem({ group, index, label, color, isHidd
       {valueStr && <span style={valueStyle}>{valueStr}</span>}
     </span>
   );
-});
+}
 
 /**
  * Legend component that shows series labels with color swatches.
@@ -77,27 +71,7 @@ const LegendItem = memo(function LegendItem({ group, index, label, color, isHidd
  */
 export function Legend({ show = true, position = 'bottom', className }: LegendProps): React.ReactElement | null {
   const store = useChart();
-  const snapRef = useRef<LegendSnapshot>({ activeGroup: -1, activeDataIdx: -1, seriesCount: 0, revision: -1 });
-
-  const subscribe = useCallback(
-    (cb: () => void) => store.subscribeCursor(cb),
-    [store],
-  );
-
-  const getSnapshot = useCallback((): LegendSnapshot => {
-    const { activeGroup, activeDataIdx } = store.cursorManager.state;
-    const seriesCount = store.seriesConfigs.length;
-    const { revision } = store;
-    const prev = snapRef.current;
-    if (prev.activeGroup === activeGroup && prev.activeDataIdx === activeDataIdx && prev.seriesCount === seriesCount && prev.revision === revision) {
-      return prev;
-    }
-    const next: LegendSnapshot = { activeGroup, activeDataIdx, seriesCount, revision };
-    snapRef.current = next;
-    return next;
-  }, [store]);
-
-  const snap = useSyncExternalStore(subscribe, getSnapshot);
+  const snap = useChartSnapshot();
 
   if (!show) return null;
 

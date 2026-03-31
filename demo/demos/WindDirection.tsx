@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Series, Axis, Vector, fmtSuffix } from '../../src';
+import { Chart, Series, Axis, Vector, fmtSuffix } from 'uplot-plus';
 
 function generateWindData() {
   const n = 48; // 48 half-hour intervals

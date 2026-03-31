@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { Chart, Series, Band, stackGroup } from '../../src';
-import type { ChartData, BandConfig } from '../../src';
+import { Chart, Series, Band, stackGroup } from 'uplot-plus';
+import type { ChartData, BandConfig } from 'uplot-plus';
 
 function generateRawData() {
   const n = 80;

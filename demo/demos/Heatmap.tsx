@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Axis, Heatmap, fmtSuffix } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Scale, Axis, Heatmap, fmtSuffix } from 'uplot-plus';
+import type { ChartData } from 'uplot-plus';
 
 const HOURS = 24;
 const BUCKETS = 15;

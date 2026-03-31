@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Series, Legend, focus } from '../../src';
+import { Chart, Series, Legend, focus } from 'uplot-plus';
 
 export default function FocusCursor() {
   const data = useMemo(() => {

@@ -1,5 +1,5 @@
-import React, { useSyncExternalStore, useCallback } from 'react';
-import { Chart, Series, Legend, useChart } from '../../src';
+import React from 'react';
+import { Chart, Series, Legend, useChart, useChartSnapshot } from 'uplot-plus';
 
 function generateData() {
   const n = 200;
@@ -12,25 +12,18 @@ function generateData() {
 /** Child component that reads chart store state via useChart() */
 function ChartInfoPanel() {
   const store = useChart();
+  const snap = useChartSnapshot();
 
-  const subscribe = useCallback((cb: () => void) => store.subscribe(cb), [store]);
-  const getSnapshot = useCallback(() => ({
-    cursor: { ...store.cursorManager.state },
-    xScale: store.scaleManager.getScale('x'),
-    yScale: store.scaleManager.getScale('y'),
-    plotBox: { ...store.plotBox },
-    seriesCount: store.seriesConfigs.length,
-  }), [store]);
+  const xScale = store.scaleManager.getScale('x');
+  const yScale = store.scaleManager.getScale('y');
 
-  const snap = useSyncExternalStore(subscribe, getSnapshot);
-
-  const xMin = snap.xScale?.min?.toFixed(1) ?? '—';
-  const xMax = snap.xScale?.max?.toFixed(1) ?? '—';
-  const yMin = snap.yScale?.min?.toFixed(1) ?? '—';
-  const yMax = snap.yScale?.max?.toFixed(1) ?? '—';
-  const cursorX = snap.cursor.left >= 0 ? snap.cursor.left.toFixed(0) : '—';
-  const cursorY = snap.cursor.top >= 0 ? snap.cursor.top.toFixed(0) : '—';
-  const activeIdx = snap.cursor.activeDataIdx >= 0 ? snap.cursor.activeDataIdx : '—';
+  const xMin = xScale?.min?.toFixed(1) ?? '—';
+  const xMax = xScale?.max?.toFixed(1) ?? '—';
+  const yMin = yScale?.min?.toFixed(1) ?? '—';
+  const yMax = yScale?.max?.toFixed(1) ?? '—';
+  const cursorX = snap.left >= 0 ? snap.left.toFixed(0) : '—';
+  const cursorY = snap.top >= 0 ? snap.top.toFixed(0) : '—';
+  const activeIdx = snap.activeDataIdx >= 0 ? snap.activeDataIdx : '—';
 
   const cellStyle: React.CSSProperties = { padding: '2px 8px', fontSize: 12, fontFamily: 'monospace' };
   const labelStyle: React.CSSProperties = { ...cellStyle, color: '#888', textAlign: 'right' };
@@ -54,7 +47,7 @@ function ChartInfoPanel() {
           </tr>
           <tr>
             <td style={labelStyle}>Plot box:</td>
-            <td style={cellStyle}>{snap.plotBox.width}x{snap.plotBox.height}</td>
+            <td style={cellStyle}>{snap.plotWidth}x{snap.plotHeight}</td>
             <td style={labelStyle}>Series count:</td>
             <td style={cellStyle}>{snap.seriesCount}</td>
           </tr>

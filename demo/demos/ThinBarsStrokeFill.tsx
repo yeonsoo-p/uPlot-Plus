@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { Chart, Series, Legend, groupedBars } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Series, Legend, groupedBars } from 'uplot-plus';
+import type { ChartData } from 'uplot-plus';
 
 export default function ThinBarsStrokeFill() {
   const data: ChartData = useMemo(() => {

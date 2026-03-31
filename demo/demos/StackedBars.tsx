@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { Chart, Series, Axis, Band, Legend, stackedBars, stackGroup, fmtLabels } from '../../src';
-import type { ChartData, BandConfig } from '../../src';
+import { Chart, Series, Axis, Band, Legend, stackedBars, stackGroup, fmtLabels } from 'uplot-plus';
+import type { ChartData, BandConfig } from 'uplot-plus';
 
 const months = [1, 2, 3, 4, 5, 6];
 const MONTH_NAMES = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];

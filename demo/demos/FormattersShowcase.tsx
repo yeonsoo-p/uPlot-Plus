@@ -1,6 +1,6 @@
 import React from 'react';
-import { Chart, Series, Axis, Scale, fmtCompact, fmtSuffix, fmtHourMin, fmtMonthName, fmtDateStr, fmtLabels } from '../../src';
-import { Side } from '../../src';
+import { Chart, Series, Axis, Scale, fmtCompact, fmtSuffix, fmtHourMin, fmtMonthName, fmtDateStr, fmtLabels } from 'uplot-plus';
+import { Side } from 'uplot-plus';
 
 const W = 380;
 const H = 200;
@@ -39,7 +39,7 @@ export default function FormattersShowcase() {
 
   // fmtDateStr: date/time
   const dateX = Array.from({ length: 30 }, (_, i) => now + i * 86400);
-  const dateY = dateX.map((_, i) => 20 + Math.random() * 60);
+  const dateY = dateX.map((_) => 20 + Math.random() * 60);
   const dateData = [{ x: dateX, series: [dateY] }];
 
   // fmtLabels: categorical

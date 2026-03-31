@@ -1,6 +1,6 @@
 import React from 'react';
-import { Sparkline } from '../../src';
-import type { ChartData } from '../../src';
+import { Sparkline } from 'uplot-plus';
+import type { ChartData } from 'uplot-plus';
 
 function randomWalk(n: number, start: number): number[] {
   const vals: number[] = [start];

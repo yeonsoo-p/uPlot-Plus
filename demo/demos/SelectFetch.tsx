@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
-import { Chart, Series, Legend } from '../../src';
-import type { ChartData, SelectEventInfo } from '../../src';
+import { Chart, Series, Legend } from 'uplot-plus';
+import type { ChartData, SelectEventInfo } from 'uplot-plus';
 
 /** Deterministic noise based on x-value (no Math.random). */
 function noise(t: number): number {

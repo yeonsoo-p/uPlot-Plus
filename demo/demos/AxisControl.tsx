@@ -1,5 +1,5 @@
 import React from 'react';
-import { Chart, Scale, Series, Axis } from '../../src';
+import { Chart, Scale, Series, Axis } from 'uplot-plus';
 
 function generateData() {
   const n = 50000;

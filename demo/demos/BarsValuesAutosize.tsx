@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Series, bars } from '../../src';
-import type { DrawCallback } from '../../src';
+import { Chart, Scale, Series, bars } from 'uplot-plus';
+import type { DrawCallback } from 'uplot-plus';
 
 export default function BarsValuesAutosize() {
   const values = useMemo(() => Array.from({ length: 10 }, () => Math.round(Math.random() * 80 + 10)), []);

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { Chart, Series } from '../../src';
-import type { DrawCallback } from '../../src';
+import { Chart, Series } from 'uplot-plus';
+import type { DrawCallback } from 'uplot-plus';
 
 function generateData() {
   const n = 80;

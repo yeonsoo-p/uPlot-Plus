@@ -1,4 +1,4 @@
-import React, { memo, forwardRef } from 'react';
+import React, { forwardRef } from 'react';
 
 // --- Shared styles for floating panels (Tooltip, FloatingLegend, HoverLabel) ---
 
@@ -43,9 +43,9 @@ export interface SeriesRowProps {
   onClick?: () => void;
 }
 
-export const SeriesRow = memo(function SeriesRow({
+export function SeriesRow({
   label, color, value, isHidden, onClick,
-}: SeriesRowProps) {
+}: SeriesRowProps): React.ReactElement {
   return (
     <div
       onClick={onClick}
@@ -60,7 +60,7 @@ export const SeriesRow = memo(function SeriesRow({
       {value && <span style={valueStyle}>{value}</span>}
     </div>
   );
-});
+}
 
 // --- Panel container ---
 

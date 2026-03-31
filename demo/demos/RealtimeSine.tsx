@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Chart, Scale, Series, Legend } from '../../src';
+import { Chart, Scale, Series, Legend } from 'uplot-plus';
 
 const WINDOW = 10000;
 const SAMPLE_RATE = 500; // samples per second
@@ -34,10 +34,10 @@ export default function RealtimeSine() {
       const group = prev[0];
       if (!group) return prev;
 
-      const xArr = group.x as number[];
-      const s1 = group.series[0] as number[];
-      const s2 = group.series[1] as number[];
-      const s3 = group.series[2] as number[];
+      const xArr = group.x;
+      const s1 = group.series[0] ?? [];
+      const s2 = group.series[1] ?? [];
+      const s3 = group.series[2] ?? [];
 
       // Slide window: drop oldest BATCH, push BATCH new
       const newX = xArr.slice(BATCH);

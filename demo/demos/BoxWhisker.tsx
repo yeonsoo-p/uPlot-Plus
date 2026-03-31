@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { Chart, Scale, Axis, BoxWhisker, fmtLabels } from '../../src';
-import type { ChartData } from '../../src';
+import { Chart, Scale, Axis, BoxWhisker, fmtLabels } from 'uplot-plus';
+import type { ChartData } from 'uplot-plus';
 
 interface BoxData {
   min: number;

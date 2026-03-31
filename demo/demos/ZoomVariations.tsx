@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Series, Legend } from '../../src';
+import { Chart, Series, Legend } from 'uplot-plus';
 
 export default function ZoomVariations() {
   const data = useMemo(() => {

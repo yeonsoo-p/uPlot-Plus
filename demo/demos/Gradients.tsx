@@ -1,5 +1,5 @@
 import React from 'react';
-import { Chart, Series, fadeGradient } from '../../src';
+import { Chart, Series, fadeGradient } from 'uplot-plus';
 
 function generateData() {
   const n = 120;

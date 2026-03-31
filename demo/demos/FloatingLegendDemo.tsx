@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Chart, Series, FloatingLegend } from '../../src';
+import { Chart, Series, FloatingLegend } from 'uplot-plus';
 
 function generateData() {
   const n = 200;

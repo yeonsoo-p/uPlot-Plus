@@ -1,5 +1,5 @@
 import React from 'react';
-import { Chart, Series, useDrawHook, useCursorDrawHook } from '../../src';
+import { Chart, Series, useDrawHook, useCursorDrawHook } from 'uplot-plus';
 
 function generateData() {
   const n = 200;
@@ -39,7 +39,7 @@ function ThresholdOverlay() {
 
 /** Child component that draws crosshair value label using useCursorDrawHook */
 function CrosshairLabel() {
-  useCursorDrawHook(({ ctx, plotBox, valToY }, cursor) => {
+  useCursorDrawHook(({ ctx, plotBox, valToY: _valToY }, cursor) => {
     if (cursor.left < 0 || cursor.top < 0) return;
 
     const yPixel = cursor.top;

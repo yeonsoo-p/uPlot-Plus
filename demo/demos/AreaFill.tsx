@@ -1,5 +1,5 @@
 import React from 'react';
-import { Chart, Series, withAlpha } from '../../src';
+import { Chart, Series, withAlpha } from 'uplot-plus';
 
 function generateData() {
   const xs = Array.from({ length: 30 }, (_, i) => i + 1);
