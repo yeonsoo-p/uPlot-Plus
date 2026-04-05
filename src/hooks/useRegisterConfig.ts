@@ -41,7 +41,7 @@ export function useRegisterConfig<T extends object>(
   }, [store, ...identityDeps]);
 
   // Sync: runs every render, bails out via shallow-equal check.
-  const prevRef = useRef<T | null>(null);
+  const prevRef = useRef<T>(config);
   useEffect(() => {
     if (shallowEqual(prevRef.current, config)) return;
     prevRef.current = config;

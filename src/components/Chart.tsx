@@ -71,8 +71,7 @@ export function Chart({
 
   // Synchronous size update — useLayoutEffect runs before paint
   useLayoutEffect(() => {
-    store.pxRatio = pxRatio;
-    store.setSize(width, height);
+    store.setSize(width, height, pxRatio);
     store.redrawSync();
   }, [store, width, height, pxRatio]);
 

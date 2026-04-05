@@ -40,6 +40,8 @@ export interface AxisConfig {
   ticks?: TickConfig;
   /** Border config */
   border?: BorderConfig;
+  /** Internal: marks axes auto-created by injectDefaults */
+  _default?: boolean;
 }
 
 export interface GridConfig {

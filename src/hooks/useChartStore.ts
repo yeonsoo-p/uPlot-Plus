@@ -73,7 +73,14 @@ function injectDefaults(store: ChartStore): void {
     store.axisConfigs.push({
       scale: 'x', side: Side.Bottom, show: true,
       label: store.xlabel ?? 'X Axis',
+      _default: true,
     });
+  } else {
+    // Update label on existing default x-axis
+    const defXAxis = store.axisConfigs.find(a => a.scale === 'x' && a._default === true);
+    if (defXAxis != null) {
+      defXAxis.label = store.xlabel ?? 'X Axis';
+    }
   }
 
   // 4. Ensure every y-scale has at least one axis
@@ -83,8 +90,15 @@ function injectDefaults(store: ChartStore): void {
       store.axisConfigs.push({
         scale: yId, side: Side.Left, show: true,
         label: store.ylabel ?? 'Y Axis',
+        _default: true,
       });
       axisScales.add(yId);
+    } else {
+      // Update label on existing default y-axis
+      const defYAxis = store.axisConfigs.find(a => a.scale === yId && a._default === true);
+      if (defYAxis != null) {
+        defYAxis.label = store.ylabel ?? 'Y Axis';
+      }
     }
   }
 }
@@ -229,6 +243,8 @@ export interface ChartStore {
 
   // Previous scale ranges for change detection
   _prevScaleRanges: Map<string, { min: number; max: number }>;
+  // Previous plotBox for cache invalidation when layout changes
+  _prevPlotBox: BBox | null;
 
   // Methods
   registerScale: (cfg: ScaleConfig) => void;
@@ -237,7 +253,7 @@ export interface ChartStore {
   unregisterSeries: (group: number, index: number) => void;
   toggleSeries: (group: number, index: number) => void;
   setFocus: (seriesIdx: number | null) => void;
-  setSize: (w: number, h: number) => void;
+  setSize: (w: number, h: number, dpr?: number) => void;
   scheduleRedraw: () => void;
   scheduleCursorRedraw: () => void;
   subscribe: (fn: () => void) => () => void;
@@ -322,6 +338,7 @@ export function createChartStore(): ChartStore {
     revision: 0,
     eventCallbacks: {},
     _prevScaleRanges: new Map(),
+    _prevPlotBox: null,
     seriesConfigMap: new Map(),
 
     registerScale(cfg: ScaleConfig) {
@@ -369,8 +386,10 @@ export function createChartStore(): ChartStore {
       store.scheduleRedraw();
     },
 
-    setSize(w: number, h: number) {
-      if (store.width === w && store.height === h) return;
+    setSize(w: number, h: number, dpr?: number) {
+      const ratio = dpr ?? store.pxRatio;
+      if (store.width === w && store.height === h && store.pxRatio === ratio) return;
+      store.pxRatio = ratio;
       store.width = w;
       store.height = h;
       if (store.canvas) {
@@ -484,6 +503,14 @@ export function createChartStore(): ChartStore {
           height: height - margin * 2,
         };
       }
+
+      // 5b. Invalidate path cache if plotBox changed (axis/title/label updates)
+      const prev = store._prevPlotBox;
+      const cur = store.plotBox;
+      if (prev != null && (prev.left !== cur.left || prev.top !== cur.top || prev.width !== cur.width || prev.height !== cur.height)) {
+        renderer.clearCache();
+      }
+      store._prevPlotBox = { ...cur };
 
       // 6. Clear canvas
       ctx.clearRect(0, 0, width * pxRatio, height * pxRatio);
@@ -747,6 +774,7 @@ export function createChartStore(): ChartStore {
       store.title = title;
       store.xlabel = xlabel;
       store.ylabel = ylabel;
+      store.scheduleRedraw();
     },
 
     redrawSync() {
