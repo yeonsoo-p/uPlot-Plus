@@ -57,6 +57,7 @@ export function resolveInitialPos(
     case 'bottom-left':  return { x: plotBox.left + CORNER_PAD, y: plotBox.top + plotBox.height - panelH - CORNER_PAD };
     case 'bottom-right': return { x: plotBox.left + plotBox.width - panelW - CORNER_PAD, y: plotBox.top + plotBox.height - panelH - CORNER_PAD };
     case 'top-right':
+    case undefined:
     default:             return { x: plotBox.left + plotBox.width - panelW - CORNER_PAD, y: plotBox.top + CORNER_PAD };
   }
 }

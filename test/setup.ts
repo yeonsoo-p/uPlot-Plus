@@ -14,11 +14,10 @@ class ResizeObserverMock {
   unobserve() { /* noop */ }
   disconnect() { /* noop */ }
 }
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 (globalThis as any).ResizeObserver = ResizeObserverMock;
 
 // ---- Path2D mock with call recording ----
-type PathCall =
+export type PathCall =
   | ['moveTo', number, number]
   | ['lineTo', number, number]
   | ['rect', number, number, number, number]
@@ -28,7 +27,7 @@ type PathCall =
   | ['bezierCurveTo', number, number, number, number, number, number]
   | ['quadraticCurveTo', number, number, number, number];
 
-class Path2DMock {
+export class Path2DMock {
   _calls: PathCall[] = [];
 
   constructor(source?: Path2DMock) {
@@ -51,7 +50,6 @@ class Path2DMock {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 (globalThis as any).Path2D = Path2DMock;
 
 // ---- CanvasRenderingContext2D stub ----
@@ -128,13 +126,10 @@ function createContextStub(): Record<string, unknown> {
 
 // Override getContext on HTMLCanvasElement
 const origGetContext = HTMLCanvasElement.prototype.getContext;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-HTMLCanvasElement.prototype.getContext = function (contextId: string, ...args: any[]) {
+HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, contextId: string, ...args: any[]) {
   if (contextId === '2d') {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return createContextStub() as any;
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return origGetContext.call(this, contextId as any, ...args);
 } as typeof origGetContext;
 
@@ -146,7 +141,7 @@ globalThis.requestAnimationFrame = (cb: FrameRequestCallback): number => {
   const id = ++rafId;
   rafCallbacks.set(id, cb);
   // Execute synchronously via microtask for deterministic tests
-  Promise.resolve().then(() => {
+  void Promise.resolve().then(() => {
     const fn = rafCallbacks.get(id);
     if (fn) {
       rafCallbacks.delete(id);

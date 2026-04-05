@@ -3,7 +3,7 @@ import { BlockMinMaxTree } from '@/core/BlockMinMax';
 import { getMinMax } from '@/math/utils';
 
 function makeData(n: number): (number | null)[] {
-  const data: (number | null)[] = new Array(n);
+  const data = new Array<number | null>(n);
   for (let i = 0; i < n; i++) {
     data[i] = Math.sin(i * 0.01) * 100;
   }

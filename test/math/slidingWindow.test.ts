@@ -15,14 +15,14 @@ function slidingWindow(
   const group = prev[groupIdx];
   if (group == null) return prev;
 
-  const prevX = group.x as number[];
+  const prevX = Array.from(group.x);
   const drop = Math.max(0, prevX.length + x.length - windowSize);
-  const newX = drop > 0 ? (prevX.slice(drop) as number[]).concat(x) : prevX.concat(x);
+  const newX = drop > 0 ? prevX.slice(drop).concat(x) : prevX.concat(x);
 
   const newSeries = group.series.map((s, i) => {
-    const arr = s as number[];
+    const arr = Array.from(s);
     const yNew = ySeries[i] ?? [];
-    return drop > 0 ? (arr.slice(drop) as number[]).concat(yNew) : arr.concat(yNew);
+    return drop > 0 ? arr.slice(drop).concat(yNew) : arr.concat(yNew);
   });
 
   const next = prev.slice();

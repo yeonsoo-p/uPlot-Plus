@@ -6,7 +6,6 @@ import {
   applyDrag,
   DEFAULT_SELECTION,
   MIN_SELECTION_FRAC,
-  GRIP_THRESHOLD_PX,
 } from '@/components/ZoomRanger';
 
 describe('rangeToFrac', () => {

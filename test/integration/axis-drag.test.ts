@@ -54,9 +54,7 @@ function setup(): TestHarness {
     _incr: 10,
     _space: 50,
     _rotate: 0,
-    _labelSize: 0,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any];
+  }];
 
   store.scaleConfigs = [
     { id: 'x', min: 0, max: 100 },

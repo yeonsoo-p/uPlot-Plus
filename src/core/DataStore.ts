@@ -96,7 +96,7 @@ export class DataStore {
 
   /** Get the visible window for a group */
   getWindow(groupIdx: number): [number, number] {
-    return this.windows.get(groupIdx) ?? [0, (this.data[groupIdx]?.x.length || 1) - 1];
+    return this.windows.get(groupIdx) ?? [0, (this.data[groupIdx]?.x.length ?? 1) - 1];
   }
 
   /** Get x values for a group */

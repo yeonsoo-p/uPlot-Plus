@@ -1,14 +1,12 @@
 import { bench, describe } from 'vitest';
 import { CanvasRenderer } from '@/rendering/CanvasRenderer';
-import { drawSeriesPath } from '@/rendering/drawSeries';
 import { linear } from '@/paths/linear';
 import { DataStore } from '@/core/DataStore';
 import { ScaleManager } from '@/core/ScaleManager';
-import { createScaleState } from '@/core/Scale';
 import { convergeSize } from '@/axes/layout';
-import type { ScaleState, ChartData } from '@/types';
+import type { ChartData } from '@/types';
 import type { AxisState } from '@/types/axes';
-import { Side, Orientation } from '@/types';
+import { Side } from '@/types';
 import { round } from '@/math/utils';
 
 const pxRound = (v: number) => round(v);
@@ -61,7 +59,7 @@ function runFullRedraw(nSeries: number, nPoints: number) {
   convergeSize(800, 600, axes, (id) => mgr.getScale(id));
 
   // Build and draw paths for each series
-  const renderer = new CanvasRenderer();
+  // CanvasRenderer constructed for side-effect registration
   for (let s = 0; s < nSeries; s++) {
     const window = ds.getWindow(0);
     builder(

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { getSyncGroup, SyncGroup } from '@/sync/SyncGroup';
+import { getSyncGroup } from '@/sync/SyncGroup';
 import { createChartStore } from '@/hooks/useChartStore';
 import type { ChartStore } from '@/hooks/useChartStore';
 import { Orientation, Direction } from '@/types';

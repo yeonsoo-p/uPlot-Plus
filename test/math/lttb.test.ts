@@ -46,7 +46,7 @@ describe('lttb', () => {
   it('indices are in ascending order', () => {
     const n = 500;
     const x = Array.from({ length: n }, (_, i) => i);
-    const y = Array.from({ length: n }, (_, i) => Math.random() * 100);
+    const y = Array.from({ length: n }, () => Math.random() * 100);
     const result = lttb(x, y, 20);
 
     for (let i = 1; i < result.indices.length; i++) {
@@ -172,7 +172,7 @@ describe('lttbGroup', () => {
   it('x values are sorted ascending', () => {
     const n = 500;
     const x = Array.from({ length: n }, (_, i) => i * 0.5);
-    const s1 = Array.from({ length: n }, (_, i) => Math.random() * 100);
+    const s1 = Array.from({ length: n }, () => Math.random() * 100);
     const group = makeGroup(x, [s1]);
 
     const result = lttbGroup(group, 30);

@@ -1,25 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
 import { drawHLine, drawVLine, drawLabel, drawRegion } from '@/annotations';
+import { createScaleState } from '@/core/Scale';
 import type { ScaleState } from '@/types';
-import { Distribution, Orientation, Direction } from '@/types';
+import { Orientation } from '@/types';
 import type { DrawContext } from '@/types/hooks';
 
 function makeScale(id: string, min: number, max: number, ori: Orientation = Orientation.Horizontal): ScaleState {
-  return {
-    id,
-    min,
-    max,
-    distr: Distribution.Linear,
-    log: 10,
-    asinh: 1,
-    ori,
-    dir: Direction.Forward,
-    time: false,
-    auto: false,
-    range: null,
-    _min: null,
-    _max: null,
-  };
+  return { ...createScaleState({ id, min, max, ori }) };
 }
 
 function makeDC() {

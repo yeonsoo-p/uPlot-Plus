@@ -4,21 +4,20 @@ import { createScaleState } from '@/core/Scale';
 import type { ScaleState } from '@/types';
 import { Orientation, Direction } from '@/types';
 import { round } from '@/math/utils';
+import type { PathCall, Path2DMock } from '../setup';
 
 function makeScale(id: string, min: number, max: number, ori: Orientation = Orientation.Horizontal): ScaleState {
   return { ...createScaleState({ id }), min, max, ori, dir: Direction.Forward };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getCalls(path: Path2D): any[] {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (path as any)._calls;
+function getCalls(path: Path2D): PathCall[] {
+  return (path as unknown as Path2DMock)._calls;
 }
 
 function getLineToCalls(path: Path2D): [number, number][] {
   return getCalls(path)
-    .filter((c: string[]) => c[0] === 'lineTo')
-    .map((c: [string, number, number]) => [c[1], c[2]]);
+    .filter((c) => c[0] === 'lineTo')
+    .map((c) => [c[1], c[2]] as [number, number]);
 }
 
 const pxRound = (v: number) => round(v);
@@ -36,7 +35,7 @@ describe('stepped path builder', () => {
     expect(result.fill).toBeInstanceOf(Path2D);
 
     // Stroke should have lineTo calls for stepped path
-    const strokeLineToCount = getCalls(result.stroke).filter((c: string[]) => c[0] === 'lineTo').length;
+    const strokeLineToCount = getCalls(result.stroke).filter((c) => c[0] === 'lineTo').length;
     expect(strokeLineToCount).toBe(11);
   });
 
@@ -112,7 +111,7 @@ describe('stepped path builder', () => {
     expect(result.gaps!.length).toBe(1);
 
     // Clip path should have rect calls for the visible regions (before and after the gap)
-    const clipRects = getCalls(result.clip!).filter((c: string[]) => c[0] === 'rect');
+    const clipRects = getCalls(result.clip!).filter((c) => c[0] === 'rect');
     expect(clipRects.length).toBe(2);
   });
 
@@ -125,7 +124,7 @@ describe('stepped path builder', () => {
   it('handles all-null data — empty stroke, no fill', () => {
     const result = builder(dataX, [null, null, null, null, null], scaleX, scaleY, 400, 300, 0, 0, 0, 4, 1, pxRound);
     const calls = getCalls(result.stroke);
-    expect(calls.filter((c: string[]) => c[0] === 'lineTo').length).toBe(0);
+    expect(calls.filter((c) => c[0] === 'lineTo').length).toBe(0);
     expect(result.fill).toBeNull();
   });
 

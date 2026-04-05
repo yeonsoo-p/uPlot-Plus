@@ -1,8 +1,8 @@
 import { bench, describe } from 'vitest';
 import { CanvasRenderer } from '@/rendering/CanvasRenderer';
 import type { SeriesPaths } from '@/paths/types';
+import { createScaleState } from '@/core/Scale';
 import type { ScaleState } from '@/types';
-import { Distribution, Orientation, Direction } from '@/types';
 
 function stubPaths(): SeriesPaths {
   return { stroke: new Path2D(), fill: new Path2D(), clip: null, band: null, gaps: null };
@@ -13,14 +13,7 @@ function makeRenderer(): CanvasRenderer {
 }
 
 function makeScaleState(id: string, min: number, max: number): ScaleState {
-  return {
-    id, min, max,
-    ori: Orientation.Horizontal,
-    dir: Direction.Forward,
-    distr: Distribution.Linear,
-    auto: true,
-    _posCache: null,
-  };
+  return { ...createScaleState({ id, min, max }) };
 }
 
 describe('path cache: exact key operations', () => {

@@ -46,7 +46,7 @@ describe('asinhAxisSplits', () => {
   });
 
   it('respects custom linthresh', () => {
-    const splitsDefault = asinhAxisSplits(0, 1000, 1);
+    asinhAxisSplits(0, 1000, 1);
     const splitsHighThresh = asinhAxisSplits(0, 1000, 10);
     // Higher threshold means the linear zone extends further,
     // so the first logarithmic tick starts at a higher value

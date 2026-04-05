@@ -1,9 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { createChartStore, type ChartStore } from '@/hooks/useChartStore';
 import { setupInteraction } from '@/hooks/useInteraction';
-import { createScaleState } from '@/core/Scale';
+
 import { DEFAULT_ACTIONS } from '@/types/interaction';
 import type { ActionKey, ReactionValue } from '@/types/interaction';
+import type { ChartEventInfo, SelectEventInfo } from '@/types/events';
 
 /**
  * Integration tests for chart interactions.
@@ -33,8 +34,6 @@ function setup(): TestHarness {
 
   // Add horizontal x-scale and vertical y-scale with explicit ranges
   store.scaleManager.addScale({ id: 'x', min: 0, max: 100 });
-  const yState = store.scaleManager.getScale('y') ?? createScaleState({ id: 'y' });
-  // Manually set y-scale since addScale infers orientation from id
   store.scaleManager.addScale({ id: 'y', min: 0, max: 100 });
   store.scaleManager.setGroupXScale(0, 'x');
 
@@ -108,8 +107,9 @@ describe('Interaction: cursor tracking', () => {
     h.el.dispatchEvent(mouseEvent('mousemove', clientX, clientY));
 
     expect(cb).toHaveBeenCalledTimes(1);
-    expect(cb.mock.calls[0][0].plotX).toBe(350);
-    expect(cb.mock.calls[0][0].plotY).toBe(280);
+    const info = cb.mock.calls[0]![0] as ChartEventInfo;
+    expect(info.plotX).toBe(350);
+    expect(info.plotY).toBe(280);
   });
 
   it('mousemove snaps to nearest data point', () => {
@@ -158,7 +158,8 @@ describe('Interaction: click events', () => {
     h.el.dispatchEvent(mouseEvent('click', clientX, clientY));
 
     expect(cb).toHaveBeenCalledTimes(1);
-    expect(cb.mock.calls[0][0].plotX).toBe(350);
+    const info = cb.mock.calls[0]![0] as ChartEventInfo;
+    expect(info.plotX).toBe(350);
   });
 
   it('click outside plot area does not fire onClick', () => {
@@ -255,12 +256,12 @@ describe('Interaction: drag-to-zoom', () => {
     h.el.dispatchEvent(mouseEvent('mouseup', end.clientX, end.clientY));
 
     expect(cb).toHaveBeenCalledTimes(1);
-    const info = cb.mock.calls[0][0];
+    const info = cb.mock.calls[0]![0] as SelectEventInfo;
     expect(info.left).toBeGreaterThan(0);
     expect(info.right).toBeGreaterThan(info.left);
-    expect(info.ranges.x).toEqual(expect.objectContaining({ min: expect.any(Number), max: expect.any(Number) }));
-    expect(info.ranges.x.min).toBeGreaterThan(0);
-    expect(info.ranges.x.max).toBeLessThan(100);
+    expect(info.ranges['x']).toEqual(expect.objectContaining({ min: expect.any(Number) as unknown, max: expect.any(Number) as unknown }));
+    expect(info.ranges['x']!.min).toBeGreaterThan(0);
+    expect(info.ranges['x']!.max).toBeLessThan(100);
   });
 
   it('onSelect returning false prevents zoom', () => {

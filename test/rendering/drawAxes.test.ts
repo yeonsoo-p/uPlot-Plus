@@ -2,17 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { drawAxesGrid } from '@/rendering/drawAxes';
 import type { ScaleState, BBox } from '@/types';
 import type { AxisState } from '@/types/axes';
-import { Side, Orientation, Direction, Distribution } from '@/types';
+import { Side, Orientation } from '@/types';
+import { createScaleState } from '@/core/Scale';
 
 function makeScale(id: string, min: number, max: number, ori: Orientation = Orientation.Horizontal): ScaleState {
-  return {
-    id, min, max,
-    ori,
-    dir: ori === Orientation.Horizontal ? Direction.Right : Direction.Forward,
-    distr: Distribution.Linear,
-    auto: true,
-    _posCache: null,
-  };
+  return { ...createScaleState({ id, min, max, ori }) };
 }
 
 function makeAxisState(overrides: Partial<AxisState> & { config: AxisState['config'] }): AxisState {
@@ -49,7 +43,7 @@ function makeCtx() {
     font: '',
     textAlign: 'start' as CanvasTextAlign,
     textBaseline: 'alphabetic' as CanvasTextBaseline,
-  } as unknown as CanvasRenderingContext2D;
+  };
 }
 
 const plotBox: BBox = { left: 50, top: 20, width: 400, height: 300 };
@@ -115,7 +109,7 @@ describe('drawAxesGrid', () => {
     // Should have rendered 3 labels
     expect(ctx.fillText).toHaveBeenCalledTimes(3);
 
-    const calls = (ctx.fillText as ReturnType<typeof vi.fn>).mock.calls;
+    const calls = ctx.fillText.mock.calls;
     expect(calls[0]![0]).toBe('0');
     expect(calls[1]![0]).toBe('50');
     expect(calls[2]![0]).toBe('100');
@@ -202,7 +196,7 @@ describe('drawAxesGrid', () => {
     drawAxesGrid(ctx as unknown as CanvasRenderingContext2D, [axis], () => xScale, plotBox, 1);
 
     // Should render axis label text
-    const calls = (ctx.fillText as ReturnType<typeof vi.fn>).mock.calls;
+    const calls = ctx.fillText.mock.calls;
     const labelCall = calls.find((c: unknown[]) => c[0] === 'Time (s)');
     expect(labelCall).toBeDefined();
   });
@@ -228,7 +222,7 @@ describe('drawAxesGrid', () => {
   it('renders chart title when provided', () => {
     drawAxesGrid(ctx as unknown as CanvasRenderingContext2D, [], () => undefined, plotBox, 1, 'My Chart');
 
-    const calls = (ctx.fillText as ReturnType<typeof vi.fn>).mock.calls;
+    const calls = ctx.fillText.mock.calls;
     const titleCall = calls.find((c: unknown[]) => c[0] === 'My Chart');
     expect(titleCall).toBeDefined();
   });
@@ -285,7 +279,7 @@ describe('drawAxesGrid', () => {
     drawAxesGrid(ctx as unknown as CanvasRenderingContext2D, [axis], () => xScale, plotBox, 2);
 
     // With pxRatio=2, pixel positions should be scaled
-    const calls = (ctx.fillText as ReturnType<typeof vi.fn>).mock.calls;
+    const calls = ctx.fillText.mock.calls;
     expect(calls.length).toBe(1);
     // The x position for value 50 at center should be scaled by 2
     const xPos = calls[0]![1] as number;

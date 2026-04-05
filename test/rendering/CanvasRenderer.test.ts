@@ -2,8 +2,8 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { CanvasRenderer } from '@/rendering/CanvasRenderer';
 import type { RenderableSeriesInfo } from '@/rendering/CanvasRenderer';
 import type { SeriesPaths } from '@/paths/types';
-import { Direction, Distribution, Orientation } from '@/types/common';
 import type { ScaleState } from '@/types';
+import { createScaleState } from '@/core/Scale';
 
 /** Create a stub SeriesPaths object for caching tests */
 function stubPaths(label = 'a'): SeriesPaths {
@@ -11,14 +11,7 @@ function stubPaths(label = 'a'): SeriesPaths {
 }
 
 function makeScale(id: string, min: number, max: number): ScaleState {
-  return {
-    id, min, max,
-    ori: Orientation.Horizontal,
-    dir: Direction.Right,
-    distr: Distribution.Linear,
-    auto: true,
-    _posCache: null,
-  };
+  return { ...createScaleState({ id, min, max }) };
 }
 
 function makeRenderInfo(xScale: ScaleState, yScale: ScaleState): RenderableSeriesInfo {
@@ -228,7 +221,7 @@ describe('CanvasRenderer: snapshot', () => {
     canvas.height = 50;
     const ctx = canvas.getContext('2d')!;
     // The stub sets canvas: null — point it at the real canvas for restoreSnapshot
-    (ctx as Record<string, unknown>).canvas = canvas;
+    (ctx as unknown as Record<string, unknown>).canvas = canvas;
 
     r.saveSnapshot(ctx, 100, 50);
     expect(r.restoreSnapshot(ctx)).toBe(true);

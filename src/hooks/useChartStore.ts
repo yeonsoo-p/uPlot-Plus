@@ -828,8 +828,6 @@ function syncAxisStates(store: ChartStore): void {
  */
 export function useChartStore(): ChartStore {
   const storeRef = useRef<ChartStore | null>(null);
-  if (storeRef.current === null) {
-    storeRef.current = createChartStore();
-  }
+  storeRef.current ??= createChartStore();
   return storeRef.current;
 }

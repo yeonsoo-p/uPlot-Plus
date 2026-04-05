@@ -2,17 +2,12 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { CursorManager } from '@/core/CursorManager';
 import type { ChartData } from '@/types/data';
 import type { SeriesConfig } from '@/types/series';
+import { createScaleState } from '@/core/Scale';
 import type { ScaleState, BBox } from '@/types';
-import { Direction, Distribution, Orientation } from '@/types/common';
+import { Orientation } from '@/types/common';
 
 function makeScale(id: string, min: number, max: number, ori = Orientation.Horizontal): ScaleState {
-  return {
-    id, min, max, ori,
-    dir: ori === Orientation.Horizontal ? Direction.Right : Direction.Up,
-    distr: Distribution.Linear,
-    auto: true,
-    _posCache: null,
-  };
+  return { ...createScaleState({ id, min, max, ori }) };
 }
 
 const plotBox: BBox = { left: 50, top: 20, width: 700, height: 560 };

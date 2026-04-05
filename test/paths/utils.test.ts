@@ -3,11 +3,11 @@ import { findGaps, clipGaps, lineToH, lineToV } from '@/paths/utils';
 import { createScaleState, valToPos } from '@/core/Scale';
 import { Orientation } from '@/types';
 
+import type { PathCall, Path2DMock } from '../setup';
+
 /** Helper to extract recorded calls from Path2D mock */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getCalls(path: Path2D): any[] {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (path as any)._calls;
+function getCalls(path: Path2D): PathCall[] {
+  return (path as unknown as Path2DMock)._calls;
 }
 
 // ---- lineToH / lineToV ----
@@ -86,7 +86,7 @@ describe('clipGaps', () => {
     const clip = clipGaps(gaps, Orientation.Horizontal, 0, 0, 500, 300);
     const calls = getCalls(clip);
     // Should create 2 rects: [0..100] and [200..500]
-    const rects = calls.filter((c: string[]) => c[0] === 'rect');
+    const rects = calls.filter((c) => c[0] === 'rect');
     expect(rects.length).toBe(2);
     // First rect: from 0 to gap start (100), full height
     expect(rects[0]).toEqual(['rect', 0, 0, 100, 300]);
@@ -98,7 +98,7 @@ describe('clipGaps', () => {
     const gaps: [number, number][] = [[50, 150]];
     const clip = clipGaps(gaps, Orientation.Vertical, 0, 0, 300, 500);
     const calls = getCalls(clip);
-    const rects = calls.filter((c: string[]) => c[0] === 'rect');
+    const rects = calls.filter((c) => c[0] === 'rect');
     expect(rects.length).toBe(2);
     // Vertical: rect(crossOff, prevEnd, crossDim, gapStart - prevEnd)
     expect(rects[0]).toEqual(['rect', 0, 0, 300, 50]);
@@ -109,7 +109,7 @@ describe('clipGaps', () => {
   it('handles empty gaps array — single rect covering full area', () => {
     const clip = clipGaps([], Orientation.Horizontal, 0, 0, 500, 300);
     const calls = getCalls(clip);
-    const rects = calls.filter((c: string[]) => c[0] === 'rect');
+    const rects = calls.filter((c) => c[0] === 'rect');
     // No gaps → one rect covering the entire dimension
     expect(rects.length).toBe(1);
     expect(rects[0]).toEqual(['rect', 0, 0, 500, 300]);
@@ -119,7 +119,7 @@ describe('clipGaps', () => {
     const gaps: [number, number][] = [[50, 100], [200, 250], [400, 450]];
     const clip = clipGaps(gaps, Orientation.Horizontal, 0, 0, 500, 300);
     const calls = getCalls(clip);
-    const rects = calls.filter((c: string[]) => c[0] === 'rect');
+    const rects = calls.filter((c) => c[0] === 'rect');
     // 3 gaps → 4 visible rects: [0,50], [100,200], [250,400], [450,500]
     expect(rects.length).toBe(4);
     expect(rects[0]).toEqual(['rect', 0, 0, 50, 300]);

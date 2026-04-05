@@ -52,7 +52,7 @@ describe('Tooltip component', () => {
     await flushEffects();
 
     // Simulate cursor at data index 2
-    await act(() => { simulateCursor(store, 2); });
+    act(() => { simulateCursor(store, 2); });
 
     const tooltip = container.querySelector('div[style*="pointer-events: none"]');
     expect(tooltip).toBeInTheDocument();
@@ -68,7 +68,7 @@ describe('Tooltip component', () => {
     );
     await flushEffects();
 
-    await act(() => { simulateCursor(store, 2); });
+    act(() => { simulateCursor(store, 2); });
 
     const tooltip = container.querySelector('div[style*="pointer-events: none"]');
     expect(tooltip).toBeNull();
@@ -86,7 +86,7 @@ describe('Tooltip component', () => {
     );
     await flushEffects();
 
-    await act(() => { simulateCursor(store, 2); });
+    act(() => { simulateCursor(store, 2); });
 
     const custom = getByTestId('custom-tooltip');
     expect(custom).toBeInTheDocument();
@@ -102,7 +102,7 @@ describe('Tooltip component', () => {
     );
     await flushEffects();
 
-    await act(() => { simulateCursor(store, 2); });
+    act(() => { simulateCursor(store, 2); });
 
     const el = container.querySelector('.my-tip');
     expect(el).toBeInTheDocument();
@@ -118,7 +118,7 @@ describe('Tooltip component', () => {
     );
     await flushEffects();
 
-    await act(() => { simulateCursor(store, 2); });
+    act(() => { simulateCursor(store, 2); });
 
     const tooltip = container.querySelector('div[style*="pointer-events: none"]') as HTMLElement;
     expect(tooltip).toBeInTheDocument();

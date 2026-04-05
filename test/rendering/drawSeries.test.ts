@@ -22,7 +22,7 @@ function makeCtx() {
     createLinearGradient: vi.fn(() => ({
       addColorStop: vi.fn(),
     })),
-  } as unknown as CanvasRenderingContext2D;
+  };
 }
 
 function makePaths(): SeriesPaths {
@@ -36,7 +36,7 @@ function makePaths(): SeriesPaths {
 }
 
 describe('drawSeriesPath', () => {
-  let ctx: CanvasRenderingContext2D;
+  let ctx: ReturnType<typeof makeCtx>;
 
   beforeEach(() => {
     ctx = makeCtx();
@@ -46,7 +46,7 @@ describe('drawSeriesPath', () => {
     const config: SeriesConfig = { group: 0, index: 0, yScale: 'y', stroke: 'red', width: 2, show: true };
     const paths = makePaths();
 
-    drawSeriesPath(ctx, config, paths, 1);
+    drawSeriesPath(ctx as unknown as CanvasRenderingContext2D, config, paths, 1);
 
     expect(ctx.save).toHaveBeenCalled();
     expect(ctx.strokeStyle).toBe('red');
@@ -59,7 +59,7 @@ describe('drawSeriesPath', () => {
     const config: SeriesConfig = { group: 0, index: 0, yScale: 'y', stroke: 'red', fill: 'rgba(255,0,0,0.3)', show: true };
     const paths = makePaths();
 
-    drawSeriesPath(ctx, config, paths, 1);
+    drawSeriesPath(ctx as unknown as CanvasRenderingContext2D, config, paths, 1);
 
     expect(ctx.fillStyle).toBe('rgba(255,0,0,0.3)');
     expect(ctx.fill).toHaveBeenCalledWith(paths.fill);
@@ -69,7 +69,7 @@ describe('drawSeriesPath', () => {
     const config: SeriesConfig = { group: 0, index: 0, yScale: 'y', stroke: 'blue', show: true };
     const paths = makePaths();
 
-    drawSeriesPath(ctx, config, paths, 1);
+    drawSeriesPath(ctx as unknown as CanvasRenderingContext2D, config, paths, 1);
 
     expect(ctx.fill).not.toHaveBeenCalled();
   });
@@ -78,7 +78,7 @@ describe('drawSeriesPath', () => {
     const config: SeriesConfig = { group: 0, index: 0, yScale: 'y', stroke: 'red', show: false };
     const paths = makePaths();
 
-    drawSeriesPath(ctx, config, paths, 1);
+    drawSeriesPath(ctx as unknown as CanvasRenderingContext2D, config, paths, 1);
 
     expect(ctx.save).not.toHaveBeenCalled();
     expect(ctx.stroke).not.toHaveBeenCalled();
@@ -90,7 +90,7 @@ describe('drawSeriesPath', () => {
     const paths = makePaths();
     paths.clip = new Path2D();
 
-    drawSeriesPath(ctx, config, paths, 1);
+    drawSeriesPath(ctx as unknown as CanvasRenderingContext2D, config, paths, 1);
 
     expect(ctx.clip).toHaveBeenCalledWith(paths.clip);
   });
@@ -99,7 +99,7 @@ describe('drawSeriesPath', () => {
     const config: SeriesConfig = { group: 0, index: 0, yScale: 'y', stroke: 'red', show: true };
     const paths = makePaths();
 
-    drawSeriesPath(ctx, config, paths, 1);
+    drawSeriesPath(ctx as unknown as CanvasRenderingContext2D, config, paths, 1);
 
     expect(ctx.clip).not.toHaveBeenCalled();
   });
@@ -108,7 +108,7 @@ describe('drawSeriesPath', () => {
     const config: SeriesConfig = { group: 0, index: 0, yScale: 'y', stroke: 'red', show: true, alpha: 0.5 };
     const paths = makePaths();
 
-    drawSeriesPath(ctx, config, paths, 1);
+    drawSeriesPath(ctx as unknown as CanvasRenderingContext2D, config, paths, 1);
 
     expect(ctx.globalAlpha).toBe(0.5);
   });
@@ -117,7 +117,7 @@ describe('drawSeriesPath', () => {
     const config: SeriesConfig = { group: 0, index: 0, yScale: 'y', stroke: 'red', show: true, dash: [5, 3] };
     const paths = makePaths();
 
-    drawSeriesPath(ctx, config, paths, 1);
+    drawSeriesPath(ctx as unknown as CanvasRenderingContext2D, config, paths, 1);
 
     expect(ctx.setLineDash).toHaveBeenCalledWith([5, 3]);
   });
@@ -126,7 +126,7 @@ describe('drawSeriesPath', () => {
     const config: SeriesConfig = { group: 0, index: 0, yScale: 'y', stroke: 'red', width: 1, show: true };
     const paths = makePaths();
 
-    drawSeriesPath(ctx, config, paths, 2);
+    drawSeriesPath(ctx as unknown as CanvasRenderingContext2D, config, paths, 2);
 
     expect(ctx.lineWidth).toBe(2); // 1 * pxRatio=2
   });
@@ -135,7 +135,7 @@ describe('drawSeriesPath', () => {
     const config: SeriesConfig = { group: 0, index: 0, yScale: 'y', stroke: 'red', show: true, join: 'bevel', cap: 'round' };
     const paths = makePaths();
 
-    drawSeriesPath(ctx, config, paths, 1);
+    drawSeriesPath(ctx as unknown as CanvasRenderingContext2D, config, paths, 1);
 
     expect(ctx.lineJoin).toBe('bevel');
     expect(ctx.lineCap).toBe('round');
@@ -145,7 +145,7 @@ describe('drawSeriesPath', () => {
     const config: SeriesConfig = { group: 0, index: 0, yScale: 'y', fill: 'blue', show: true };
     const paths = makePaths();
 
-    drawSeriesPath(ctx, config, paths, 1);
+    drawSeriesPath(ctx as unknown as CanvasRenderingContext2D, config, paths, 1);
 
     expect(ctx.stroke).not.toHaveBeenCalled();
     expect(ctx.fill).toHaveBeenCalled();
