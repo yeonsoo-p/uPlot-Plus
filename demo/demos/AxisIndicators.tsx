@@ -13,9 +13,6 @@ export default function AxisIndicators() {
 
   return (
     <div>
-      <p className="text-demo text-muted mb-2">
-        Each axis has different grid, tick, and border styles with custom colors, widths, and dash patterns.
-      </p>
       <Chart width={800} height={400} data={data}>
         {/* Bottom x-axis: blue grid dashed, red ticks, green border */}
         <Axis

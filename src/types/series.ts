@@ -58,6 +58,21 @@ export interface SeriesConfig {
   };
 }
 
+/**
+ * Resolve the representative color for a series config (used by Legend/Tooltip swatches).
+ * Bars: use fill. Lines with transparent stroke + fill: use fill. Otherwise: use stroke.
+ */
+export function getSeriesColor(cfg: SeriesConfig): string {
+  const stroke = typeof cfg.stroke === 'string' ? cfg.stroke : null;
+  const fill = typeof cfg.fill === 'string' ? cfg.fill : null;
+  const hasStroke = stroke != null && stroke !== 'transparent';
+  const hasFill = fill != null && fill !== 'transparent';
+  const isBar = cfg.paths?.defaults?.width === 0;
+  if (isBar && hasFill) return fill;
+  if (!hasStroke && hasFill) return fill;
+  return stroke ?? '#000';
+}
+
 export interface PointsConfig {
   show?: boolean | ((groupIdx: number, seriesIdx: number, i0: number, i1: number, dim: number) => boolean);
   size?: number;

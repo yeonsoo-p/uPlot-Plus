@@ -8,26 +8,24 @@ function generateData(): ChartData {
   const y1 = x.map(() => Math.round(Math.random() * 60 + 20));
   const y2 = x.map(() => Math.round(Math.random() * 60 + 20));
   const y3 = x.map(() => Math.round(Math.random() * 60 + 20));
-  return [{ x, series: [y1, y2, y3] }];
+  const y4 = x.map(() => Math.round(Math.random() * 60 + 20));
+  return [{ x, series: [y1, y2, y3, y4] }];
 }
 
 export default function ThinBarsStrokeFill() {
   const data = generateData();
 
   return (
-    <div>
-      <p className="text-demo text-muted mb-2">
-        Bar chart variations: stroke-only, fill-only, and stroke+fill with different widths.
-      </p>
-      <Chart width={800} height={400} data={data} xlabel="Item" ylabel="Value">
-        {/* Stroke only (auto-fill from palette) */}
-        <Series group={0} index={0} label="Stroke Only" paths={groupedBars(0, 3)} />
-        {/* Fill only — explicit transparent stroke + custom fill */}
-        <Series group={0} index={1} stroke="transparent" fill="rgba(52, 152, 219, 0.6)" label="Fill Only" paths={groupedBars(1, 3)} />
-        {/* Stroke + Fill — explicit low-alpha fill */}
-        <Series group={0} index={2} stroke="#27ae60" fill="rgba(39, 174, 96, 0.3)" label="Stroke + Fill" paths={groupedBars(2, 3)} />
-        <Legend />
-      </Chart>
-    </div>
+    <Chart width={800} height={400} data={data} xlabel="Item" ylabel="Value">
+      {/* No specifics — auto palette assigns stroke and fill */}
+      <Series group={0} index={0} label="Stroke and Fill" paths={groupedBars(0, 4)} />
+      {/* Fill only — transparent stroke hides the outline */}
+      <Series group={0} index={1} stroke="transparent" fill="rgba(52, 152, 219, 0.6)" label="Fill Only" paths={groupedBars(1, 4)} />
+      {/* Stroke only — transparent fill shows just the outline */}
+      <Series group={0} index={2} stroke="#e74c3c" fill="transparent" label="Stroke Only" paths={groupedBars(2, 4)} />
+      {/* Both specified explicitly */}
+      <Series group={0} index={3} stroke="#27ae60" fill="rgba(39, 174, 96, 0.3)" label="Custom Stroke + Fill" paths={groupedBars(3, 4)} />
+      <Legend />
+    </Chart>
   );
 }

@@ -5,8 +5,8 @@ import React, { forwardRef } from 'react';
 export const panelStyle: React.CSSProperties = {
   position: 'absolute',
   zIndex: 50,
-  background: 'rgba(255,255,255,0.92)',
-  border: '1px solid #ccc',
+  background: 'var(--uplot-panel-bg, rgba(255,255,255,0.92))',
+  border: '1px solid var(--uplot-panel-border, #ccc)',
   borderRadius: 4,
   padding: '4px 6px',
   fontSize: 12,

@@ -2,6 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState, useSyncExternalSto
 import { useStore } from '../hooks/useChart';
 import { Panel, SeriesRow } from './overlay/SeriesPanel';
 import { clamp } from '../math/utils';
+import { getSeriesColor } from '../types/series';
 
 const hoverPanelStyle: React.CSSProperties = { pointerEvents: 'none' };
 
@@ -66,7 +67,7 @@ export function HoverLabel({
   );
   if (!cfg?.label || cfg.legend === false) return null;
 
-  const color = typeof cfg.stroke === 'string' ? cfg.stroke : '#000';
+  const color = getSeriesColor(cfg);
 
   // Position above cursor, clamped to plot
   const mW = measured.w;

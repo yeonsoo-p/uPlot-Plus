@@ -87,6 +87,10 @@ export function drawAxesGrid(
   pxRatio: number,
   title?: string,
 ): void {
+  // Read CSS custom properties for themeable defaults (set by e.g. a .dark class)
+  const cs = ctx.canvas != null ? getComputedStyle(ctx.canvas) : null;
+  const cssVar = (name: string) => cs?.getPropertyValue(name).trim() || '';
+
   const plotLft = round(plotBox.left * pxRatio);
   const plotTop = round(plotBox.top * pxRatio);
   const plotWid = round(plotBox.width * pxRatio);
@@ -104,7 +108,7 @@ export function drawAxesGrid(
     if (!scale || !isScaleReady(scale))
       continue;
 
-    const fillStyle = config.stroke ?? '#000';
+    const fillStyle = config.stroke ?? (cssVar('--uplot-axis-stroke') || '#000');
 
     const shiftDir = side === Side.Top || side === Side.Left ? -1 : 1;
 
@@ -126,7 +130,7 @@ export function drawAxesGrid(
     // Draw grid lines
     const grid = config.grid;
     if (grid?.show !== false) {
-      const gridStroke = grid?.stroke ?? 'rgba(0,0,0,0.12)';
+      const gridStroke = grid?.stroke ?? (cssVar('--uplot-grid-stroke') || 'rgba(0,0,0,0.12)');
       const gridWidth = round((grid?.width ?? 2) * pxRatio);
       const gridDash = (grid?.dash ?? []).map(d => d * pxRatio);
 
@@ -258,7 +262,7 @@ export function drawAxesGrid(
   if (title != null) {
     const titleFont = scaleFontPx('bold 14px system-ui, sans-serif', pxRatio);
     ctx.font = titleFont;
-    ctx.fillStyle = '#000';
+    ctx.fillStyle = cssVar('--uplot-title-fill') || '#000';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     ctx.fillText(title, round(plotLft + plotWid / 2), round(4 * pxRatio));

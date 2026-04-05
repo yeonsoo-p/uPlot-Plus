@@ -23,9 +23,6 @@ export default function StackedBars() {
 
   return (
     <div>
-      <p className="text-demo text-muted mb-2">
-        Stacked bars using <code>stackGroup()</code> to transform data and <code>Band</code> for shaded regions.
-      </p>
       <Chart width={800} height={400} data={data} title="Stacked Bars" ylabel="Sales">
         <Axis scale="x" label="Month" values={fmtLabels(MONTH_NAMES)} />
         <Series group={0} index={0} stroke="#3498db" label="Product A" paths={stackedBars()} />

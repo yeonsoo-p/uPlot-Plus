@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect, useLayoutEffect, useSyncExternalSto
 import { useStore } from '../hooks/useChart';
 import { Panel, SeriesRow, formatSeriesValue } from './overlay/SeriesPanel';
 import { clamp } from '../math/utils';
+import { getSeriesColor } from '../types/series';
 
 export interface FloatingLegendProps {
   /** Behavior mode: 'draggable' (default) or 'cursor' (follows cursor). */
@@ -137,7 +138,7 @@ export function FloatingLegend({
 
   // Build rows
   const rows = store.seriesConfigs.filter(c => c.legend !== false).map((cfg) => {
-    const color = typeof cfg.stroke === 'string' ? cfg.stroke : '#000';
+    const color = getSeriesColor(cfg);
     const value = formatSeriesValue(store, cfg.group, cfg.index, activeGroup, activeDataIdx);
     const isClickable = mode === 'draggable';
     return (

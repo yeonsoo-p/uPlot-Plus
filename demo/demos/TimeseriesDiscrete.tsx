@@ -39,9 +39,6 @@ export default function TimeseriesDiscrete() {
 
   return (
     <div>
-      <p className="text-demo text-muted mb-2">
-        Discrete status values (0=OK, 1=WARN, 2=CRIT) over time using stepped interpolation.
-      </p>
       <Chart width={800} height={300} data={data}>
         <Scale id="y" min={-0.5} max={2.5} />
         <Axis scale="x" label="Time" values={fmtTime} />

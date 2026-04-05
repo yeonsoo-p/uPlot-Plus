@@ -14,9 +14,6 @@ export default function SyncYZero() {
 
   return (
     <div>
-      <p className="text-demo text-muted mb-2">
-        Two y-scales both pinned to zero with <code>min=0</code>. Different magnitudes but both start at zero.
-      </p>
       <Chart width={800} height={400} data={data} xlabel="Index">
         <Scale id="y1"  min={0} />
         <Scale id="y2"  min={0} />

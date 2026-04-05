@@ -18,9 +18,6 @@ export default function MultiBars() {
 
   return (
     <div>
-      <p className="text-demo text-muted mb-2">
-        Grouped bar chart: 3 product lines shown side-by-side per quarter.
-      </p>
       <Chart width={800} height={400} data={data}>
         <Axis scale="x" label="Quarter" values={fmtPrefix('Q')} />
         <Axis scale="y" label="Revenue" values={fmtWrap('$', 'K')} />

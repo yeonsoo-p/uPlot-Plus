@@ -21,9 +21,6 @@ export default function BarsGroupedStacked() {
 
   return (
     <div>
-      <p className="text-demo text-muted mb-2">
-        Side-by-side grouped bars using the <code>groupedBars()</code> path builder.
-      </p>
       <Chart width={800} height={400} data={data} title="Grouped Bars" ylabel="Sales">
         <Axis scale="x" label="Month" values={fmtLabels(MONTH_NAMES)} />
         <Series group={0} index={0} stroke="#2980b9" label="Product A" paths={groupedBars(0, 3)} />

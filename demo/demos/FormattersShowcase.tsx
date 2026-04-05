@@ -50,9 +50,6 @@ export default function FormattersShowcase() {
 
   return (
     <div>
-      <p className="text-demo text-muted mb-2">
-        All six axis formatter functions side-by-side. Each formats axis labels differently.
-      </p>
       <div className="flex flex-wrap gap-1">
         <SmallChart title="fmtCompact — SI suffixes (K, M, B)">
           <Chart width={W} height={H} data={compactData}>

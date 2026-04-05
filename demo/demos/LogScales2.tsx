@@ -26,9 +26,6 @@ export default function LogScales2() {
 
   return (
     <div>
-      <p className="text-demo text-muted mb-2">
-        Log scale comparison: base 10 (top) vs base 2 (bottom) on exponentially growing data.
-      </p>
       <div className="mb-4">
         <Chart width={800} height={220} data={data} title="Log base 10">
           <Scale id="y"  distr={Distribution.Log} log={10} />

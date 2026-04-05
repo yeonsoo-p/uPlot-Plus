@@ -28,10 +28,6 @@ export default function TimezonesDST() {
 
   return (
     <div>
-      <p className="text-demo text-muted mb-2">
-        Hourly data spanning the spring-forward DST transition (March 9-12, 2024).
-        Note the time jump around March 10 at 2:00 AM.
-      </p>
       <Chart width={800} height={400} data={data} ylabel="Temperature (C)">
         <Axis scale="x" label="Date/Time" values={fmtDateTime} rotate={-45} />
         <Series group={0} index={0} label="Temp" />

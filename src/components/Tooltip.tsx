@@ -3,6 +3,7 @@ import { useStore } from '../hooks/useChart';
 import type { TooltipProps, TooltipData, TooltipItem } from '../types/tooltip';
 import { Panel, SeriesRow } from './overlay/SeriesPanel';
 import { clamp } from '../math/utils';
+import { getSeriesColor } from '../types/series';
 
 const DEFAULT_OFFSET: { x?: number; y?: number } = {};
 const tooltipPanelStyle: React.CSSProperties = { pointerEvents: 'none', zIndex: 100 };
@@ -59,7 +60,7 @@ export function Tooltip({
     items.push({
       label: cfg.label ?? `Series ${cfg.index}`,
       value: val,
-      color: typeof cfg.stroke === 'string' ? cfg.stroke : '#000',
+      color: getSeriesColor(cfg),
       group: cfg.group,
       index: cfg.index,
     });

@@ -20,11 +20,6 @@ export default function PaletteColors() {
 
   return (
     <div>
-      <p className="text-demo text-muted mb-2">
-        <code>palette({N})</code> generates {N} distinct colors via golden-angle HSL rotation.
-        Uses <code>withAlpha</code> for semi-transparent fills and <code>fadeGradient</code> for gradient area fills.
-      </p>
-
       <h4 className="mt-3 mb-1">palette() &mdash; {N} auto-generated colors</h4>
       <Chart width={800} height={250} data={data}>
         {colors.map((c, i) => (

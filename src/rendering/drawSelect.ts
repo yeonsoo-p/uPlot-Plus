@@ -28,7 +28,15 @@ export function drawSelection(
 ): void {
   if (!select.show || select.width <= 0) return;
 
-  const cfg = { ...defaultSelectConfig, ...config };
+  // Read CSS custom properties for themeable defaults (set by e.g. a .dark class)
+  const cs = ctx.canvas != null ? getComputedStyle(ctx.canvas) : null;
+  const cssVar = (name: string) => cs?.getPropertyValue(name).trim() || '';
+
+  const themedDefaults: SelectDrawConfig = {
+    fill: cssVar('--uplot-select-fill') || defaultSelectConfig.fill,
+    stroke: cssVar('--uplot-select-stroke') || defaultSelectConfig.stroke,
+  };
+  const cfg = { ...defaultSelectConfig, ...themedDefaults, ...config };
   const pr = pxRatio;
 
   const x = round((plotBox.left + select.left) * pr);

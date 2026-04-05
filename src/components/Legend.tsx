@@ -2,6 +2,7 @@ import React, { useSyncExternalStore } from 'react';
 import { useStore } from '../hooks/useChart';
 import type { LegendConfig } from '../types/legend';
 import type { ChartStore } from '../hooks/useChartStore';
+import { getSeriesColor } from '../types/series';
 
 interface LegendProps extends LegendConfig {
   className?: string;
@@ -86,7 +87,7 @@ export function Legend({ show = true, position = 'bottom', className }: LegendPr
     >
       {store.seriesConfigs.map((cfg) => {
         if (cfg.legend === false) return null;
-        const color = typeof cfg.stroke === 'string' ? cfg.stroke : '#000';
+        const color = getSeriesColor(cfg);
         let valueStr = '';
         if (activeDataIdx >= 0 && activeGroup >= 0 && cfg.group === activeGroup) {
           const yData = store.dataStore.getYValues(cfg.group, cfg.index);

@@ -22,9 +22,6 @@ export default function PathGapClip() {
 
   return (
     <div>
-      <p className="text-demo text-muted mb-2">
-        Same data with null gaps. Red line shows gaps (default). Blue line uses <code>spanGaps</code> to connect across nulls.
-      </p>
       <Chart width={800} height={400} data={data} xlabel="Index" ylabel="Value">
         <Series group={0} index={0} label="With Gaps (default)" />
         <Series group={0} index={1} label="spanGaps = true" spanGaps />

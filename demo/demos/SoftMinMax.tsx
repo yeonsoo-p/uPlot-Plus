@@ -14,10 +14,6 @@ export default function SoftMinMax() {
 
   return (
     <div>
-      <p className="text-demo text-muted mb-2">
-        Scale has <code>range.min.soft=0</code> and <code>range.max.soft=100</code>.
-        The range expands to include data beyond those bounds but never contracts below them.
-      </p>
       <Chart width={800} height={400} data={data} xlabel="Index" ylabel="Value">
         <Scale
           id="y"

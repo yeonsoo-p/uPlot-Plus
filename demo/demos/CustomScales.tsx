@@ -13,10 +13,6 @@ export default function CustomScales() {
 
   return (
     <div>
-      <p className="text-demo text-muted mb-2">
-        Custom scale with manual <code>min</code>/<code>max</code> configuration.
-        Data ranges ~20-80 but scale is fixed to 0-100.
-      </p>
       <div className="mb-4">
         <Chart width={800} height={220} data={data} title="Fixed scale: 0 to 100" xlabel="Index" ylabel="Value (0-100)">
           <Scale id="y" auto={false} min={0} max={100} />

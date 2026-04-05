@@ -7,8 +7,8 @@ import { round } from '../math/utils';
 /** Stroke width for the point indicator outline (CSS pixels) */
 const POINT_STROKE_WIDTH = 2;
 
-/** Fill color for the point indicator center */
-const POINT_FILL = '#fff';
+/** Default fill color for the point indicator center */
+const DEFAULT_POINT_FILL = '#fff';
 
 export interface CursorDrawConfig {
   /** Crosshair line color */
@@ -51,7 +51,14 @@ export function drawCursor(
 ): void {
   if (cursor.left < 0 || cursor.top < 0) return;
 
-  const cfg = { ...defaultCursorConfig, ...config };
+  // Read CSS custom properties for themeable defaults (set by e.g. a .dark class)
+  const cs = ctx.canvas != null ? getComputedStyle(ctx.canvas) : null;
+  const cssVar = (name: string) => cs?.getPropertyValue(name).trim() || '';
+
+  const themedDefaults: CursorDrawConfig = {
+    stroke: cssVar('--uplot-cursor-stroke') || defaultCursorConfig.stroke,
+  };
+  const cfg = { ...defaultCursorConfig, ...themedDefaults, ...config };
   const pr = pxRatio;
 
   const plotLft = round(plotBox.left * pr);
@@ -128,7 +135,7 @@ export function drawCursor(
             const strokeW = round(POINT_STROKE_WIDTH * pr);
             ctx.beginPath();
             ctx.arc(px, py, r, 0, Math.PI * 2);
-            ctx.fillStyle = POINT_FILL;
+            ctx.fillStyle = cssVar('--uplot-point-fill') || DEFAULT_POINT_FILL;
             ctx.fill();
             ctx.strokeStyle = pointFill;
             ctx.lineWidth = strokeW;

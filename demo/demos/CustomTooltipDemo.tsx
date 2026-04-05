@@ -27,10 +27,6 @@ export default function CustomTooltipDemo() {
 
   return (
     <div>
-      <p className="text-demo text-muted mb-2">
-        Custom tooltip via <code>&lt;Tooltip&gt;&#123;(data) =&gt; ...&#125;&lt;/Tooltip&gt;</code> children
-        render prop. Full control over tooltip layout and styling.
-      </p>
       <Chart width={800} height={400} data={data} xlabel="Day" ylabel="Value ($K)">
         <Series group={0} index={0} label="Revenue" stroke={COLORS[0]} />
         <Series group={0} index={1} label="Cost" stroke={COLORS[1]} />

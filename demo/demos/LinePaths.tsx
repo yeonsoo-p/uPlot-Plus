@@ -14,9 +14,6 @@ export default function LinePaths() {
 
   return (
     <div>
-      <p className="text-demo text-muted mb-2">
-        All path builder types rendering the same data for comparison.
-      </p>
       <Chart width={800} height={500} data={data} xlabel="Index" ylabel="Value">
         <Series group={0} index={0} label="linear" paths={linear()} />
         <Series group={0} index={1} label="monotoneCubic" paths={monotoneCubic()} />

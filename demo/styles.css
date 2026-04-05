@@ -1,8 +1,10 @@
 @import "tailwindcss";
+@custom-variant dark (&:is(.dark *));
 
 @theme {
   --font-size-2xs: 11px;
   --font-size-demo: 13px;
+  --color-text: #333;
   --color-muted: #666;
   --color-muted-light: #888;
   --color-muted-lighter: #999;
@@ -12,10 +14,32 @@
   --color-border-lighter: #eee;
 }
 
-body {
-  font-family: system-ui, -apple-system, sans-serif;
-  background: #f5f5f5;
-  color: #333;
+@layer base {
+  body {
+    @apply font-sans bg-surface text-text transition-colors duration-200;
+  }
+}
+
+/* Dark mode: override theme tokens + define canvas rendering vars */
+.dark {
+  --color-text: #e0e0e0;
+  --color-muted: #999;
+  --color-muted-light: #aaa;
+  --color-muted-lighter: #bbb;
+  --color-surface: #121212;
+  --color-surface-light: #1e1e1e;
+  --color-border-light: #333;
+  --color-border-lighter: #444;
+
+  --uplot-axis-stroke: #ccc;
+  --uplot-grid-stroke: rgba(255, 255, 255, 0.10);
+  --uplot-title-fill: #ddd;
+  --uplot-cursor-stroke: #90A4AE;
+  --uplot-point-fill: #1e1e2e;
+  --uplot-select-fill: rgba(255, 255, 255, 0.07);
+  --uplot-select-stroke: rgba(255, 255, 255, 0.15);
+  --uplot-panel-bg: rgba(30, 30, 46, 0.95);
+  --uplot-panel-border: #444;
 }
 
 /* Scrollbar utilities — no Tailwind equivalent */
@@ -29,6 +53,9 @@ body {
 
 .thin-scrollbar {
   scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
+}
+.dark .thin-scrollbar {
   scrollbar-color: #444 transparent;
 }
 .thin-scrollbar::-webkit-scrollbar {
@@ -36,13 +63,23 @@ body {
   height: 6px;
 }
 .thin-scrollbar::-webkit-scrollbar-thumb {
-  background: #444;
+  background: #ccc;
   border-radius: 3px;
+}
+.dark .thin-scrollbar::-webkit-scrollbar-thumb {
+  background: #444;
 }
 
 /* Syntax highlighting — applied via innerHTML, can't use Tailwind */
-.hl-keyword { color: #cba6f7; }
-.hl-string { color: #a6e3a1; }
-.hl-number { color: #fab387; }
-.hl-comment { color: #6c7086; font-style: italic; }
-.hl-tag { color: #89b4fa; }
+/* Light: Catppuccin Latte / Dark: Catppuccin Mocha */
+.hl-keyword { color: #8839ef; }
+.hl-string { color: #40a02b; }
+.hl-number { color: #fe640b; }
+.hl-comment { color: #9ca0b0; font-style: italic; }
+.hl-tag { color: #1e66f5; }
+
+.dark .hl-keyword { color: #cba6f7; }
+.dark .hl-string { color: #a6e3a1; }
+.dark .hl-number { color: #fab387; }
+.dark .hl-comment { color: #6c7086; }
+.dark .hl-tag { color: #89b4fa; }

@@ -23,9 +23,6 @@ export default function StackedSeries() {
 
   return (
     <div>
-      <p className="text-demo text-muted mb-2">
-        Stacked area chart using stackGroup() to compute cumulative sums and bands.
-      </p>
       <Chart width={800} height={400} data={stackedData} xlabel="Sample" ylabel="Value">
         <Series group={0} index={0} stroke="#e74c3c" fill="rgba(231,76,60,0.4)" label="Series A" fillTo={0} />
         <Series group={0} index={1} stroke="#2ecc71" fill="rgba(46,204,113,0.4)" label="Series B" fillTo={0} />
