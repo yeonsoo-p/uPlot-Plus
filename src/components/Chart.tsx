@@ -166,11 +166,13 @@ export function Chart({
           display: 'flex',
           flexDirection: 'column',
           width: `${width}px`,
+          isolation: 'isolate',
         }}
       >
         <div
           ref={containerRef}
           tabIndex={0}
+          data-testid="chart-container"
           style={{
             position: 'relative',
             width: `${width}px`,

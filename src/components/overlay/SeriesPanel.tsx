@@ -1,37 +1,35 @@
 import React, { forwardRef } from 'react';
+import {
+  PANEL_BORDER, PANEL_PAD_X, PANEL_PAD_Y, ROW_PAD_X, ROW_GAP, ROW_LINE_H,
+  PANEL_FONT, PANEL_BOLD_FONT, OVERLAY_FONT_SIZE, OVERLAY_FONT_FAMILY,
+  SWATCH_W, SWATCH_H, SWATCH_RADIUS, HIDDEN_OPACITY,
+  CSS_OVERLAY_Z, DEFAULT_OVERLAY_Z,
+} from './tokens';
 
-// --- Layout constants for floating panels (shared with estimatePanelSize) ---
-
-export const PANEL_BORDER = 1;
-export const PANEL_PAD_X = 6;
-export const PANEL_PAD_Y = 4;
-export const ROW_PAD_X = 4;
-export const ROW_SWATCH_W = 12;
-export const ROW_GAP = 4;
-export const PANEL_FONT = '12px sans-serif';
-export const PANEL_BOLD_FONT = 'bold 12px sans-serif';
-export const ROW_LINE_H = 16;
+// Re-export layout constants so existing consumers (estimatePanelSize) keep working.
+export { PANEL_BORDER, PANEL_PAD_X, PANEL_PAD_Y, ROW_PAD_X, ROW_GAP, ROW_LINE_H, PANEL_FONT, PANEL_BOLD_FONT };
+export const ROW_SWATCH_W = SWATCH_W;
 
 // --- Shared styles for floating panels (Tooltip, FloatingLegend, HoverLabel) ---
 
 export const panelStyle: React.CSSProperties = {
   position: 'absolute',
-  zIndex: 50,
+  zIndex: `var(${CSS_OVERLAY_Z}, ${DEFAULT_OVERLAY_Z})`,
   background: 'var(--uplot-panel-bg, rgba(255,255,255,0.92))',
   border: '1px solid var(--uplot-panel-border, #ccc)',
   borderRadius: 4,
-  padding: '4px 6px',
-  fontSize: 12,
-  fontFamily: 'sans-serif',
+  padding: `${PANEL_PAD_Y}px ${PANEL_PAD_X}px`,
+  fontSize: OVERLAY_FONT_SIZE,
+  fontFamily: OVERLAY_FONT_FAMILY,
   userSelect: 'none',
   boxShadow: '0 1px 4px rgba(0,0,0,0.12)',
   whiteSpace: 'nowrap' as const,
 };
 
 const swatchStyle: React.CSSProperties = {
-  width: 12,
-  height: 3,
-  borderRadius: 1,
+  width: SWATCH_W,
+  height: SWATCH_H,
+  borderRadius: SWATCH_RADIUS,
   display: 'inline-block',
   flexShrink: 0,
 };
@@ -41,15 +39,15 @@ const valueStyle: React.CSSProperties = { fontWeight: 600 };
 const rowStyle: React.CSSProperties = {
   display: 'flex',
   alignItems: 'center',
-  gap: 4,
-  padding: '1px 4px',
+  gap: ROW_GAP,
+  padding: `1px ${ROW_PAD_X}px`,
 };
 
 // Pre-computed row style variants to avoid object spreads on every render
 const rowVisiblePointer: React.CSSProperties = { ...rowStyle, opacity: 1, cursor: 'pointer' };
 const rowVisibleDefault: React.CSSProperties = { ...rowStyle, opacity: 1, cursor: 'default' };
-const rowHiddenPointer: React.CSSProperties = { ...rowStyle, opacity: 0.4, cursor: 'pointer' };
-const rowHiddenDefault: React.CSSProperties = { ...rowStyle, opacity: 0.4, cursor: 'default' };
+const rowHiddenPointer: React.CSSProperties = { ...rowStyle, opacity: HIDDEN_OPACITY, cursor: 'pointer' };
+const rowHiddenDefault: React.CSSProperties = { ...rowStyle, opacity: HIDDEN_OPACITY, cursor: 'default' };
 
 // Swatch style cache keyed by color string
 const swatchStyleCache = new Map<string, React.CSSProperties>();
@@ -97,19 +95,21 @@ export interface PanelProps {
   children: React.ReactNode;
   className?: string;
   style?: React.CSSProperties;
+  'data-testid'?: string;
   onMouseDown?: React.MouseEventHandler;
   onMouseEnter?: React.MouseEventHandler;
   onMouseLeave?: React.MouseEventHandler;
 }
 
 export const Panel = forwardRef<HTMLDivElement, PanelProps>(function Panel(
-  { left, top, children, className, style, onMouseDown, onMouseEnter, onMouseLeave },
+  { left, top, children, className, style, 'data-testid': testId, onMouseDown, onMouseEnter, onMouseLeave },
   ref,
 ) {
   return (
     <div
       ref={ref}
       className={className}
+      data-testid={testId}
       onMouseDown={onMouseDown}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}

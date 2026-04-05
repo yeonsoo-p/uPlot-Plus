@@ -37,7 +37,7 @@ describe('Tooltip component', () => {
     await flushEffects();
 
     // No tooltip panel should exist when cursor is inactive
-    const tooltip = container.querySelector('div[style*="pointer-events: none"]');
+    const tooltip = container.querySelector('[data-testid="tooltip-panel"]');
     expect(tooltip).toBeNull();
   });
 
@@ -54,7 +54,7 @@ describe('Tooltip component', () => {
     // Simulate cursor at data index 2
     act(() => { simulateCursor(store, 2); });
 
-    const tooltip = container.querySelector('div[style*="pointer-events: none"]');
+    const tooltip = container.querySelector('[data-testid="tooltip-panel"]');
     expect(tooltip).toBeInTheDocument();
   });
 
@@ -70,7 +70,7 @@ describe('Tooltip component', () => {
 
     act(() => { simulateCursor(store, 2); });
 
-    const tooltip = container.querySelector('div[style*="pointer-events: none"]');
+    const tooltip = container.querySelector('[data-testid="tooltip-panel"]');
     expect(tooltip).toBeNull();
   });
 
@@ -120,7 +120,7 @@ describe('Tooltip component', () => {
 
     act(() => { simulateCursor(store, 2); });
 
-    const tooltip = container.querySelector('div[style*="pointer-events: none"]') as HTMLElement;
+    const tooltip = container.querySelector('[data-testid="tooltip-panel"]') as HTMLElement;
     expect(tooltip).toBeInTheDocument();
     expect(tooltip.style.position).toBe('absolute');
   });

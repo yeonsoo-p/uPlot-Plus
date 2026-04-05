@@ -4,12 +4,12 @@ import {
   PANEL_PAD_X,
   PANEL_PAD_Y,
   ROW_PAD_X,
-  ROW_SWATCH_W,
+  SWATCH_W as ROW_SWATCH_W,
   ROW_GAP,
   PANEL_FONT,
   PANEL_BOLD_FONT,
   ROW_LINE_H,
-} from '../components/overlay/SeriesPanel';
+} from '../components/overlay/tokens';
 
 export interface PanelContent {
   header?: string;

@@ -3,12 +3,13 @@ import { useStore } from '../hooks/useChart';
 import { useDraggableOverlay } from '../hooks/useDraggableOverlay';
 import type { TooltipProps, TooltipData, TooltipItem } from '../types/tooltip';
 import { Panel, SeriesRow } from './overlay/SeriesPanel';
+import { CSS_TOOLTIP_Z, DEFAULT_TOOLTIP_Z } from './overlay/tokens';
 import { getSeriesColor } from '../types/series';
 import { estimatePanelSize } from '../utils/estimatePanelSize';
 
 const DEFAULT_OFFSET = { x: 12, y: -12 };
 const EMPTY_SIZE = { w: 0, h: 0 };
-const tooltipZIndex: React.CSSProperties = { zIndex: 100 };
+const tooltipZIndex: React.CSSProperties = { zIndex: `var(${CSS_TOOLTIP_Z}, ${DEFAULT_TOOLTIP_Z})` };
 const xLabelStyle: React.CSSProperties = { fontWeight: 600, marginBottom: 2, padding: '0 4px' };
 
 /**
@@ -125,6 +126,7 @@ export function Tooltip({
       <div
         ref={overlay.panelRef}
         className={className}
+        data-testid="tooltip-panel"
         style={{
           position: 'absolute',
           left: overlay.renderPos.x,
@@ -148,6 +150,7 @@ export function Tooltip({
       top={overlay.renderPos.y}
       className={className}
       style={panelStyle}
+      data-testid="tooltip-panel"
       {...overlay.panelHandlers}
     >
       {xLabel && <div style={xLabelStyle}>{xLabel}</div>}

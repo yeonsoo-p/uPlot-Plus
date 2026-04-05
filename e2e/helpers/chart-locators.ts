@@ -1,11 +1,8 @@
 import type { Page, Locator } from '@playwright/test';
 
-/**
- * Locator for the chart interaction container (div with cursor:crosshair and tabIndex=0).
- * This is the div that receives mouse events in Chart.tsx.
- */
+/** Locator for the chart interaction container (div with data-testid and tabIndex=0). */
 export function getChartContainer(page: Page, nth = 0): Locator {
-  return page.locator('div[tabindex="0"][style*="cursor: crosshair"]').nth(nth);
+  return page.locator('[data-testid="chart-container"]').nth(nth);
 }
 
 /** Locator for the canvas element inside a chart container. */
@@ -13,24 +10,24 @@ export function getCanvas(page: Page, nth = 0): Locator {
   return getChartContainer(page, nth).locator('canvas');
 }
 
-/** Tooltip overlay (zIndex: 100, pointer-events: none). */
+/** Tooltip overlay panel. */
 export function getTooltip(page: Page): Locator {
-  return page.locator('div[style*="pointer-events: none"][style*="z-index"]').first();
+  return page.locator('[data-testid="tooltip-panel"]').first();
 }
 
-/** Floating legend overlay (zIndex: 50). */
+/** Floating legend overlay panel. */
 export function getFloatingLegend(page: Page): Locator {
-  return page.locator('div[style*="z-index: 50"]').first();
+  return page.locator('[data-testid="floating-legend"]').first();
 }
 
-/** Legend wrapper div (flex-wrap container rendered by Legend.tsx). */
+/** Legend wrapper div rendered by Legend.tsx. */
 export function getLegendWrapper(page: Page, nth = 0): Locator {
-  return page.locator('div[style*="flex-wrap: wrap"][style*="justify-content: center"]').nth(nth);
+  return page.locator('[data-testid="legend"]').nth(nth);
 }
 
-/** Individual legend item spans (clickable, with cursor:pointer). */
+/** Individual legend item spans. */
 export function getLegendItems(page: Page, nth = 0): Locator {
-  return getLegendWrapper(page, nth).locator('span[style*="cursor: pointer"]');
+  return getLegendWrapper(page, nth).locator('[data-testid^="legend-item-"]');
 }
 
 /** The demo content area (excludes sidebar and source code). */

@@ -7,10 +7,9 @@ test.describe('ZoomRanger', () => {
   });
 
   test('renders selection window and dimmed regions', async ({ page }) => {
-    // The ZoomRanger renders dimmed regions with rgba(0,0,0,0.3)
-    const dimmedRegions = page.locator('div[style*="rgba(0, 0, 0, 0.3)"]');
+    const dimmedRegions = page.locator('[data-testid^="zoom-ranger-dim-"]');
     const count = await dimmedRegions.count();
-    expect(count).toBeGreaterThanOrEqual(1);
+    expect(count).toBeGreaterThanOrEqual(2);
   });
 
   test('dragging selection center pans the range', async ({ page }) => {

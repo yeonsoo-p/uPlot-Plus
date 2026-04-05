@@ -86,6 +86,7 @@ export function FloatingLegend({
       top={overlay.renderPos.y}
       className={className}
       style={overlay.panelStyle}
+      data-testid="floating-legend"
       {...overlay.panelHandlers}
     >
       {rows.map(({ cfg, color, value, label }) => (

@@ -5,6 +5,10 @@ import { Series } from './Series';
 import { clamp } from '../math/utils';
 import { Axis } from './Axis';
 import { normalizeData } from '../core/normalizeData';
+import {
+  CSS_RANGER_ACCENT, DEFAULT_RANGER_ACCENT,
+  CSS_RANGER_DIM, DEFAULT_RANGER_DIM,
+} from './overlay/tokens';
 
 /** Grip hit-target width in CSS pixels */
 export const GRIP_THRESHOLD_PX = 8;
@@ -219,7 +223,7 @@ export function ZoomRanger({
   const seriesCount = group != null ? group.series.length : 0;
 
   return (
-    <div className={className} style={{ position: 'relative', width, height }}>
+    <div className={className} data-testid="zoom-ranger" style={{ position: 'relative', width, height }}>
       <Chart width={width} height={height} data={normalized}>
         <Axis scale="x" show={false} />
         <Axis scale="y" show={false} />
@@ -253,38 +257,41 @@ export function ZoomRanger({
       >
         {/* Dimmed left region */}
         <div
+          data-testid="zoom-ranger-dim-left"
           style={{
             position: 'absolute',
             top: 0,
             left: 0,
             width: leftPct,
             height: '100%',
-            background: 'rgba(0,0,0,0.3)',
+            background: `var(${CSS_RANGER_DIM}, ${DEFAULT_RANGER_DIM})`,
             pointerEvents: 'none',
           }}
         />
         {/* Dimmed right region */}
         <div
+          data-testid="zoom-ranger-dim-right"
           style={{
             position: 'absolute',
             top: 0,
             left: `${selFrac[1] * 100}%`,
             right: 0,
             height: '100%',
-            background: 'rgba(0,0,0,0.3)',
+            background: `var(${CSS_RANGER_DIM}, ${DEFAULT_RANGER_DIM})`,
             pointerEvents: 'none',
           }}
         />
         {/* Selection window */}
         <div
+          data-testid="zoom-ranger-selection"
           style={{
             position: 'absolute',
             top: 0,
             left: leftPct,
             width: widthPct,
             height: '100%',
-            borderLeft: '2px solid rgba(0,100,255,0.8)',
-            borderRight: '2px solid rgba(0,100,255,0.8)',
+            borderLeft: `2px solid var(${CSS_RANGER_ACCENT}, ${DEFAULT_RANGER_ACCENT})`,
+            borderRight: `2px solid var(${CSS_RANGER_ACCENT}, ${DEFAULT_RANGER_ACCENT})`,
             boxSizing: 'border-box',
             cursor: 'grab',
             pointerEvents: 'none',
@@ -292,14 +299,14 @@ export function ZoomRanger({
         >
           {grips && (
             <>
-              <div style={{
+              <div data-testid="zoom-ranger-grip-left" style={{
                 position: 'absolute', left: -5, top: '50%', transform: 'translateY(-50%)',
-                width: 8, height: 24, borderRadius: 3, background: 'rgba(0,100,255,0.8)',
+                width: 8, height: 24, borderRadius: 3, background: `var(${CSS_RANGER_ACCENT}, ${DEFAULT_RANGER_ACCENT})`,
                 cursor: 'ew-resize', pointerEvents: 'auto',
               }} />
-              <div style={{
+              <div data-testid="zoom-ranger-grip-right" style={{
                 position: 'absolute', right: -5, top: '50%', transform: 'translateY(-50%)',
-                width: 8, height: 24, borderRadius: 3, background: 'rgba(0,100,255,0.8)',
+                width: 8, height: 24, borderRadius: 3, background: `var(${CSS_RANGER_ACCENT}, ${DEFAULT_RANGER_ACCENT})`,
                 cursor: 'ew-resize', pointerEvents: 'auto',
               }} />
             </>

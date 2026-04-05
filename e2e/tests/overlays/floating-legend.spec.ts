@@ -31,8 +31,7 @@ test.describe('Floating legend overlay', () => {
 
   test('draggable mode: visible at rest', async ({ page }) => {
     // The second chart uses draggable mode — should be visible without hover
-    // Look for the draggable legend panel (z-index: 50)
-    const panels = page.locator('div[style*="z-index: 50"]');
+    const panels = page.locator('[data-testid="floating-legend"]');
     const count = await panels.count();
     // At least the draggable panel should exist
     expect(count).toBeGreaterThanOrEqual(1);

@@ -14,5 +14,21 @@ export default defineConfig({
     benchmark: {
       include: ['test/**/*.bench.ts'],
     },
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'lcov', 'json-summary'],
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: [
+        'src/**/*.d.ts',
+        'src/**/index.ts',
+        'src/types/**',
+      ],
+      thresholds: {
+        lines: 78,
+        statements: 78,
+        branches: 78,
+        functions: 85,
+      },
+    },
   },
 });

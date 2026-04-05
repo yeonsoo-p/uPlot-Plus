@@ -3,6 +3,10 @@ import { useStore } from '../hooks/useChart';
 import type { LegendConfig } from '../types/legend';
 import type { ChartStore } from '../hooks/useChartStore';
 import { getSeriesColor } from '../types/series';
+import {
+  SWATCH_W, SWATCH_H, SWATCH_RADIUS, ROW_GAP, HIDDEN_OPACITY,
+  OVERLAY_FONT_SIZE, OVERLAY_FONT_FAMILY,
+} from './overlay/tokens';
 
 interface LegendProps extends LegendConfig {
   className?: string;
@@ -10,9 +14,9 @@ interface LegendProps extends LegendConfig {
 
 // Static styles hoisted out of render to avoid re-allocation
 const swatchStyle: React.CSSProperties = {
-  width: 12,
-  height: 3,
-  borderRadius: 1,
+  width: SWATCH_W,
+  height: SWATCH_H,
+  borderRadius: SWATCH_RADIUS,
   display: 'inline-block',
 };
 
@@ -21,15 +25,15 @@ const valueStyle: React.CSSProperties = { fontWeight: 600 };
 const baseItemStyle: React.CSSProperties = {
   display: 'inline-flex',
   alignItems: 'center',
-  gap: 4,
+  gap: ROW_GAP,
   padding: '2px 8px',
   cursor: 'pointer',
-  fontSize: 12,
-  fontFamily: 'sans-serif',
+  fontSize: OVERLAY_FONT_SIZE,
+  fontFamily: OVERLAY_FONT_FAMILY,
 };
 
 const itemStyleVisible: React.CSSProperties = { ...baseItemStyle, opacity: 1 };
-const itemStyleHidden: React.CSSProperties = { ...baseItemStyle, opacity: 0.4 };
+const itemStyleHidden: React.CSSProperties = { ...baseItemStyle, opacity: HIDDEN_OPACITY };
 const swatchStyleCache = new Map<string, React.CSSProperties>();
 
 const wrapperStyleTop: React.CSSProperties = {
@@ -58,6 +62,7 @@ function LegendItem({ group, index, label, color, isHidden, valueStr, store }: L
 
   return (
     <span
+      data-testid={`legend-item-${group}-${index}`}
       onClick={() => store.toggleSeries(group, index)}
       style={isHidden ? itemStyleHidden : itemStyleVisible}
     >
@@ -83,6 +88,7 @@ export function Legend({ show = true, position = 'bottom', className }: LegendPr
   return (
     <div
       className={className}
+      data-testid="legend"
       style={position === 'top' ? wrapperStyleTop : wrapperStyleBottom}
     >
       {store.seriesConfigs.map((cfg) => {

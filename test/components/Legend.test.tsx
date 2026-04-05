@@ -78,7 +78,7 @@ describe('Legend component', () => {
     await flushEffects();
 
     // Legend should not render any wrapper div with flex layout
-    const legendWrapper = container.querySelector('div[style*="flex-wrap"]');
+    const legendWrapper = container.querySelector('[data-testid="legend"]');
     expect(legendWrapper).toBeNull();
   });
 
@@ -92,7 +92,7 @@ describe('Legend component', () => {
     );
     await flushEffects();
 
-    const legendWrapper = container.querySelector('div[style*="flex-wrap"]') as HTMLElement;
+    const legendWrapper = container.querySelector('[data-testid="legend"]') as HTMLElement;
     expect(legendWrapper).toBeInTheDocument();
     expect(legendWrapper.style.order).toBe('-1');
   });
@@ -107,7 +107,7 @@ describe('Legend component', () => {
     );
     await flushEffects();
 
-    const legendWrapper = container.querySelector('div[style*="flex-wrap"]') as HTMLElement;
+    const legendWrapper = container.querySelector('[data-testid="legend"]') as HTMLElement;
     expect(legendWrapper).toBeInTheDocument();
     expect(legendWrapper.style.order).toBe('1');
   });
