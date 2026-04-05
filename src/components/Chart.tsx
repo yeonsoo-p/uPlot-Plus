@@ -1,5 +1,5 @@
-import { useRef, useEffect, useLayoutEffect, useState } from 'react';
-import type { ChartProps, ChartData, DataInput } from '../types';
+import { useRef, useEffect, useLayoutEffect, useState, useCallback } from 'react';
+import type { ChartProps } from '../types';
 import { DEFAULT_ACTIONS } from '../types/interaction';
 import type { DrawCallback, CursorDrawCallback } from '../types/hooks';
 import { useChartStore } from '../hooks/useChartStore';
@@ -31,8 +31,9 @@ export function Chart({
       : new Map(DEFAULT_ACTIONS);
   }, [store, actions]);
 
-  // Sync title and axis labels to store (in effect, not render)
-  useEffect(() => {
+  // Sync title and axis labels to store — layout effect so labels are
+  // current before redrawSync() fires on size changes.
+  useLayoutEffect(() => {
     store.setLabels(title, xlabel, ylabel);
   }, [store, title, xlabel, ylabel]);
 
@@ -54,27 +55,53 @@ export function Chart({
   // Cursor sync across charts with same key
   useSyncGroup(store, syncKey);
 
-  // Ref-gated canvas callback — avoids useCallback, gates on identity
+  // Stable canvas callback ref — useCallback keeps identity stable so React
+  // won't tear down (null) and re-set (node) on every render.
   const canvasElRef = useRef<HTMLCanvasElement | null>(null);
-  const canvasRef = (node: HTMLCanvasElement | null) => {
+  const canvasRef = useCallback((node: HTMLCanvasElement | null) => {
     if (canvasElRef.current === node) return;
     canvasElRef.current = node;
     store.setCanvas(node);
     if (node) store.scheduleRedraw();
-  };
+  }, [store]);
 
-  // Ref-gated container callback
+  // Stable container callback ref
   const containerElRef = useRef<HTMLDivElement | null>(null);
-  const containerRef = (node: HTMLDivElement | null) => {
+  const containerRef = useCallback((node: HTMLDivElement | null) => {
     if (containerElRef.current === node) return;
     containerElRef.current = node;
     setContainerEl(node);
-  };
+  }, []);
 
-  // Synchronous size update — useLayoutEffect runs before paint
+  // Ref wrapper for onDraw — layout effect so it's current before redrawSync
+  const onDrawRef = useRef<DrawCallback | undefined>(onDraw);
+  useLayoutEffect(() => { onDrawRef.current = onDraw; });
+
+  // Ref wrapper for onCursorDraw — layout effect so it's current before redrawSync
+  const onCursorDrawRef = useRef<CursorDrawCallback | undefined>(onCursorDraw);
+  useLayoutEffect(() => { onCursorDrawRef.current = onCursorDraw; });
+
+  // Tracks whether data has been loaded at least once — gates redrawSync
+  // so the first mount doesn't paint an empty chart before data/configs register.
+  const mountedRef = useRef(false);
+
+  // Update store data — layout effect so data is current before redrawSync
+  const prevStoreDataRef = useRef(data);
+  useLayoutEffect(() => {
+    if (data === prevStoreDataRef.current && store.dataStore.data.length > 0) return;
+    prevStoreDataRef.current = data;
+    mountedRef.current = true;
+    store.setData(normalizeData(data));
+    store.scheduleRedraw();
+  }, [store, data]);
+
+  // Synchronous size update — runs last among layout effects in this component,
+  // after labels, data, and draw refs are all current.
   useLayoutEffect(() => {
     store.setSize(width, height, pxRatio);
-    store.redrawSync();
+    if (mountedRef.current) {
+      store.redrawSync();
+    }
   }, [store, width, height, pxRatio]);
 
   // Clean up on unmount
@@ -105,40 +132,13 @@ export function Chart({
     return () => { observer.disconnect(); };
   }, [store, containerEl]);
 
-  // Normalize flexible input → internal ChartData (ref-based identity check, no useMemo)
-  const prevDataRef = useRef<DataInput | undefined>(undefined);
-  const normalizedRef = useRef<ChartData>(normalizeData(data));
-  if (data !== prevDataRef.current) {
-    prevDataRef.current = data;
-    normalizedRef.current = normalizeData(data);
-  }
-  const normalized = normalizedRef.current;
-
-  // Update store data
-  const prevStoreDataRef = useRef(data);
-  useEffect(() => {
-    if (data === prevStoreDataRef.current && store.dataStore.data.length > 0) return;
-    prevStoreDataRef.current = data;
-
-    store.setData(normalized);
-    store.scheduleRedraw();
-  }, [store, data, normalized]);
-
-  // Ref wrapper for onDraw — register stable wrapper once, update ref on each render
-  const onDrawRef = useRef<DrawCallback | undefined>(onDraw);
-  onDrawRef.current = onDraw;
-
-  useEffect(() => {
+  useLayoutEffect(() => {
     const wrapper: DrawCallback = (dc) => { onDrawRef.current?.(dc); };
     store.drawHooks.add(wrapper);
     return () => { store.drawHooks.delete(wrapper); };
   }, [store]);
 
-  // Ref wrapper for onCursorDraw
-  const onCursorDrawRef = useRef<CursorDrawCallback | undefined>(onCursorDraw);
-  onCursorDrawRef.current = onCursorDraw;
-
-  useEffect(() => {
+  useLayoutEffect(() => {
     const wrapper: CursorDrawCallback = (dc, cursor) => { onCursorDrawRef.current?.(dc, cursor); };
     store.cursorDrawHooks.add(wrapper);
     return () => { store.cursorDrawHooks.delete(wrapper); };
@@ -163,6 +163,7 @@ export function Chart({
             width: `${width}px`,
             height: `${height}px`,
             cursor: 'crosshair',
+            outline: 'none',
             order: 0,
           }}
         >

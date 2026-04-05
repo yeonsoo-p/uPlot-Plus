@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { useStore } from './useChart';
 import { shallowEqual } from '../utils/shallowEqual';
 import type { ChartStore } from './useChartStore';
@@ -25,10 +25,10 @@ export function useRegisterConfig<T extends object>(
 ): void {
   const store = useStore();
   const configRef = useRef(config);
-  configRef.current = config;
+  useLayoutEffect(() => { configRef.current = config; });
 
   // Mount/unmount: register on mount, unregister on unmount or identity change.
-  useEffect(() => {
+  useLayoutEffect(() => {
     const cfg = configRef.current;
     register(store, cfg);
     store.scheduleRedraw();
@@ -42,7 +42,7 @@ export function useRegisterConfig<T extends object>(
 
   // Sync: runs every render, bails out via shallow-equal check.
   const prevRef = useRef<T>(config);
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (shallowEqual(prevRef.current, config)) return;
     prevRef.current = config;
     sync(store, config);
