@@ -134,6 +134,17 @@ export function ZoomRanger({
     return DEFAULT_SELECTION;
   });
 
+  // Sync selFrac when initialRange or x-domain changes after mount
+  useEffect(() => {
+    if (initialRange == null || normalized.length === 0) return;
+    const group = normalized[0];
+    if (group == null || group.x.length < 2) return;
+    const xFirst = group.x[0];
+    const xLast = group.x[group.x.length - 1];
+    if (xFirst == null || xLast == null) return;
+    setSelFrac(rangeToFrac(initialRange, xFirst, xLast));
+  }, [initialRange, normalized]);
+
   // Fire onRangeChange when selection changes
   const prevRangeRef = useRef<[number, number] | null>(null);
   useEffect(() => {

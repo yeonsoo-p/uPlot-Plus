@@ -71,4 +71,19 @@ describe('BoxWhisker convenience mode', () => {
     expect(cfg).toBeDefined();
     expect(cfg!._internal).toBe(false);
   });
+
+  it('empty boxes array does not register NaN scales', async () => {
+    const { store } = renderChart(
+      { data: placeholderData },
+      <BoxWhisker boxes={[]} />,
+    );
+    await flushEffects();
+
+    // With an empty boxes array, BoxWhisker should not register fixed scales
+    // with NaN bounds. Any y scale present should have valid (finite or undefined) bounds.
+    for (const s of store.scaleConfigs) {
+      if (s.min != null) expect(Number.isFinite(s.min)).toBe(true);
+      if (s.max != null) expect(Number.isFinite(s.max)).toBe(true);
+    }
+  });
 });

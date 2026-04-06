@@ -177,4 +177,24 @@ describe('RenderScheduler', () => {
     expect(sched.has(Scales)).toBe(false);
     expect(sched.dirty).toBe(Size);
   });
+
+  it('re-entrant mark() during callback survives and schedules a new frame', async () => {
+    let callCount = 0;
+    let secondCallDirty = 0;
+    sched.onRedraw(() => {
+      callCount++;
+      if (callCount === 1) {
+        // Re-entrant mark during the first callback
+        sched.mark(Paths);
+      } else if (callCount === 2) {
+        secondCallDirty = sched.dirty;
+      }
+    });
+
+    sched.mark(Scales);
+    // Flush enough microtasks for both the initial and re-entrant RAF callbacks
+    for (let i = 0; i < 6; i++) await Promise.resolve();
+    expect(callCount).toBe(2);
+    expect(secondCallDirty).toBe(Paths);
+  });
 });

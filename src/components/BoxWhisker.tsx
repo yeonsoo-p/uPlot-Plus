@@ -69,7 +69,7 @@ export function BoxWhisker({
     }
   });
 
-  if (!autoScales) return <></>;
+  if (!autoScales || boxes.length === 0) return <></>;
 
   // Infer y-domain from box min/max with 10% padding
   let yMin = Infinity, yMax = -Infinity;

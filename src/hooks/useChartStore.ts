@@ -255,6 +255,8 @@ export interface ChartStore {
   _prevScaleRanges: Map<string, { min: number; max: number }>;
   // Previous plotBox for cache invalidation when layout changes
   _prevPlotBox: BBox | null;
+  // Serialized theme key for detecting CSS theme changes across full redraws
+  _prevThemeKey: string;
 
   // Methods
   registerScale: (cfg: ScaleConfig) => void;
@@ -352,6 +354,7 @@ export function createChartStore(): ChartStore {
     theme: resolveTheme(null),
     _prevScaleRanges: new Map(),
     _prevPlotBox: null,
+    _prevThemeKey: '',
     seriesConfigMap: new Map(),
 
     registerScale(cfg: ScaleConfig) {
@@ -488,6 +491,11 @@ export function createChartStore(): ChartStore {
 
       // Refresh cached CSS theme vars (one getComputedStyle call per full redraw)
       store.theme = resolveTheme(canvas);
+      const themeKey = JSON.stringify(store.theme);
+      if (themeKey !== store._prevThemeKey) {
+        store._prevThemeKey = themeKey;
+        store.revision++;
+      }
 
       // Re-apply palette colors for series with auto-assigned strokes
       const palette = store.theme.seriesColors;
@@ -835,6 +843,9 @@ export function createChartStore(): ChartStore {
       store.scheduler.cancel();
       store.scheduler.mark(DirtyFlag.Full);
       store.redraw();
+      // The synchronous Full redraw handled all flags. Cancel the
+      // pending RAF that mark() scheduled and clear flags.
+      store.scheduler.cancel();
       store.scheduler.clear();
     },
   };

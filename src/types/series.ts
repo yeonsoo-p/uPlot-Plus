@@ -86,9 +86,18 @@ function isTransparent(color: string): boolean {
  * Resolve the representative color for a series config (used by Legend/Tooltip swatches).
  * Bars: use fill. Lines with transparent stroke + fill: use fill. Otherwise: use stroke.
  */
+function extractColor(value: ColorValue | undefined): string | null {
+  if (typeof value === 'string') return value;
+  if (value != null && value.stops.length > 0) {
+    const first = value.stops[0];
+    if (first != null) return first[1];
+  }
+  return null;
+}
+
 export function getSeriesColor(cfg: SeriesConfig): string {
-  const stroke = typeof cfg.stroke === 'string' ? cfg.stroke : null;
-  const fill = typeof cfg.fill === 'string' ? cfg.fill : null;
+  const stroke = extractColor(cfg.stroke);
+  const fill = extractColor(cfg.fill);
   const hasStroke = stroke != null && !isTransparent(stroke);
   const hasFill = fill != null && !isTransparent(fill);
   const isBar = cfg.paths?.defaults?.width === 0;
