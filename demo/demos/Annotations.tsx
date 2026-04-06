@@ -1,4 +1,4 @@
-import { Chart, Scale, Series, HLine, VLine, Region, AnnotationLabel } from 'uplot-plus';
+import { Chart, Scale, Series, HLine, VLine, Region, VRegion, AnnotationLabel } from 'uplot-plus';
 
 function generateData() {
   const n = 150;
@@ -18,6 +18,9 @@ export default function Annotations() {
 
         {/* Shaded region between y=40 and y=60 */}
         <Region yMin={40} yMax={60} fill="rgba(46,204,113,0.12)" stroke="rgba(46,204,113,0.4)" strokeWidth={1} dash={[3, 3]} />
+
+        {/* Vertical region between x=100 and x=130 */}
+        <VRegion xMin={100} xMax={130} fill="rgba(52,152,219,0.1)" stroke="rgba(52,152,219,0.3)" strokeWidth={1} dash={[3, 3]} />
 
         {/* Horizontal threshold lines */}
         <HLine value={65} stroke="#e74c3c" width={1.5} dash={[6, 4]} label="Upper threshold" />

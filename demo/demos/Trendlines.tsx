@@ -1,4 +1,4 @@
-import { Chart, Series, linear, at } from 'uplot-plus';
+import { Chart, Series, DiagonalLine, at } from 'uplot-plus';
 
 function generateData() {
   const n = 80;
@@ -29,22 +29,24 @@ function generateData() {
   const slope = den !== 0 ? num / den : 0;
   const intercept = meanY - slope * meanX;
 
-  const trendY = x.map(v => slope * v + intercept);
   const label = `Trend: y = ${slope.toFixed(2)}x + ${intercept.toFixed(1)}`;
 
-  return { data: [{ x, series: [y, trendY] }], trendLabel: label };
+  return { data: [{ x, series: [y] }], slope, intercept, n, trendLabel: label };
 }
 
 export default function Trendlines() {
-  const { data, trendLabel } = generateData();
+  const { data, slope, intercept, n, trendLabel } = generateData();
 
   return (
     <Chart width={800} height={400} data={data} xlabel="X" ylabel="Y">
       <Series group={0} index={0} label="Data"
         points={{ show: true, size: 4, fill: '#3498db' }} />
-      <Series group={0} index={1} label={trendLabel}
+      <DiagonalLine
+        x1={0} y1={intercept}
+        x2={n - 1} y2={slope * (n - 1) + intercept}
         stroke="#e74c3c" width={2.5} dash={[8, 4]}
-        paths={linear()} points={{ show: false }} />
+        label={trendLabel}
+      />
     </Chart>
   );
 }

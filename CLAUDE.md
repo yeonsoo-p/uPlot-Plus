@@ -11,7 +11,7 @@ Library code lives at the project root. The `uPlot/` and `uplot-wrappers/` direc
 ├── src/
 │   ├── components/    Chart, Series, Scale, Axis, Band, Legend, Tooltip, FloatingLegend, HoverLabel,
 │   │                  ZoomRanger, Timeline, Sparkline, BoxWhisker, Candlestick, Heatmap, Vector,
-│   │                  ThemeProvider, annotations/{HLine,VLine,Region,AnnotationLabel},
+│   │                  ThemeProvider, annotations/{HLine,VLine,Region,VRegion,DiagonalLine,AnnotationLabel},
 │   │                  overlay/SeriesPanel
 │   ├── core/          DataStore, ScaleManager, CursorManager, RenderScheduler, Scale, BlockMinMax, normalizeData
 │   ├── rendering/     CanvasRenderer, drawSeries, drawAxes, drawCursor, drawSelect, drawBands, drawPoints, drawRangeBox, theme
@@ -59,12 +59,12 @@ npm run test:e2e    # Playwright e2e tests (requires dev server running)
 
 ## Features
 
-- **21 components**: Chart, Scale, Series, Axis, Band, Legend, Tooltip, FloatingLegend, HoverLabel, ZoomRanger, Timeline, Sparkline, BoxWhisker, Candlestick, Heatmap, Vector, ThemeProvider, HLine, VLine, Region, AnnotationLabel
+- **23 components**: Chart, Scale, Series, Axis, Band, Legend, Tooltip, FloatingLegend, HoverLabel, ZoomRanger, Timeline, Sparkline, BoxWhisker, Candlestick, Heatmap, Vector, ThemeProvider, HLine, VLine, Region, VRegion, DiagonalLine, AnnotationLabel
 - **8 exported path builders**: linear (pixel decimation), stepped, bars, groupedBars, stackedBars, monotoneCubic, catmullRom, points. Internal default is lttbLinear (LTTB downsampling + pixel decimation), applied by CanvasRenderer when no `paths` prop is set.
 - **Theming**: `ThemeProvider` sets CSS custom properties on a wrapper div; `Chart.theme` prop for per-chart overrides. Pre-built `DARK_THEME` preset. 40+ themeable properties (axes, grid, cursor, selection, series palette, candlestick, box-whisker, overlay panels, zoom ranger, annotations). CSS custom properties (`--uplot-*`) also work without ThemeProvider. `resolveTheme()` reads from `getComputedStyle(canvas)` on each full redraw.
 - **Default injection**: Chart auto-creates missing x/y scales, axes, and series colors — minimal config: just `<Chart data={data}><Series group={0} index={0} /></Chart>`
 - **Candlestick**: `<Candlestick />` auto-registers hidden OHLC series — no manual `<Series show={false}>` declarations needed.
-- **Annotations**: declarative `<HLine>`, `<VLine>`, `<Region>`, `<AnnotationLabel>` components; also imperative drawHLine/drawVLine/drawLabel/drawRegion
+- **Annotations**: declarative `<HLine>`, `<VLine>`, `<Region>`, `<VRegion>`, `<DiagonalLine>`, `<AnnotationLabel>` components; also imperative drawHLine/drawVLine/drawLabel/drawRegion/drawVRegion/drawDiagonalLine
 - **Axis formatters**: fmtCompact (K/M/B), fmtSuffix (°C, %), fmtPrefix ($), fmtWrap (prefix+suffix), fmtHourMin, fmtMonthName, fmtDateStr, fmtLabels
 - **Color utilities**: fadeGradient, withAlpha, palette
 - **Time formatting**: Intl.DateTimeFormat-based formatters, 26 standard time increments, round-boundary tick alignment
@@ -97,7 +97,7 @@ npm run test:e2e    # Playwright e2e tests (requires dev server running)
 - **Pattern**: `describe`/`it` blocks with `@/` path aliases; helper factories for scales/data
 - **Coverage**: math (utils, increments, stack, align, lttb), core (Scale, ScaleManager, DataStore, BlockMinMax, normalizeData, RenderScheduler, CursorManager), axes (ticks, layout, log filter, asinh splits), paths (linear, lttbLinear, stepped, bars, spline, candlestick, points, path utils), annotations, time formatting, formatters, colors, sync, hooks (useChart, useDraggableOverlay, useDrawHook), components (Chart, Legend, Tooltip, ZoomRanger, FloatingLegend, ThemeProvider), utils (shallowEqual), integration tests (convergence, auto-ranging, cursor snapping, cursor snapping extended, interactions, resize, mount, focus, defaults, axis drag, touch pinch)
 - **Interaction tests**: `setupInteraction()` extracted from `useInteraction` hook for direct DOM event testing without React Testing Library
-- **Demos**: 107 interactive examples across 14 categories (Getting Started, Line Styles, Bars & Stacking, Scales, Axes & Formatting, Time & Dates, Cursor & Interaction, Zoom & Pan, Data Handling, Tooltips & Legends, Layout & Streaming, Annotations & Drawing, Theming, Specialized Charts)
+- **Demos**: 108 interactive examples across 14 categories (Getting Started, Line Styles, Bars & Stacking, Scales, Axes & Formatting, Time & Dates, Cursor & Interaction, Zoom & Pan, Data Handling, Tooltips & Legends, Layout & Streaming, Annotations & Drawing, Theming, Specialized Charts)
 
 ## Reference Code
 

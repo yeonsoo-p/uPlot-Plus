@@ -16,7 +16,7 @@ export { Heatmap } from './components/Heatmap';
 export { Vector } from './components/Vector';
 
 // Annotation components (declarative)
-export { HLine, VLine, Region, AnnotationLabel } from './components/annotations';
+export { HLine, VLine, Region, VRegion, DiagonalLine, AnnotationLabel } from './components/annotations';
 
 // Theme
 export { ThemeProvider } from './components/ThemeProvider';
@@ -70,7 +70,7 @@ export type { LegendConfig } from './types/legend';
 export type { TooltipProps, TooltipData, TooltipItem } from './types/tooltip';
 export type { DrawContext, DrawCallback, CursorDrawCallback } from './types/hooks';
 export type { ChartEventInfo, NearestPoint, SelectEventInfo, ScaleChangeCallback, SelectCallback, EventCallbacks } from './types/events';
-export type { AnnotationStyle } from './annotations';
+export type { AnnotationStyle, DiagonalLineStyle } from './annotations';
 export type { LttbResult } from './types/downsample';
 export type { ZoomRangerProps } from './components/ZoomRanger';
 export type { TimelineProps, TimelineLane, TimelineSegment } from './types/timeline';
@@ -78,7 +78,7 @@ export type { CandlestickProps } from './components/Candlestick';
 export type { SparklineProps } from './components/Sparkline';
 export type { FloatingLegendProps } from './components/FloatingLegend';
 export type { HoverLabelProps } from './components/HoverLabel';
-export type { HLineProps, VLineProps, RegionProps, AnnotationLabelProps } from './components/annotations';
+export type { HLineProps, VLineProps, RegionProps, VRegionProps, DiagonalLineProps, AnnotationLabelProps } from './components/annotations';
 export type { BoxWhiskerProps } from './components/BoxWhisker';
 export type { HeatmapProps } from './components/Heatmap';
 export type { VectorProps } from './components/Vector';
@@ -97,7 +97,7 @@ export { alignData } from './math/align';
 export { lttb, lttbGroup } from './math/lttb';
 
 // Annotation helpers
-export { drawHLine, drawVLine, drawLabel, drawRegion } from './annotations';
+export { drawHLine, drawVLine, drawLabel, drawRegion, drawVRegion, drawDiagonalLine } from './annotations';
 
 // Scale utilities (for advanced draw hooks that need raw access)
 export { valToPos, posToVal } from './core/Scale';

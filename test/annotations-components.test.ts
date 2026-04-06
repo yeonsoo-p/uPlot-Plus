@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { drawHLine, drawVLine, drawRegion } from '@/annotations';
+import { drawHLine, drawVLine, drawRegion, drawVRegion } from '@/annotations';
 import type { DrawContext } from '@/types/hooks';
 import { createScaleState } from '@/core/Scale';
 import type { ScaleState } from '@/types';
@@ -75,5 +75,25 @@ describe('drawRegion (imperative)', () => {
 
     expect(mockCtx.strokeRect).toHaveBeenCalled();
     expect(mockCtx.strokeStyle).toBe('green');
+  });
+});
+
+describe('drawVRegion (imperative)', () => {
+  it('draws a filled rectangle between two x-values', () => {
+    const scale = makeScale(0, 200);
+    const { dc, mockCtx } = makeDC();
+    drawVRegion(dc, scale, 50, 150, { fill: 'rgba(0,0,255,0.2)' });
+
+    expect(mockCtx.fillRect).toHaveBeenCalled();
+    expect(mockCtx.fillStyle).toBe('rgba(0,0,255,0.2)');
+  });
+
+  it('draws border when stroke is provided', () => {
+    const scale = makeScale(0, 200);
+    const { dc, mockCtx } = makeDC();
+    drawVRegion(dc, scale, 50, 150, { fill: 'rgba(0,0,0,0.1)', stroke: 'purple', width: 2 });
+
+    expect(mockCtx.strokeRect).toHaveBeenCalled();
+    expect(mockCtx.strokeStyle).toBe('purple');
   });
 });

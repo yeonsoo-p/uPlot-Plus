@@ -261,7 +261,7 @@ export const demos: DemoEntry[] = [
 
   // --- Annotations & Drawing ---
   { id: 'draw-hooks', title: 'Draw Hooks', description: 'onDraw for threshold lines/zones, onCursorDraw for crosshair labels.', category: 'Annotations & Drawing', component: DrawHooks, sourceFile: 'DrawHooks' },
-  { id: 'annotations', title: 'Annotations', description: 'Declarative annotation components: horizontal lines, vertical markers, shaded regions, and labels.', category: 'Annotations & Drawing', component: Annotations, sourceFile: 'Annotations' },
+  { id: 'annotations', title: 'Annotations', description: 'Declarative annotation components: horizontal lines, vertical markers, horizontal and vertical regions, and labels.', category: 'Annotations & Drawing', component: Annotations, sourceFile: 'Annotations' },
   { id: 'gradients', title: 'Gradients', description: 'Area chart with linear gradient fills from top to bottom.', category: 'Annotations & Drawing', component: Gradients, sourceFile: 'Gradients' },
   { id: 'high-low-bands', title: 'High/Low Bands', description: 'Band component fills the region between upper and lower confidence bounds.', category: 'Annotations & Drawing', component: HighLowBands, sourceFile: 'HighLowBands' },
   { id: 'band-demo', title: 'Band Component', description: 'Band component: confidence intervals, between-series fills, and multiple bands.', category: 'Annotations & Drawing', component: BandDemo, sourceFile: 'BandDemo' },
@@ -282,7 +282,7 @@ export const demos: DemoEntry[] = [
   { id: 'heatmap', title: 'Heatmap', description: 'Latency heatmap with color-mapped rectangles via onDraw hook.', category: 'Specialized Charts', component: Heatmap, sourceFile: 'Heatmap' },
   { id: 'box-whisker', title: 'Box & Whisker', description: 'Box and whisker plot with Q1-Q3 boxes and min-max whiskers.', category: 'Specialized Charts', component: BoxWhisker, sourceFile: 'BoxWhisker' },
   { id: 'scatter-plot', title: 'Scatter Plot', description: 'Scatter plot with point-only series and wheel zoom.', category: 'Specialized Charts', component: ScatterPlot, sourceFile: 'ScatterPlot' },
-  { id: 'trendlines', title: 'Trendlines', description: 'Line chart with linear regression trendline overlay.', category: 'Specialized Charts', component: Trendlines, sourceFile: 'Trendlines' },
+  { id: 'trendlines', title: 'Trendlines', description: 'Linear regression trendline using DiagonalLine annotation.', category: 'Specialized Charts', component: Trendlines, sourceFile: 'Trendlines' },
   { id: 'measure-datums', title: 'Measure Datums', description: 'Click to set reference point, cursor shows distance measurement.', category: 'Specialized Charts', component: MeasureDatums, sourceFile: 'MeasureDatums' },
   { id: 'data-smoothing', title: 'Data Smoothing', description: 'Noisy signal with moving-average smoothed overlay.', category: 'Specialized Charts', component: DataSmoothing, sourceFile: 'DataSmoothing' },
   { id: 'wind-direction', title: 'Wind Direction', description: 'Wind speed with directional arrow markers via onDraw hook.', category: 'Specialized Charts', component: WindDirection, sourceFile: 'WindDirection' },

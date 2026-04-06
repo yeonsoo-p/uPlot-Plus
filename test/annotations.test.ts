@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { drawHLine, drawVLine, drawLabel, drawRegion } from '@/annotations';
+import { drawHLine, drawVLine, drawLabel, drawRegion, drawVRegion, drawDiagonalLine } from '@/annotations';
 import { createScaleState } from '@/core/Scale';
 import type { ScaleState } from '@/types';
 import { Orientation } from '@/types';
@@ -136,5 +136,104 @@ describe('drawRegion', () => {
     drawRegion(dc, yScale, 20, 80);
 
     expect(ctx.strokeRect).not.toHaveBeenCalled();
+  });
+});
+
+describe('drawVRegion', () => {
+  it('fills a rect between two x-values spanning full height', () => {
+    const { dc, ctx } = makeDC();
+    const xScale = makeScale('x', 0, 100);
+
+    drawVRegion(dc, xScale, 20, 80);
+
+    // valToPos(20, {Horizontal,Forward}, width=400, left=50) = 50 + 0.2*400 = 130
+    // valToPos(80, {Horizontal,Forward}, width=400, left=50) = 50 + 0.8*400 = 370
+    // fillRect(x=130, y=20, w=240, h=300)
+    const args = ctx.fillRect.mock.calls[0]!;
+    expect(args[0]).toBeCloseTo(130, 10);
+    expect(args[1]).toBe(20);
+    expect(args[2]).toBeCloseTo(240, 10);
+    expect(args[3]).toBe(300);
+  });
+
+  it('draws a stroke border when stroke style provided', () => {
+    const { dc, ctx } = makeDC();
+    const xScale = makeScale('x', 0, 100);
+
+    drawVRegion(dc, xScale, 20, 80, { stroke: '#ccc', fill: 'rgba(0,0,0,0.1)' });
+
+    expect(ctx.fillRect).toHaveBeenCalled();
+    expect(ctx.strokeRect).toHaveBeenCalled();
+  });
+
+  it('does not stroke when no stroke style', () => {
+    const { dc, ctx } = makeDC();
+    const xScale = makeScale('x', 0, 100);
+
+    drawVRegion(dc, xScale, 20, 80);
+
+    expect(ctx.strokeRect).not.toHaveBeenCalled();
+  });
+});
+
+describe('drawDiagonalLine', () => {
+  it('draws a line between two data points', () => {
+    const { dc, ctx } = makeDC();
+    const xScale = makeScale('x', 0, 100);
+    const yScale = makeScale('y', 0, 100, Orientation.Vertical);
+
+    drawDiagonalLine(dc, xScale, yScale, 0, 0, 100, 100);
+
+    expect(ctx.beginPath).toHaveBeenCalled();
+    // (0,0) -> valToPos x: 50+0*400=50, y: 20+(1-0)*300=320
+    // (100,100) -> x: 50+1*400=450, y: 20+(1-1)*300=20
+    expect(ctx.moveTo).toHaveBeenCalledWith(50, 320);
+    expect(ctx.lineTo).toHaveBeenCalledWith(450, 20);
+    expect(ctx.stroke).toHaveBeenCalled();
+  });
+
+  it('applies custom stroke style and dash', () => {
+    const { dc, ctx } = makeDC();
+    const xScale = makeScale('x', 0, 100);
+    const yScale = makeScale('y', 0, 100, Orientation.Vertical);
+
+    drawDiagonalLine(dc, xScale, yScale, 0, 0, 100, 100, { stroke: 'blue', width: 3, dash: [5, 5] });
+
+    expect(ctx.strokeStyle).toBe('blue');
+    expect(ctx.lineWidth).toBe(3);
+    expect(ctx.setLineDash).toHaveBeenCalledWith([5, 5]);
+  });
+
+  it('extends line to plot box edges', () => {
+    const { dc, ctx } = makeDC();
+    const xScale = makeScale('x', 0, 100);
+    const yScale = makeScale('y', 0, 100, Orientation.Vertical);
+
+    // Line from center (50,50) to (75,75) — should extend to corners
+    drawDiagonalLine(dc, xScale, yScale, 50, 50, 75, 75, { extend: true });
+
+    expect(ctx.moveTo).toHaveBeenCalled();
+    expect(ctx.lineTo).toHaveBeenCalled();
+    // Extended endpoints should reach plot box edges (beyond original points)
+    const moveArgs = ctx.moveTo.mock.calls[0]!;
+    const lineArgs = ctx.lineTo.mock.calls[0]!;
+    // The extended line should go further than the original endpoints
+    expect(moveArgs[0]).toBeLessThanOrEqual(250); // original midpoint x=250
+    expect(lineArgs[0]).toBeGreaterThanOrEqual(250);
+  });
+
+  it('draws label at midpoint', () => {
+    const { dc, ctx } = makeDC();
+    const xScale = makeScale('x', 0, 100);
+    const yScale = makeScale('y', 0, 100, Orientation.Vertical);
+
+    drawDiagonalLine(dc, xScale, yScale, 0, 0, 100, 100, { label: 'Trend' });
+
+    expect(ctx.fillText).toHaveBeenCalled();
+    const callArgs = ctx.fillText.mock.calls[0]!;
+    expect(callArgs[0]).toBe('Trend');
+    // Midpoint: x=(50+450)/2=250, y=(320+20)/2=170, offset by LABEL_OFFSET_Y=4
+    expect(callArgs[1]).toBe(250);
+    expect(callArgs[2]).toBe(166);
   });
 });
