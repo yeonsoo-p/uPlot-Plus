@@ -54,7 +54,7 @@ describe('fmtSuffix', () => {
 
 describe('fmtHourMin', () => {
   it('formats UTC timestamps as HH:MM', () => {
-    const fmt = fmtHourMin({ utc: true });
+    const fmt = fmtHourMin({ utc: true, locale: 'en-US' });
     // 2024-01-01 14:30 UTC
     const ts = Date.UTC(2024, 0, 1, 14, 30) / 1000;
     const result = fmt([ts], 0, 0);
@@ -64,7 +64,7 @@ describe('fmtHourMin', () => {
 
 describe('fmtMonthName', () => {
   it('formats timestamps as short month names', () => {
-    const fmt = fmtMonthName({ utc: true });
+    const fmt = fmtMonthName({ utc: true, locale: 'en-US' });
     const jan = Date.UTC(2024, 0, 15) / 1000;
     const jul = Date.UTC(2024, 6, 15) / 1000;
     const result = fmt([jan, jul], 0, 0);
@@ -73,7 +73,7 @@ describe('fmtMonthName', () => {
   });
 
   it('supports long format', () => {
-    const fmt = fmtMonthName({ utc: true, format: 'long' });
+    const fmt = fmtMonthName({ utc: true, format: 'long', locale: 'en-US' });
     const jan = Date.UTC(2024, 0, 15) / 1000;
     const result = fmt([jan], 0, 0);
     expect(result[0]).toBe('January');
@@ -82,7 +82,7 @@ describe('fmtMonthName', () => {
 
 describe('fmtDateStr', () => {
   it('formats with custom Intl options', () => {
-    const fmt = fmtDateStr({ year: 'numeric', month: '2-digit', day: '2-digit', tz: 'UTC' });
+    const fmt = fmtDateStr({ year: 'numeric', month: '2-digit', day: '2-digit', tz: 'UTC', locale: 'en-US' });
     const ts = Date.UTC(2024, 5, 15) / 1000;
     const result = fmt([ts], 0, 0);
     expect(result[0]).toBe('06/15/2024');

@@ -14,8 +14,9 @@ export function timeAxisVals(
   splits: number[],
   incr: number,
   tz?: string,
+  locale?: string,
 ): string[] {
-  let fmt: (ts: number, tz?: string) => string;
+  let fmt: (ts: number, tz?: string, locale?: string) => string;
 
   if (incr >= YEAR)
     fmt = fmtYear;
@@ -32,7 +33,7 @@ export function timeAxisVals(
   else
     fmt = fmtFullDateTime;
 
-  return splits.map(ts => fmt(ts, tz));
+  return splits.map(ts => fmt(ts, tz, locale));
 }
 
 /**

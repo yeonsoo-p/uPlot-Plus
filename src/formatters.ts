@@ -46,34 +46,36 @@ export function fmtWrap(prefix: string, suffix: string, decimals = 0): AxisValue
 /**
  * Format unix timestamps (seconds) as HH:MM.
  */
-export function fmtHourMin(opts?: { utc?: boolean }): AxisValueFormatter {
+export function fmtHourMin(opts?: { utc?: boolean; locale?: string }): AxisValueFormatter {
   const utc = opts?.utc ?? false;
+  const locale = opts?.locale;
   return (splits: number[]) =>
     splits.map(v => {
       if (utc) {
-        return fmtDate(v, { hour: '2-digit', minute: '2-digit', hour12: false }, 'UTC');
+        return fmtDate(v, { hour: '2-digit', minute: '2-digit', hour12: false }, 'UTC', locale);
       }
-      return fmtDate(v, { hour: '2-digit', minute: '2-digit', hour12: false });
+      return fmtDate(v, { hour: '2-digit', minute: '2-digit', hour12: false }, undefined, locale);
     });
 }
 
 /**
  * Format unix timestamps (seconds) as month names: "Jan", "Feb", etc.
  */
-export function fmtMonthName(opts?: { utc?: boolean; format?: 'short' | 'long' }): AxisValueFormatter {
+export function fmtMonthName(opts?: { utc?: boolean; format?: 'short' | 'long'; locale?: string }): AxisValueFormatter {
   const tz = opts?.utc ? 'UTC' : undefined;
   const month = opts?.format ?? 'short';
+  const locale = opts?.locale;
   return (splits: number[]) =>
-    splits.map(v => fmtDate(v, { month }, tz));
+    splits.map(v => fmtDate(v, { month }, tz, locale));
 }
 
 /**
  * Format unix timestamps (seconds) using arbitrary Intl.DateTimeFormat options.
  */
-export function fmtDateStr(opts?: Intl.DateTimeFormatOptions & { tz?: string }): AxisValueFormatter {
-  const { tz, ...fmtOpts } = opts ?? {};
+export function fmtDateStr(opts?: Intl.DateTimeFormatOptions & { tz?: string; locale?: string }): AxisValueFormatter {
+  const { tz, locale, ...fmtOpts } = opts ?? {};
   return (splits: number[]) =>
-    splits.map(v => fmtDate(v, fmtOpts, tz));
+    splits.map(v => fmtDate(v, fmtOpts, tz, locale));
 }
 
 /**

@@ -8,19 +8,19 @@ describe('timeAxisVals', () => {
     // 1700010000 = 2023-11-15 01:00:00 UTC
     // 1700013600 = 2023-11-15 02:00:00 UTC
     const splits = [1700006400, 1700010000, 1700013600];
-    const vals = timeAxisVals(splits, HOUR, 'UTC');
+    const vals = timeAxisVals(splits, HOUR, 'UTC', 'en-US');
     expect(vals.length).toBe(3);
     expect(vals).toEqual(['00:00', '01:00', '02:00']);
   });
 
   it('formats daily splits as month + day', () => {
     const splits = [1700006400, 1700092800]; // ~1 day apart
-    const vals = timeAxisVals(splits, DAY, 'UTC');
+    const vals = timeAxisVals(splits, DAY, 'UTC', 'en-US');
     expect(vals).toEqual(['Nov 15', 'Nov 16']);
   });
 
   it('formats yearly splits as 4-digit year', () => {
-    const vals = timeAxisVals([1700006400], YEAR, 'UTC');
+    const vals = timeAxisVals([1700006400], YEAR, 'UTC', 'en-US');
     expect(vals.length).toBe(1);
     expect(vals[0]).toBe('2023');
   });
@@ -28,7 +28,7 @@ describe('timeAxisVals', () => {
   it('formats sub-minute splits with seconds', () => {
     // Use increment < MIN to trigger fmtTimeOnly
     const ts = 1700006400;
-    const vals = timeAxisVals([ts, ts + 10, ts + 20], 10, 'UTC');
+    const vals = timeAxisVals([ts, ts + 10, ts + 20], 10, 'UTC', 'en-US');
     expect(vals.length).toBe(3);
     // fmtTimeOnly includes seconds
     expect(vals[0]).toMatch(/\d{2}:\d{2}:\d{2}/);
@@ -36,8 +36,8 @@ describe('timeAxisVals', () => {
 
   it('selects different format based on increment', () => {
     const ts = 1700006400;
-    const hourVals = timeAxisVals([ts], HOUR, 'UTC');
-    const yearVals = timeAxisVals([ts], YEAR, 'UTC');
+    const hourVals = timeAxisVals([ts], HOUR, 'UTC', 'en-US');
+    const yearVals = timeAxisVals([ts], YEAR, 'UTC', 'en-US');
     // Hourly format is shorter and different from yearly
     expect(hourVals[0]).not.toEqual(yearVals[0]);
   });

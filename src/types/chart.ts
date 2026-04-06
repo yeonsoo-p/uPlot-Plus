@@ -54,4 +54,8 @@ export interface ChartProps {
   onSelect?: (sel: SelectEventInfo) => boolean | void;
   /** Theme overrides — sets CSS custom properties on the chart wrapper. */
   theme?: ChartTheme;
+  /** BCP 47 locale tag for number/date formatting (default: browser locale) */
+  locale?: string;
+  /** IANA timezone for time axis labels (default: browser local timezone) */
+  timezone?: string;
 }

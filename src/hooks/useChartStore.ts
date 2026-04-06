@@ -234,6 +234,10 @@ export interface ChartStore {
   xlabel: string | undefined;
   /** Y-axis label for default axis */
   ylabel: string | undefined;
+  /** BCP 47 locale for number/date formatting */
+  locale: string | undefined;
+  /** IANA timezone for time axis labels */
+  timezone: string | undefined;
 
   // Immutable snapshot for UI subscribers (rebuilt before notifications)
   snapshot: ChartSnapshot;
@@ -291,8 +295,8 @@ export interface ChartStore {
   setData: (data: ChartData) => void;
   /** Set the canvas element */
   setCanvas: (node: HTMLCanvasElement | null) => void;
-  /** Set title and axis labels */
-  setLabels: (title?: string, xlabel?: string, ylabel?: string) => void;
+  /** Set title, axis labels, locale, and timezone */
+  setLabels: (title?: string, xlabel?: string, ylabel?: string, locale?: string, timezone?: string) => void;
 }
 
 /** Rebuild the series config lookup map from the current seriesConfigs array. */
@@ -340,6 +344,8 @@ export function createChartStore(): ChartStore {
     title: undefined,
     xlabel: undefined,
     ylabel: undefined,
+    locale: undefined,
+    timezone: undefined,
     snapshot: EMPTY_SNAPSHOT,
     revision: 0,
     eventCallbacks: {},
@@ -532,7 +538,7 @@ export function createChartStore(): ChartStore {
       if (store.axisStates.length > 0) {
         const titleFontSize = parseFontSizePx(store.theme.titleFont);
         const titleHeight = store.title != null ? Math.ceil(titleFontSize * 1.5) + 4 : 0;
-        store.plotBox = convergeSize(width, height, store.axisStates, getScale, titleHeight, store.theme);
+        store.plotBox = convergeSize(width, height, store.axisStates, getScale, titleHeight, store.theme, store.locale, store.timezone);
       } else {
         const margin = 10;
         store.plotBox = {
@@ -816,10 +822,12 @@ export function createChartStore(): ChartStore {
       store.canvas = node;
     },
 
-    setLabels(title?: string, xlabel?: string, ylabel?: string) {
+    setLabels(title?: string, xlabel?: string, ylabel?: string, locale?: string, timezone?: string) {
       store.title = title;
       store.xlabel = xlabel;
       store.ylabel = ylabel;
+      store.locale = locale;
+      store.timezone = timezone;
       store.scheduleRedraw();
     },
 

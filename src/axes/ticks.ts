@@ -46,8 +46,8 @@ export function numAxisSplits(
  * Format tick values as strings for a numeric axis.
  * Ported from uPlot opts.js numAxisVals.
  */
-export function numAxisVals(splits: number[]): string[] {
-  return splits.map(v => fmtNum(v));
+export function numAxisVals(splits: number[], locale?: string): string[] {
+  return splits.map(v => fmtNum(v, locale));
 }
 
 /**
@@ -201,8 +201,8 @@ function estCharWidth(font?: string): number {
   return font != null ? parseFontSizePx(font) * 0.58 : DEFAULT_CHAR_WIDTH;
 }
 
-function estimateMinSpace(min: number, max: number, charWidth = DEFAULT_CHAR_WIDTH): number {
-  const maxAbsStr = fmtNum(Math.max(Math.abs(min), Math.abs(max)));
+function estimateMinSpace(min: number, max: number, charWidth = DEFAULT_CHAR_WIDTH, locale?: string): number {
+  const maxAbsStr = fmtNum(Math.max(Math.abs(min), Math.abs(max)), locale);
   const estWidth = maxAbsStr.length * charWidth;
   return Math.max(MIN_LABEL_WIDTH_PX, estWidth + LABEL_PADDING_PX);
 }
@@ -217,6 +217,7 @@ export function getIncrSpace(
   max: number,
   fullDim: number,
   tickFont?: string,
+  locale?: string,
 ): [number, number] {
   if (fullDim <= 0)
     return [0, 0];
@@ -225,7 +226,7 @@ export function getIncrSpace(
   const fontSize = tickFont != null ? parseFontSizePx(tickFont) : 12;
   // Y-axis: vertical spacing based on font height + gap.
   // X-axis: horizontal spacing based on label width estimate.
-  const minSpace = axis.space ?? (isVertical ? Math.ceil(fontSize * 2.5) : estimateMinSpace(min, max, estCharWidth(tickFont)));
+  const minSpace = axis.space ?? (isVertical ? Math.ceil(fontSize * 2.5) : estimateMinSpace(min, max, estCharWidth(tickFont), locale));
   const incrs = axis.incrs ?? numIncrs;
 
   return findIncr(min, max, incrs, fullDim, minSpace);

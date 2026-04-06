@@ -46,17 +46,17 @@ describe('numAxisSplits', () => {
 // ---- numAxisVals ----
 describe('numAxisVals', () => {
   it('formats splits as exact string representations', () => {
-    const vals = numAxisVals([0, 5, 10]);
+    const vals = numAxisVals([0, 5, 10], 'en-US');
     expect(vals).toEqual(['0', '5', '10']);
   });
 
   it('formats large numbers with locale formatting', () => {
-    const vals = numAxisVals([1000, 50000]);
+    const vals = numAxisVals([1000, 50000], 'en-US');
     expect(vals).toEqual(['1,000', '50,000']);
   });
 
   it('formats decimals', () => {
-    const vals = numAxisVals([0.1, 0.5, 1.0]);
+    const vals = numAxisVals([0.1, 0.5, 1.0], 'en-US');
     expect(vals).toEqual(['0.1', '0.5', '1']);
   });
 });

@@ -6,22 +6,22 @@ describe('fmtDate', () => {
   const ts = 1705318200;
 
   it('formats with Intl options', () => {
-    const result = fmtDate(ts, { year: 'numeric' }, 'UTC');
+    const result = fmtDate(ts, { year: 'numeric' }, 'UTC', 'en-US');
     expect(result).toBe('2024');
   });
 
   it('formats hour:minute in UTC', () => {
-    const result = fmtHourMinute(ts, 'UTC');
+    const result = fmtHourMinute(ts, 'UTC', 'en-US');
     expect(result).toBe('11:30');
   });
 
   it('formats month day', () => {
-    const result = fmtMonthDay(ts, 'UTC');
+    const result = fmtMonthDay(ts, 'UTC', 'en-US');
     expect(result).toBe('Jan 15');
   });
 
   it('formats year', () => {
-    const result = fmtYear(ts, 'UTC');
+    const result = fmtYear(ts, 'UTC', 'en-US');
     expect(result).toBe('2024');
   });
 });

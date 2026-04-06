@@ -202,7 +202,7 @@ describe('clamp', () => {
 // ---- fmtNum ----
 describe('fmtNum', () => {
   it('formats numbers with locale separators', () => {
-    expect(fmtNum(1234)).toBe('1,234');
+    expect(fmtNum(1234, 'en-US')).toBe('1,234');
   });
 });
 

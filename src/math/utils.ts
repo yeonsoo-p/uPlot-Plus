@@ -208,9 +208,17 @@ export function clamp(num: number, _min: number, _max: number): number {
   return min(max(num, _min), _max);
 }
 
-/** Number formatter */
-const numFormatter = new Intl.NumberFormat();
-export const fmtNum = (val: number): string => numFormatter.format(val);
+/** Number formatter (locale-aware with caching) */
+const numFmtCache = new Map<string, Intl.NumberFormat>();
+export function fmtNum(val: number, locale?: string): string {
+  const key = locale ?? '';
+  let fmt = numFmtCache.get(key);
+  if (fmt == null) {
+    fmt = new Intl.NumberFormat(locale);
+    numFmtCache.set(key, fmt);
+  }
+  return fmt.format(val);
+}
 
 /** Check if range has any non-null data */
 export function hasData(data: ArrayLike<number | null>, idx0: number, idx1: number): boolean {

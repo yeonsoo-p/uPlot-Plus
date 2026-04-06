@@ -17,7 +17,7 @@ import { ThemeRevisionContext } from './ThemeProvider';
  */
 export function Chart({
   width, height, data, children, className, pxRatio: pxRatioOverride, title, xlabel, ylabel,
-  onDraw, onCursorDraw, syncKey, actions, theme,
+  onDraw, onCursorDraw, syncKey, actions, theme, locale, timezone,
   onClick, onContextMenu, onDblClick, onCursorMove, onCursorLeave,
   onScaleChange, onSelect,
 }: ChartProps) {
@@ -60,8 +60,8 @@ export function Chart({
   // Sync title and axis labels to store — layout effect so labels are
   // current before redrawSync() fires on size changes.
   useLayoutEffect(() => {
-    store.setLabels(title, xlabel, ylabel);
-  }, [store, title, xlabel, ylabel]);
+    store.setLabels(title, xlabel, ylabel, locale, timezone);
+  }, [store, title, xlabel, ylabel, locale, timezone]);
 
   // Sync event callback props — deferred to effect so render stays pure
   useEffect(() => {

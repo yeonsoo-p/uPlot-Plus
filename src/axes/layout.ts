@@ -33,6 +33,8 @@ export function axesCalc(
   plotHgtCss: number,
   cycleNum: number,
   theme?: ResolvedTheme,
+  locale?: string,
+  timezone?: string,
 ): boolean {
   let converged = true;
 
@@ -72,7 +74,7 @@ export function axesCalc(
       [_incr, _space] = findTimeIncr(min, max, timeIncrs, fullDim, minSpace);
     } else {
       const tickFont = config.font ?? theme?.tickFont;
-      [_incr, _space] = getIncrSpace(config, min, max, fullDim, tickFont);
+      [_incr, _space] = getIncrSpace(config, min, max, fullDim, tickFont, locale);
     }
 
     // Discrete x-data: force integer-only ticks
@@ -104,16 +106,16 @@ export function axesCalc(
     if (config.values) {
       axis._values = config.values(axis._splits, _space, _incr);
     } else if (scale.time) {
-      axis._values = timeAxisVals(axis._splits, _incr);
+      axis._values = timeAxisVals(axis._splits, _incr, timezone, locale);
     } else if (scale.distr === Distribution.Log) {
       // For log scales, only label power-of-base values; intermediate ticks still drawn as grid
       const filter = logAxisValFilter(axis._splits, scale.log);
-      const allVals = numAxisVals(axis._splits);
+      const allVals = numAxisVals(axis._splits, locale);
       axis._values = allVals.map((v, i) => filter[i] ? v : '');
     } else if (scale.distr === Distribution.Asinh) {
-      axis._values = numAxisVals(axis._splits);
+      axis._values = numAxisVals(axis._splits, locale);
     } else {
-      axis._values = numAxisVals(axis._splits);
+      axis._values = numAxisVals(axis._splits, locale);
     }
 
     // Rotating of labels only supported on bottom x-axis
@@ -239,6 +241,8 @@ export function convergeSize(
   getScale: (id: string) => ScaleState | undefined,
   titleHeight = 0,
   theme?: ResolvedTheme,
+  locale?: string,
+  timezone?: string,
 ): BBox {
   // Reset _size so convergence always runs at least 2 cycles.
   // Without this, preserved _size from a previous redraw can cause
@@ -261,6 +265,8 @@ export function convergeSize(
       plotBox.height,
       cycleNum,
       theme,
+      locale,
+      timezone,
     );
 
     converged = cycleNum === CYCLE_LIMIT || axesConverged;
