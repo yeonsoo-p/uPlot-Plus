@@ -329,7 +329,9 @@ export function readThemeVars(canvas: HTMLCanvasElement | null): ResolvedTheme {
 // ---------------------------------------------------------------------------
 
 export function themeToVars(theme: ChartTheme): React.CSSProperties {
-  const vars: Record<string, string | number> = {};
+  // Using a mutable CSSProperties object; CSS custom property keys (--uplot-*)
+  // are accepted via React's `[key: `--${string}`]` index signature.
+  const vars: React.CSSProperties & Record<string, string | number> = {};
 
   const set = (key: keyof ResolvedTheme, value: string | number | undefined) => {
     if (value != null) vars[VAR_MAP[key]] = value;
@@ -394,5 +396,5 @@ export function themeToVars(theme: ChartTheme): React.CSSProperties {
   set('rangerAccent', theme.ranger?.accent);
   set('rangerDim', theme.ranger?.dim);
 
-  return vars as React.CSSProperties;
+  return vars;
 }

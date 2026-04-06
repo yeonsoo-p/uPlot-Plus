@@ -6,6 +6,7 @@ import { createScaleState } from '@/core/Scale';
 import type { ScaleState, BBox } from '@/types';
 import { Orientation } from '@/types/common';
 
+
 function makeScale(id: string, min: number, max: number, ori = Orientation.Horizontal): ScaleState {
   return { ...createScaleState({ id, min, max, ori }) };
 }
@@ -78,6 +79,7 @@ describe('CursorManager: edge cases', () => {
 
   it('handles scale with null min/max', () => {
     const nullScales = new Map<string, ScaleState>([
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       ['x', { ...makeScale('x', 0, 100), min: null as unknown as number }],
       ['y', makeScale('y', 0, 100, Orientation.Vertical)],
     ]);
@@ -99,7 +101,7 @@ describe('CursorManager: edge cases', () => {
     const configs: SeriesConfig[] = [{ group: 0, index: 0, yScale: 'y', show: true }];
 
     mgr.update(350, 280, plotBox, data, configs, getScale,
-      () => [0, 4] as [number, number], getGroupXScaleKey,
+      (): [number, number] => [0, 4], getGroupXScaleKey,
     );
 
     // Should snap to index 2 (the only non-null value)
@@ -115,7 +117,7 @@ describe('CursorManager: edge cases', () => {
 
     // Window only shows indices 1-3
     mgr.update(350, 280, plotBox, data, configs, getScale,
-      () => [1, 3] as [number, number], getGroupXScaleKey,
+      (): [number, number] => [1, 3], getGroupXScaleKey,
     );
 
     // Should snap within window bounds
@@ -199,13 +201,15 @@ describe('CursorManager: syncToValue edge cases', () => {
   });
 
   it('handles empty data', () => {
+    const emptyData: ChartData = [];
+    const emptyConfigs: SeriesConfig[] = [];
     const store = {
-      dataStore: { data: [] as ChartData, getWindow: () => [0, 0] as [number, number] },
+      dataStore: { data: emptyData, getWindow: (): [number, number] => [0, 0] },
       scaleManager: {
         getGroupXScaleKey: () => 'x',
         getScale: (id: string) => scales.get(id),
       },
-      seriesConfigs: [] as SeriesConfig[],
+      seriesConfigs: emptyConfigs,
       plotBox,
     };
 
@@ -218,14 +222,14 @@ describe('CursorManager: syncToValue edge cases', () => {
   it('handles all null y-values — falls back to center y', () => {
     const store = {
       dataStore: {
-        data: [{ x: [0, 50, 100], series: [[null, null, null]] }] as ChartData,
-        getWindow: () => [0, 2] as [number, number],
+        data: [{ x: [0, 50, 100], series: [[null, null, null]] }],
+        getWindow: (): [number, number] => [0, 2],
       },
       scaleManager: {
         getGroupXScaleKey: () => 'x',
         getScale: (id: string) => scales.get(id),
       },
-      seriesConfigs: [{ group: 0, index: 0, yScale: 'y', show: true }] as SeriesConfig[],
+      seriesConfigs: [{ group: 0, index: 0, yScale: 'y', show: true }],
       plotBox,
     };
 

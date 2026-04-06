@@ -1,4 +1,4 @@
-import type { SeriesConfig } from '../types';
+import type { SeriesConfig, ResolvedSeriesConfig } from '../types';
 import { useRegisterConfig } from '../hooks/useRegisterConfig';
 import { withAlpha } from '../colors';
 import { THEME_DEFAULTS } from '../rendering/theme';
@@ -7,7 +7,7 @@ import { THEME_DEFAULTS } from '../rendering/theme';
 export type SeriesProps = Omit<SeriesConfig, 'yScale'> & { yScale?: string };
 
 /** Apply defaults for yScale, show, stroke, and auto-fill. */
-function resolveDefaults(p: SeriesProps, colorIndex: number, palette?: string[]): SeriesConfig {
+function resolveDefaults(p: SeriesProps, colorIndex: number, palette?: string[]): ResolvedSeriesConfig {
   const pathDefaults = p.paths?.defaults;
   const colors = palette ?? THEME_DEFAULTS.seriesColors;
   const autoStroke = p.stroke == null;

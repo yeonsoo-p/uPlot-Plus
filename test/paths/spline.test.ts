@@ -6,14 +6,10 @@ import { createScaleState } from '@/core/Scale';
 import type { ScaleState } from '@/types';
 import { Orientation, Direction } from '@/types';
 import { round } from '@/math/utils';
-import type { PathCall, Path2DMock } from '../setup';
+import { getMockCalls } from '../helpers/mockCanvas';
 
 function makeScale(id: string, min: number, max: number, ori: Orientation = Orientation.Horizontal): ScaleState {
   return { ...createScaleState({ id }), min, max, ori, dir: Direction.Forward };
-}
-
-function getCalls(path: Path2D): PathCall[] {
-  return (path as unknown as Path2DMock)._calls;
 }
 
 const pxRound = (v: number) => round(v);
@@ -30,7 +26,7 @@ describe('monotoneCubic path builder', () => {
     expect(result.stroke).toBeInstanceOf(Path2D);
     expect(result.fill).toBeInstanceOf(Path2D);
 
-    const calls = getCalls(result.stroke);
+    const calls = getMockCalls(result.stroke);
     const beziers = calls.filter((c) => c[0] === 'bezierCurveTo');
     // 6 points → 5 bezier segments
     expect(beziers.length).toBe(5);
@@ -38,7 +34,7 @@ describe('monotoneCubic path builder', () => {
 
   it('handles 2 points — falls back to lineTo', () => {
     const result = builder([0, 1], [10, 20], scaleX, scaleY, 500, 300, 0, 0, 0, 1, 1, pxRound);
-    const calls = getCalls(result.stroke);
+    const calls = getMockCalls(result.stroke);
     const lineTos = calls.filter((c) => c[0] === 'lineTo');
     const beziers = calls.filter((c) => c[0] === 'bezierCurveTo');
     // 2 points: linear fallback → lineTo, no bezier
@@ -48,7 +44,7 @@ describe('monotoneCubic path builder', () => {
 
   it('handles 1 point — empty path (interp returns null)', () => {
     const result = builder([0], [10], scaleX, scaleY, 500, 300, 0, 0, 0, 0, 1, pxRound);
-    const calls = getCalls(result.stroke);
+    const calls = getMockCalls(result.stroke);
     // Single point: interp returns null, stroke is fresh empty Path2D
     expect(calls.length).toBe(0);
   });
@@ -58,16 +54,33 @@ describe('monotoneCubic path builder', () => {
     const result = builder(dataX, gappyY, scaleX, scaleY, 500, 300, 0, 0, 0, 5, 1, pxRound);
     expect(result.clip).toBeInstanceOf(Path2D);
 
-    const clipRects = getCalls(result.clip!).filter((c) => c[0] === 'rect');
+    const clipRects = getMockCalls(result.clip!).filter((c) => c[0] === 'rect');
     // Gaps produce a single clip rect covering the drawable span
     expect(clipRects.length).toBe(1);
   });
 
   it('all-null returns empty stroke, no fill', () => {
     const result = builder(dataX, [null, null, null, null, null, null], scaleX, scaleY, 500, 300, 0, 0, 0, 5, 1, pxRound);
-    const calls = getCalls(result.stroke);
+    const calls = getMockCalls(result.stroke);
     expect(calls.length).toBe(0);
     expect(result.fill).toBeNull();
+  });
+
+  it('fillToData uses per-point baseline instead of flat fillTo', () => {
+    const baseline = [5, 20, 10, 30, 15, 25];
+    const result = builder(dataX, dataY, scaleX, scaleY, 500, 300, 0, 0, 0, 5, 1, pxRound, { fillToData: baseline });
+    expect(result.fill).toBeInstanceOf(Path2D);
+
+    const fillCalls = getMockCalls(result.fill!);
+    const fillLineTos = fillCalls.filter((c) => c[0] === 'lineTo');
+    // Fill should have lineTo calls from the baseline trace (in addition to bezier stroke)
+    expect(fillLineTos.length).toBeGreaterThan(0);
+  });
+
+  it('fillToData with nulls in baseline skips those points', () => {
+    const baseline: (number | null)[] = [5, null, 10, null, 15, null];
+    const result = builder(dataX, dataY, scaleX, scaleY, 500, 300, 0, 0, 0, 5, 1, pxRound, { fillToData: baseline });
+    expect(result.fill).toBeInstanceOf(Path2D);
   });
 });
 
@@ -76,7 +89,7 @@ describe('catmullRom path builder', () => {
 
   it('produces bezierCurveTo calls for smooth curves', () => {
     const result = builder(dataX, dataY, scaleX, scaleY, 500, 300, 0, 0, 0, 5, 1, pxRound);
-    const calls = getCalls(result.stroke);
+    const calls = getMockCalls(result.stroke);
     const beziers = calls.filter((c) => c[0] === 'bezierCurveTo');
     // 6 points → 5 bezier segments
     expect(beziers.length).toBe(5);
@@ -84,7 +97,7 @@ describe('catmullRom path builder', () => {
 
   it('handles 2 points — lineTo fallback', () => {
     const result = builder([0, 1], [10, 20], scaleX, scaleY, 500, 300, 0, 0, 0, 1, 1, pxRound);
-    const calls = getCalls(result.stroke);
+    const calls = getMockCalls(result.stroke);
     const lineTos = calls.filter((c) => c[0] === 'lineTo');
     expect(lineTos.length).toBe(1);
   });
@@ -92,8 +105,8 @@ describe('catmullRom path builder', () => {
   it('reversed direction produces same number of bezier segments', () => {
     const resultFwd = builder(dataX, dataY, scaleX, scaleY, 500, 300, 0, 0, 0, 5, 1, pxRound);
     const resultRev = builder(dataX, dataY, scaleX, scaleY, 500, 300, 0, 0, 0, 5, -1, pxRound);
-    const fwdBeziers = getCalls(resultFwd.stroke).filter((c) => c[0] === 'bezierCurveTo');
-    const revBeziers = getCalls(resultRev.stroke).filter((c) => c[0] === 'bezierCurveTo');
+    const fwdBeziers = getMockCalls(resultFwd.stroke).filter((c) => c[0] === 'bezierCurveTo');
+    const revBeziers = getMockCalls(resultRev.stroke).filter((c) => c[0] === 'bezierCurveTo');
     expect(fwdBeziers.length).toBe(revBeziers.length);
   });
 });
@@ -104,7 +117,7 @@ describe('points path builder', () => {
   it('produces arc calls for each non-null data point', () => {
     const result = builder(dataX, dataY, scaleX, scaleY, 500, 300, 0, 0, 0, 5, 1, pxRound);
     expect(result.fill).toBe(result.stroke);
-    const calls = getCalls(result.fill!);
+    const calls = getMockCalls(result.fill!);
     const arcs = calls.filter((c) => c[0] === 'arc');
     // 6 non-null points → 6 arcs
     expect(arcs.length).toBe(6);
@@ -117,7 +130,7 @@ describe('points path builder', () => {
   it('skips null values — fewer arcs', () => {
     const gappyY: (number | null)[] = [10, null, null, 60, null, 50];
     const result = builder(dataX, gappyY, scaleX, scaleY, 500, 300, 0, 0, 0, 5, 1, pxRound);
-    const arcs = getCalls(result.fill!).filter((c) => c[0] === 'arc');
+    const arcs = getMockCalls(result.fill!).filter((c) => c[0] === 'arc');
     // Only 3 non-null values → 3 arcs
     expect(arcs.length).toBe(3);
   });

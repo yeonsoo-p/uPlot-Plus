@@ -29,33 +29,33 @@ function hslToRgb(h: number, s: number, l: number): [number, number, number] {
 function parseColor(color: string): [number, number, number] | null {
   // #rrggbb or #rrggbbaa
   const hex6 = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i.exec(color);
-  if (hex6) {
+  if (hex6 && hex6[1] != null && hex6[2] != null && hex6[3] != null) {
     return [
-      parseInt(hex6[1] as string, 16),
-      parseInt(hex6[2] as string, 16),
-      parseInt(hex6[3] as string, 16),
+      parseInt(hex6[1], 16),
+      parseInt(hex6[2], 16),
+      parseInt(hex6[3], 16),
     ];
   }
 
   // #rgb or #rgba
   const hex3 = /^#([0-9a-f])([0-9a-f])([0-9a-f])/i.exec(color);
-  if (hex3) {
+  if (hex3 && hex3[1] != null && hex3[2] != null && hex3[3] != null) {
     return [
-      parseInt((hex3[1] as string) + (hex3[1] as string), 16),
-      parseInt((hex3[2] as string) + (hex3[2] as string), 16),
-      parseInt((hex3[3] as string) + (hex3[3] as string), 16),
+      parseInt(hex3[1] + hex3[1], 16),
+      parseInt(hex3[2] + hex3[2], 16),
+      parseInt(hex3[3] + hex3[3], 16),
     ];
   }
 
   // rgb(r, g, b) or rgba(r, g, b, a) — with or without spaces
   const rgb = /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i.exec(color);
-  if (rgb) {
+  if (rgb && rgb[1] != null && rgb[2] != null && rgb[3] != null) {
     return [Number(rgb[1]), Number(rgb[2]), Number(rgb[3])];
   }
 
   // hsl(h, s%, l%) or hsla(h, s%, l%, a) — with or without spaces
   const hsl = /^hsla?\(\s*([\d.]+)\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%/i.exec(color);
-  if (hsl) {
+  if (hsl && hsl[1] != null && hsl[2] != null && hsl[3] != null) {
     return hslToRgb(Number(hsl[1]), Number(hsl[2]), Number(hsl[3]));
   }
 

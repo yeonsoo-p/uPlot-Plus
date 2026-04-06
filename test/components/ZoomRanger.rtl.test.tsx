@@ -39,7 +39,8 @@ describe('ZoomRanger component', () => {
 
     expect(spy).toHaveBeenCalledTimes(1);
     // Default selection is [0.25, 0.75] fraction → [25, 75] data range
-    const [min, max] = spy.mock.calls[0] as [number, number];
+    const min = Number(spy.mock.calls[0]![0]);
+    const max = Number(spy.mock.calls[0]![1]);
     expect(min).toBeCloseTo(25, 0);
     expect(max).toBeCloseTo(75, 0);
   });
@@ -70,7 +71,8 @@ describe('ZoomRanger component', () => {
     await flushEffects();
 
     expect(spy).toHaveBeenCalledTimes(1);
-    const [min, max] = spy.mock.calls[0] as [number, number];
+    const min = Number(spy.mock.calls[0]![0]);
+    const max = Number(spy.mock.calls[0]![1]);
     expect(min).toBeCloseTo(10, 0);
     expect(max).toBeCloseTo(60, 0);
   });

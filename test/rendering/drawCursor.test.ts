@@ -1,27 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { drawCursor } from '@/rendering/drawCursor';
 import type { CursorState, ScaleState, BBox } from '@/types';
 import type { ChartData } from '@/types/data';
 import type { SeriesConfig } from '@/types/series';
 import type { ResolvedTheme } from '@/rendering/theme';
 import { THEME_DEFAULTS } from '@/rendering/theme';
-
-function makeCtx() {
-  return {
-    save: vi.fn(),
-    restore: vi.fn(),
-    beginPath: vi.fn(),
-    moveTo: vi.fn(),
-    lineTo: vi.fn(),
-    stroke: vi.fn(),
-    arc: vi.fn(),
-    fill: vi.fn(),
-    setLineDash: vi.fn(),
-    strokeStyle: '' as string,
-    fillStyle: '' as string,
-    lineWidth: 0,
-  };
-}
+import { createMockCtx } from '../helpers/mockCanvas';
 
 const plotBox: BBox = { left: 50, top: 20, width: 700, height: 560 };
 
@@ -48,29 +32,29 @@ function noGroupXScale(): string | undefined {
 }
 
 describe('drawCursor', () => {
-  let ctx: ReturnType<typeof makeCtx>;
+  let ctx: ReturnType<typeof createMockCtx>;
 
   beforeEach(() => {
-    ctx = makeCtx();
+    ctx = createMockCtx();
   });
 
   it('does nothing when cursor.left < 0', () => {
     const cursor = makeCursor({ left: -1 });
-    drawCursor(ctx as unknown as CanvasRenderingContext2D, cursor, plotBox, 1, emptyData, emptyConfigs, noScale, noGroupXScale);
+    drawCursor(ctx, cursor, plotBox, 1, emptyData, emptyConfigs, noScale, noGroupXScale);
 
     expect(ctx.save).not.toHaveBeenCalled();
   });
 
   it('does nothing when cursor.top < 0', () => {
     const cursor = makeCursor({ top: -1 });
-    drawCursor(ctx as unknown as CanvasRenderingContext2D, cursor, plotBox, 1, emptyData, emptyConfigs, noScale, noGroupXScale);
+    drawCursor(ctx, cursor, plotBox, 1, emptyData, emptyConfigs, noScale, noGroupXScale);
 
     expect(ctx.save).not.toHaveBeenCalled();
   });
 
   it('draws vertical crosshair when showX=true (default)', () => {
     const cursor = makeCursor();
-    drawCursor(ctx as unknown as CanvasRenderingContext2D, cursor, plotBox, 1, emptyData, emptyConfigs, noScale, noGroupXScale);
+    drawCursor(ctx, cursor, plotBox, 1, emptyData, emptyConfigs, noScale, noGroupXScale);
 
     expect(ctx.save).toHaveBeenCalled();
     expect(ctx.beginPath).toHaveBeenCalled();
@@ -85,7 +69,7 @@ describe('drawCursor', () => {
 
   it('skips vertical crosshair when showX=false', () => {
     const cursor = makeCursor();
-    drawCursor(ctx as unknown as CanvasRenderingContext2D, cursor, plotBox, 1, emptyData, emptyConfigs, noScale, noGroupXScale, { showX: false, showY: false });
+    drawCursor(ctx, cursor, plotBox, 1, emptyData, emptyConfigs, noScale, noGroupXScale, { showX: false, showY: false });
 
     expect(ctx.save).toHaveBeenCalled();
     // No beginPath / moveTo / lineTo for crosshairs
@@ -94,7 +78,7 @@ describe('drawCursor', () => {
 
   it('draws horizontal crosshair when showY=true (default)', () => {
     const cursor = makeCursor();
-    drawCursor(ctx as unknown as CanvasRenderingContext2D, cursor, plotBox, 1, emptyData, emptyConfigs, noScale, noGroupXScale, { showX: false });
+    drawCursor(ctx, cursor, plotBox, 1, emptyData, emptyConfigs, noScale, noGroupXScale, { showX: false });
 
     // Only horizontal crosshair drawn
     expect(ctx.beginPath).toHaveBeenCalledTimes(1);
@@ -106,7 +90,7 @@ describe('drawCursor', () => {
 
   it('skips horizontal crosshair when showY=false', () => {
     const cursor = makeCursor();
-    drawCursor(ctx as unknown as CanvasRenderingContext2D, cursor, plotBox, 1, emptyData, emptyConfigs, noScale, noGroupXScale, { showX: true, showY: false });
+    drawCursor(ctx, cursor, plotBox, 1, emptyData, emptyConfigs, noScale, noGroupXScale, { showX: true, showY: false });
 
     // Only 1 beginPath for vertical crosshair
     expect(ctx.beginPath).toHaveBeenCalledTimes(1);
@@ -115,21 +99,21 @@ describe('drawCursor', () => {
   it('applies theme cursorStroke override', () => {
     const cursor = makeCursor();
     const theme: ResolvedTheme = { ...THEME_DEFAULTS, cursorStroke: '#ff0' };
-    drawCursor(ctx as unknown as CanvasRenderingContext2D, cursor, plotBox, 1, emptyData, emptyConfigs, noScale, noGroupXScale, undefined, undefined, theme);
+    drawCursor(ctx, cursor, plotBox, 1, emptyData, emptyConfigs, noScale, noGroupXScale, undefined, undefined, theme);
 
     expect(ctx.strokeStyle).toBe('#ff0');
   });
 
   it('uses default stroke color when no theme', () => {
     const cursor = makeCursor();
-    drawCursor(ctx as unknown as CanvasRenderingContext2D, cursor, plotBox, 1, emptyData, emptyConfigs, noScale, noGroupXScale);
+    drawCursor(ctx, cursor, plotBox, 1, emptyData, emptyConfigs, noScale, noGroupXScale);
 
     expect(ctx.strokeStyle).toBe('#607D8B');
   });
 
   it('sets dashed line style', () => {
     const cursor = makeCursor();
-    drawCursor(ctx as unknown as CanvasRenderingContext2D, cursor, plotBox, 1, emptyData, emptyConfigs, noScale, noGroupXScale);
+    drawCursor(ctx, cursor, plotBox, 1, emptyData, emptyConfigs, noScale, noGroupXScale);
 
     expect(ctx.setLineDash).toHaveBeenCalledWith([5, 3]);
   });
@@ -143,8 +127,8 @@ describe('drawCursor', () => {
     ];
     const configMap = new Map([['0:0', configs[0]!]]);
 
-    const xScale = { id: 'x', min: 0, max: 100, distr: 1, log: 10, asinh: 1, ori: 0, dir: 1, time: false, auto: true, range: null, _discrete: false, _cfgMin: null, _cfgMax: null, _min: null, _max: null } as ScaleState;
-    const yScale = { id: 'y', min: 0, max: 100, distr: 1, log: 10, asinh: 1, ori: 1, dir: 1, time: false, auto: true, range: null, _discrete: false, _cfgMin: null, _cfgMax: null, _min: null, _max: null } as ScaleState;
+    const xScale: ScaleState = { id: 'x', min: 0, max: 100, distr: 1, log: 10, asinh: 1, ori: 0, dir: 1, time: false, auto: true, range: null, _discrete: false, _cfgMin: null, _cfgMax: null, _min: null, _max: null };
+    const yScale: ScaleState = { id: 'y', min: 0, max: 100, distr: 1, log: 10, asinh: 1, ori: 1, dir: 1, time: false, auto: true, range: null, _discrete: false, _cfgMin: null, _cfgMax: null, _min: null, _max: null };
 
     function getScale(id: string): ScaleState | undefined {
       if (id === 'x') return xScale;
@@ -158,7 +142,7 @@ describe('drawCursor', () => {
 
     it('draws point indicator at snapped data position', () => {
       const cursor = makeCursor({ activeGroup: 0, activeSeriesIdx: 0, activeDataIdx: 2 });
-      drawCursor(ctx as unknown as CanvasRenderingContext2D, cursor, plotBox, 1, data, configs, getScale, getGroupXScaleKey, undefined, configMap);
+      drawCursor(ctx, cursor, plotBox, 1, data, configs, getScale, getGroupXScaleKey, undefined, configMap);
 
       expect(ctx.arc).toHaveBeenCalledTimes(1);
       expect(ctx.fill).toHaveBeenCalled();
@@ -169,7 +153,7 @@ describe('drawCursor', () => {
 
     it('uses series stroke color for point indicator', () => {
       const cursor = makeCursor({ activeGroup: 0, activeSeriesIdx: 0, activeDataIdx: 2 });
-      drawCursor(ctx as unknown as CanvasRenderingContext2D, cursor, plotBox, 1, data, configs, getScale, getGroupXScaleKey, undefined, configMap);
+      drawCursor(ctx, cursor, plotBox, 1, data, configs, getScale, getGroupXScaleKey, undefined, configMap);
 
       // After arc, strokeStyle should be set to the series color 'green'
       // It gets set right before the final stroke() call
@@ -185,7 +169,7 @@ describe('drawCursor', () => {
       const hiddenMap = new Map([['0:0', hiddenConfigs[0]!]]);
 
       const cursor = makeCursor({ activeGroup: 0, activeSeriesIdx: 0, activeDataIdx: 2 });
-      drawCursor(ctx as unknown as CanvasRenderingContext2D, cursor, plotBox, 1, data, hiddenConfigs, getScale, getGroupXScaleKey, undefined, hiddenMap);
+      drawCursor(ctx, cursor, plotBox, 1, data, hiddenConfigs, getScale, getGroupXScaleKey, undefined, hiddenMap);
 
       expect(ctx.arc).not.toHaveBeenCalled();
     });
@@ -193,7 +177,7 @@ describe('drawCursor', () => {
     it('applies theme pointFill override', () => {
       const theme: ResolvedTheme = { ...THEME_DEFAULTS, pointFill: '#000' };
       const cursor = makeCursor({ activeGroup: 0, activeSeriesIdx: 0, activeDataIdx: 2 });
-      drawCursor(ctx as unknown as CanvasRenderingContext2D, cursor, plotBox, 1, data, configs, getScale, getGroupXScaleKey, undefined, configMap, theme);
+      drawCursor(ctx, cursor, plotBox, 1, data, configs, getScale, getGroupXScaleKey, undefined, configMap, theme);
 
       expect(ctx.arc).toHaveBeenCalled();
       expect(ctx.fillStyle).toBe('#000');
@@ -201,7 +185,7 @@ describe('drawCursor', () => {
 
     it('uses default white pointFill when no theme', () => {
       const cursor = makeCursor({ activeGroup: 0, activeSeriesIdx: 0, activeDataIdx: 2 });
-      drawCursor(ctx as unknown as CanvasRenderingContext2D, cursor, plotBox, 1, data, configs, getScale, getGroupXScaleKey, undefined, configMap);
+      drawCursor(ctx, cursor, plotBox, 1, data, configs, getScale, getGroupXScaleKey, undefined, configMap);
 
       expect(ctx.fillStyle).toBe('#fff');
     });
@@ -212,14 +196,14 @@ describe('drawCursor', () => {
       }
 
       const cursor = makeCursor({ activeGroup: 0, activeSeriesIdx: 0, activeDataIdx: 2 });
-      drawCursor(ctx as unknown as CanvasRenderingContext2D, cursor, plotBox, 1, data, configs, noReadyScale, getGroupXScaleKey, undefined, configMap);
+      drawCursor(ctx, cursor, plotBox, 1, data, configs, noReadyScale, getGroupXScaleKey, undefined, configMap);
 
       expect(ctx.arc).not.toHaveBeenCalled();
     });
 
     it('falls back to findYScaleId when seriesConfigMap is undefined', () => {
       const cursor = makeCursor({ activeGroup: 0, activeSeriesIdx: 0, activeDataIdx: 2 });
-      drawCursor(ctx as unknown as CanvasRenderingContext2D, cursor, plotBox, 1, data, configs, getScale, getGroupXScaleKey);
+      drawCursor(ctx, cursor, plotBox, 1, data, configs, getScale, getGroupXScaleKey);
 
       // Should still draw the point using fallback lookup
       expect(ctx.arc).toHaveBeenCalled();
@@ -227,14 +211,14 @@ describe('drawCursor', () => {
 
     it('skips point when data index is out of bounds', () => {
       const cursor = makeCursor({ activeGroup: 0, activeSeriesIdx: 0, activeDataIdx: 999 });
-      drawCursor(ctx as unknown as CanvasRenderingContext2D, cursor, plotBox, 1, data, configs, getScale, getGroupXScaleKey, undefined, configMap);
+      drawCursor(ctx, cursor, plotBox, 1, data, configs, getScale, getGroupXScaleKey, undefined, configMap);
 
       expect(ctx.arc).not.toHaveBeenCalled();
     });
 
     it('skips point when group does not exist in data', () => {
       const cursor = makeCursor({ activeGroup: 5, activeSeriesIdx: 0, activeDataIdx: 0 });
-      drawCursor(ctx as unknown as CanvasRenderingContext2D, cursor, plotBox, 1, data, configs, getScale, getGroupXScaleKey, undefined, configMap);
+      drawCursor(ctx, cursor, plotBox, 1, data, configs, getScale, getGroupXScaleKey, undefined, configMap);
 
       expect(ctx.arc).not.toHaveBeenCalled();
     });

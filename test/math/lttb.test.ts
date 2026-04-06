@@ -63,7 +63,7 @@ describe('lttb', () => {
     const result = lttb(x, y, 50);
 
     // The global max and min should be among the selected points
-    const selectedY = result.y as number[];
+    const selectedY: number[] = result.y.filter((v): v is number => v != null);
     const maxSelected = Math.max(...selectedY);
     const minSelected = Math.min(...selectedY);
 
@@ -194,7 +194,7 @@ describe('lttbGroup', () => {
 
     // Nulls in original data should map to nulls in result
     for (let i = 0; i < result.x.length; i++) {
-      const origIdx = Array.from(group.x).indexOf(result.x[i] as number);
+      const origIdx = Array.from(group.x).indexOf(result.x[i]!);
       if (origIdx >= 0 && s1[origIdx] === null) {
         expect(result.series[0]![i]).toBeNull();
       }

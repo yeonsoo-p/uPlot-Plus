@@ -1,4 +1,4 @@
-import { Chart, Series, Legend } from 'uplot-plus';
+import { Chart, Series, Legend, at } from 'uplot-plus';
 
 function movingAverage(arr: number[], window: number): number[] {
   const result: number[] = [];
@@ -8,7 +8,7 @@ function movingAverage(arr: number[], window: number): number[] {
     const start = Math.max(0, i - Math.floor(window / 2));
     const end = Math.min(arr.length - 1, i + Math.floor(window / 2));
     for (let j = start; j <= end; j++) {
-      sum += arr[j] as number;
+      sum += at(arr, j);
       count++;
     }
     result.push(sum / count);

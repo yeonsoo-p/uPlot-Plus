@@ -18,9 +18,6 @@ export default function ZoomTouch() {
 
   return (
     <div>
-      <p className="text-demo text-muted-light mb-2">
-        Use two-finger pinch to zoom on touch devices. Drag to zoom on desktop. Double-tap to reset.
-      </p>
       <Chart width={800} height={400} data={data} >
         <Series group={0} index={0} label="Signal" />
       </Chart>

@@ -60,7 +60,8 @@ function setup(): TestHarness {
 }
 
 function touchEvent(type: string, touches: Array<{ clientX: number; clientY: number }>, changedTouches?: Array<{ clientX: number; clientY: number }>): TouchEvent {
-  const makeTouchList = (items: Array<{ clientX: number; clientY: number }>) =>
+  const makeTouchList = (items: Array<{ clientX: number; clientY: number }>): TouchList =>
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     items.map(t => ({
       clientX: t.clientX, clientY: t.clientY,
       identifier: 0, target: null,
@@ -70,7 +71,9 @@ function touchEvent(type: string, touches: Array<{ clientX: number; clientY: num
     })) as unknown as TouchList;
 
   // jsdom TouchEvent constructor is limited — use Event + manual properties
-  const ev = new Event(type, { bubbles: true, cancelable: true }) as unknown as TouchEvent;
+  const ev: TouchEvent =
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    new Event(type, { bubbles: true, cancelable: true }) as unknown as TouchEvent;
   Object.defineProperty(ev, 'touches', { value: makeTouchList(touches) });
   Object.defineProperty(ev, 'changedTouches', { value: makeTouchList(changedTouches ?? touches) });
   Object.defineProperty(ev, 'preventDefault', { value: () => {} });

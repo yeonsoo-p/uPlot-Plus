@@ -94,7 +94,7 @@ describe('Legend component', () => {
     );
     await flushEffects();
 
-    const legendWrapper = container.querySelector('[data-testid="legend"]') as HTMLElement;
+    const legendWrapper = container.querySelector<HTMLElement>('[data-testid="legend"]')!;
     expect(legendWrapper).toBeInTheDocument();
     expect(legendWrapper.style.order).toBe('-1');
   });
@@ -109,7 +109,7 @@ describe('Legend component', () => {
     );
     await flushEffects();
 
-    const legendWrapper = container.querySelector('[data-testid="legend"]') as HTMLElement;
+    const legendWrapper = container.querySelector<HTMLElement>('[data-testid="legend"]')!;
     expect(legendWrapper).toBeInTheDocument();
     expect(legendWrapper.style.order).toBe('1');
   });

@@ -28,6 +28,9 @@ const baseItemStyle: React.CSSProperties = {
   cursor: 'pointer',
   fontSize: cssVar('overlayFontSize'),
   fontFamily: cssVar('overlayFontFamily'),
+  background: 'none',
+  border: 'none',
+  color: 'inherit',
 };
 
 const itemStyleVisible: React.CSSProperties = { ...baseItemStyle, opacity: 1 };
@@ -59,15 +62,18 @@ function LegendItem({ group, index, label, color, isHidden, valueStr, store }: L
   }
 
   return (
-    <span
+    <button
+      type="button"
       data-testid={`legend-item-${group}-${index}`}
       onClick={() => store.toggleSeries(group, index)}
+      aria-pressed={!isHidden}
+      aria-label={`Toggle ${label}`}
       style={isHidden ? itemStyleHidden : itemStyleVisible}
     >
       <span style={cachedSwatch} />
       <span>{label}</span>
       {valueStr && <span style={valueStyle}>{valueStr}</span>}
-    </span>
+    </button>
   );
 }
 

@@ -1,252 +1,263 @@
 import { describe, it, expect } from 'vitest';
-import { createChartStore } from '@/hooks/useChartStore';
+import { act } from '@testing-library/react';
+import { renderChart, flushEffects } from '../helpers/rtl';
+import { Series } from '@/components/Series';
+import { Tooltip } from '@/components/Tooltip';
+import { rebuildSnapshot } from '@/hooks/useChartStore';
 import type { ChartStore } from '@/hooks/useChartStore';
-import { clamp } from '@/math/utils';
-import { getSeriesColor } from '@/types/series';
-import { estimatePanelSize } from '@/utils/estimatePanelSize';
-import type { TooltipItem } from '@/types/tooltip';
+import type { TooltipData } from '@/types/tooltip';
+import type { DataInput } from '@/types/data';
+import React from 'react';
 
 /**
- * Tests for the Tooltip data extraction and positioning logic.
+ * Tests for the Tooltip component's data extraction, positioning, and modes.
  *
- * Since @testing-library/react is not available, we recreate the Tooltip's
- * core logic (data extraction from store, position clamping) and verify it
- * against a configured ChartStore — the same pattern used by interactions.test.ts.
+ * These tests render the real Tooltip component inside a <Chart> and drive
+ * cursor state via the store — the same approach used by the RTL test suite.
+ * A custom children render function captures the TooltipData that the
+ * component would pass to any render prop, letting us assert on the exact
+ * values without mirroring internal logic.
  */
 
-function setupStore(): ChartStore {
-  const store = createChartStore();
-  store.pxRatio = 1;
-  store.width = 800;
-  store.height = 600;
-  store.plotBox = { left: 50, top: 20, width: 700, height: 560 };
+const testData: DataInput = [
+  { x: [0, 25, 50, 75, 100], series: [[10, 40, 70, 30, 90], [20, 50, 80, 40, 100]] },
+];
 
-  store.scaleManager.addScale({ id: 'x', min: 0, max: 100 });
-  store.scaleManager.addScale({ id: 'y', min: 0, max: 100 });
-  store.scaleManager.setGroupXScale(0, 'x');
-
-  store.registerSeries({ group: 0, index: 0, yScale: 'y', stroke: 'red', show: true, label: 'Temperature' });
-  store.registerSeries({ group: 0, index: 1, yScale: 'y', stroke: 'blue', show: true, label: 'Pressure' });
-  store.dataStore.setData([{
-    x: [0, 25, 50, 75, 100],
-    series: [[10, 40, 70, 30, 90], [20, 50, 80, 40, 100]],
-  }]);
-
-  return store;
+function simulateCursor(store: ChartStore, dataIdx: number, opts?: { left?: number; top?: number; group?: number }) {
+  store.cursorManager.state.left = opts?.left ?? 100;
+  store.cursorManager.state.top = opts?.top ?? 100;
+  store.cursorManager.state.activeGroup = opts?.group ?? 0;
+  store.cursorManager.state.activeSeriesIdx = 0;
+  store.cursorManager.state.activeDataIdx = dataIdx;
+  rebuildSnapshot(store);
+  for (const fn of store.cursorListeners) fn();
 }
 
-/**
- * Mirrors the Tooltip component's data extraction logic (Tooltip.tsx lines 47-76).
- */
-function extractTooltipData(
-  store: ChartStore,
-  activeGroup: number,
-  activeDataIdx: number,
-  cursorLeft: number,
-  cursorTop: number,
-  precision: number,
-): { xLabel: string; items: TooltipItem[]; posLeft: number; posTop: number } | null {
-  if (activeDataIdx < 0 || activeGroup < 0 || cursorLeft < 0) return null;
-
-  const group = store.dataStore.data[activeGroup];
-  const xVal = group != null ? (group.x[activeDataIdx] as number | undefined) ?? null : null;
-  const xLabel = xVal != null ? parseFloat(xVal.toFixed(precision)).toString() : '';
-
-  const items: TooltipItem[] = [];
-  for (const cfg of store.seriesConfigs) {
-    if (cfg.show === false || cfg.legend === false) continue;
-    const yData = store.dataStore.getYValues(cfg.group, cfg.index);
-    const val = cfg.group === activeGroup ? (yData[activeDataIdx] as number | null) : null;
-    items.push({
-      label: cfg.label ?? `Series ${cfg.index}`,
-      value: val,
-      color: getSeriesColor(cfg),
-      group: cfg.group,
-      index: cfg.index,
-    });
-  }
-
-  const plotBox = store.plotBox;
-  const offX = 12;
-  const offY = -12;
-  const estimated = estimatePanelSize({
-    header: xLabel,
-    rows: items.map(item => ({
-      label: item.label,
-      value: item.value != null ? item.value.toPrecision(4) : '—',
-    })),
-  });
-
-  const posLeft = clamp(cursorLeft + plotBox.left + offX, plotBox.left, plotBox.left + plotBox.width - estimated.w);
-  const posTop = clamp(cursorTop + plotBox.top + offY, plotBox.top, plotBox.top + plotBox.height - estimated.h);
-
-  return { xLabel, items, posLeft, posTop };
+function clearCursor(store: ChartStore) {
+  store.cursorManager.state.left = -1;
+  store.cursorManager.state.top = -1;
+  store.cursorManager.state.activeGroup = -1;
+  store.cursorManager.state.activeSeriesIdx = -1;
+  store.cursorManager.state.activeDataIdx = -1;
+  rebuildSnapshot(store);
+  for (const fn of store.cursorListeners) fn();
 }
 
 describe('Tooltip data extraction', () => {
-  it('extracts x label and series values at cursor position', () => {
-    const store = setupStore();
-    const result = extractTooltipData(store, 0, 2, 350, 280, 2);
+  it('extracts x label and series values at cursor position', async () => {
+    let captured: TooltipData | null = null;
+    const spy = (data: TooltipData) => {
+      captured = data;
+      return React.createElement('span', { 'data-testid': 'spy' }, data.xLabel);
+    };
 
-    expect(result).not.toBeNull();
-    expect(result!.xLabel).toBe('50');
-    expect(result!.items).toHaveLength(2);
-    expect(result!.items[0]!.label).toBe('Temperature');
-    expect(result!.items[0]!.value).toBe(70);
-    expect(result!.items[1]!.label).toBe('Pressure');
-    expect(result!.items[1]!.value).toBe(80);
+    const { store } = renderChart(
+      { data: testData },
+      React.createElement(React.Fragment, null,
+        React.createElement(Series, { group: 0, index: 0, label: 'Temperature', stroke: 'red' }),
+        React.createElement(Series, { group: 0, index: 1, label: 'Pressure', stroke: 'blue' }),
+        React.createElement(Tooltip, { children: spy }),
+      ),
+    );
+    await flushEffects();
+
+    act(() => { simulateCursor(store, 2); });
+
+    expect(captured).not.toBeNull();
+    expect(captured!.xLabel).toBe('50');
+    expect(captured!.items).toHaveLength(2);
+    expect(captured!.items[0]!.label).toBe('Temperature');
+    expect(captured!.items[0]!.value).toBe(70);
+    expect(captured!.items[1]!.label).toBe('Pressure');
+    expect(captured!.items[1]!.value).toBe(80);
   });
 
-  it('returns null when activeDataIdx is -1', () => {
-    const store = setupStore();
-    expect(extractTooltipData(store, 0, -1, 350, 280, 2)).toBeNull();
+  it('returns no panel when activeDataIdx is -1', async () => {
+    const { container } = renderChart(
+      { data: testData },
+      React.createElement(React.Fragment, null,
+        React.createElement(Series, { group: 0, index: 0, label: 'Temperature', stroke: 'red' }),
+        React.createElement(Tooltip, null),
+      ),
+    );
+    await flushEffects();
+
+    // Cursor is inactive by default — no tooltip
+    const tooltip = container.querySelector('[data-testid="tooltip-panel"]');
+    expect(tooltip).toBeNull();
   });
 
-  it('returns null when activeGroup is -1', () => {
-    const store = setupStore();
-    expect(extractTooltipData(store, -1, 2, 350, 280, 2)).toBeNull();
+  it('excludes hidden series', async () => {
+    let captured: TooltipData | null = null;
+    const spy = (data: TooltipData) => {
+      captured = data;
+      return React.createElement('span', null, 'spy');
+    };
+
+    const { store } = renderChart(
+      { data: testData },
+      React.createElement(React.Fragment, null,
+        React.createElement(Series, { group: 0, index: 0, label: 'Temperature', stroke: 'red' }),
+        React.createElement(Series, { group: 0, index: 1, label: 'Pressure', stroke: 'blue' }),
+        React.createElement(Tooltip, { children: spy }),
+      ),
+    );
+    await flushEffects();
+
+    // Hide Pressure series
+    act(() => { store.toggleSeries(0, 1); });
+
+    act(() => { simulateCursor(store, 2); });
+
+    expect(captured).not.toBeNull();
+    expect(captured!.items).toHaveLength(1);
+    expect(captured!.items[0]!.label).toBe('Temperature');
   });
 
-  it('returns null when cursor is off-chart (left < 0)', () => {
-    const store = setupStore();
-    expect(extractTooltipData(store, 0, 0, -10, 100, 2)).toBeNull();
-  });
+  it('formats x label with specified precision', async () => {
+    let captured: TooltipData | null = null;
+    const spy = (data: TooltipData) => {
+      captured = data;
+      return React.createElement('span', null, 'spy');
+    };
 
-  it('excludes hidden series', () => {
-    const store = setupStore();
-    store.toggleSeries(0, 1); // hide Pressure
-    const result = extractTooltipData(store, 0, 2, 350, 280, 2);
+    const { store } = renderChart(
+      { data: testData },
+      React.createElement(React.Fragment, null,
+        React.createElement(Series, { group: 0, index: 0, label: 'Temperature', stroke: 'red' }),
+        React.createElement(Tooltip, { precision: 4, children: spy }),
+      ),
+    );
+    await flushEffects();
 
-    expect(result).not.toBeNull();
-    expect(result!.items).toHaveLength(1);
-    expect(result!.items[0]!.label).toBe('Temperature');
-  });
+    act(() => { simulateCursor(store, 1); });
 
-  it('formats x label with specified precision', () => {
-    const store = setupStore();
-    // Use data point at index 1 where x=25
-    const result = extractTooltipData(store, 0, 1, 175, 280, 4);
-    expect(result!.xLabel).toBe('25');
+    expect(captured).not.toBeNull();
+    expect(captured!.xLabel).toBe('25');
   });
 });
 
 describe('Tooltip position clamping', () => {
-  it('clamps tooltip to stay within plot bounds on the right edge', () => {
-    const store = setupStore();
-    // Cursor near right edge of plot
-    const result = extractTooltipData(store, 0, 4, 690, 280, 2);
-    expect(result).not.toBeNull();
-    // posLeft should be clamped so tooltip doesn't extend past plotRight
-    expect(result!.posLeft).toBeLessThanOrEqual(store.plotBox.left + store.plotBox.width);
-  });
+  it('positions tooltip absolutely with left/top style', async () => {
+    const { store, container } = renderChart(
+      { data: testData },
+      React.createElement(React.Fragment, null,
+        React.createElement(Series, { group: 0, index: 0, label: 'Temperature', stroke: 'red' }),
+        React.createElement(Tooltip, null),
+      ),
+    );
+    await flushEffects();
 
-  it('clamps tooltip to stay within plot bounds on the bottom edge', () => {
-    const store = setupStore();
-    // Cursor near bottom of plot
-    const result = extractTooltipData(store, 0, 2, 350, 560, 2);
-    expect(result).not.toBeNull();
-    expect(result!.posTop).toBeLessThanOrEqual(store.plotBox.top + store.plotBox.height);
-  });
+    act(() => { simulateCursor(store, 2); });
 
-  it('places tooltip at plot left when cursor is near left edge', () => {
-    const store = setupStore();
-    // Cursor at leftmost position with negative offset
-    const result = extractTooltipData(store, 0, 0, 0, 280, 2);
-    expect(result).not.toBeNull();
-    // With offset 12, posLeft = clamp(0 + 50 + 12, 50, ...) = 62, unless panel is wider
-    expect(result!.posLeft).toBeGreaterThanOrEqual(store.plotBox.left);
+    const tooltip = container.querySelector<HTMLElement>('[data-testid="tooltip-panel"]');
+    expect(tooltip).not.toBeNull();
+    expect(tooltip!.style.position).toBe('absolute');
   });
 });
 
-// ---- Draggable-mode data extraction ----
-
-/**
- * Mirrors the Tooltip component's draggable-mode data extraction logic.
- * When cursor is off-chart, items are still built with null values (dashes).
- */
-function extractDraggableTooltipData(
-  store: ChartStore,
-  activeGroup: number,
-  activeDataIdx: number,
-  cursorLeft: number,
-  precision: number,
-): { xLabel: string; items: TooltipItem[] } {
-  const hasCursor = activeDataIdx >= 0 && activeGroup >= 0 && cursorLeft >= 0;
-
-  let xLabel = '';
-  const items: TooltipItem[] = [];
-
-  if (hasCursor) {
-    const group = store.dataStore.data[activeGroup];
-    const xVal = group != null ? (group.x[activeDataIdx] as number | undefined) ?? null : null;
-    xLabel = xVal != null ? parseFloat(xVal.toFixed(precision)).toString() : '';
-
-    for (const cfg of store.seriesConfigs) {
-      if (cfg.show === false || cfg.legend === false) continue;
-      const yData = store.dataStore.getYValues(cfg.group, cfg.index);
-      const val = cfg.group === activeGroup ? (yData[activeDataIdx] as number | null) : null;
-      items.push({
-        label: cfg.label ?? `Series ${cfg.index}`,
-        value: val,
-        color: getSeriesColor(cfg),
-        group: cfg.group,
-        index: cfg.index,
-      });
-    }
-  } else {
-    // Draggable mode: show all series with null values (dashes)
-    for (const cfg of store.seriesConfigs) {
-      if (cfg.show === false || cfg.legend === false) continue;
-      items.push({
-        label: cfg.label ?? `Series ${cfg.index}`,
-        value: null,
-        color: getSeriesColor(cfg),
-        group: cfg.group,
-        index: cfg.index,
-      });
-    }
-  }
-
-  return { xLabel, items };
-}
-
 describe('Tooltip draggable mode data extraction', () => {
-  it('shows series values when cursor is on chart', () => {
-    const store = setupStore();
-    const result = extractDraggableTooltipData(store, 0, 2, 350, 2);
+  it('shows series values when cursor is on chart', async () => {
+    let captured: TooltipData | null = null;
+    const spy = (data: TooltipData) => {
+      captured = data;
+      return React.createElement('span', null, 'spy');
+    };
 
-    expect(result.xLabel).toBe('50');
-    expect(result.items).toHaveLength(2);
-    expect(result.items[0]!.value).toBe(70);
-    expect(result.items[1]!.value).toBe(80);
+    const { store } = renderChart(
+      { data: testData },
+      React.createElement(React.Fragment, null,
+        React.createElement(Series, { group: 0, index: 0, label: 'Temperature', stroke: 'red' }),
+        React.createElement(Series, { group: 0, index: 1, label: 'Pressure', stroke: 'blue' }),
+        React.createElement(Tooltip, { mode: 'draggable', children: spy }),
+      ),
+    );
+    await flushEffects();
+
+    act(() => { simulateCursor(store, 2); });
+
+    expect(captured).not.toBeNull();
+    expect(captured!.xLabel).toBe('50');
+    expect(captured!.items).toHaveLength(2);
+    expect(captured!.items[0]!.value).toBe(70);
+    expect(captured!.items[1]!.value).toBe(80);
   });
 
-  it('shows null values (dashes) when cursor is off chart', () => {
-    const store = setupStore();
-    const result = extractDraggableTooltipData(store, -1, -1, -1, 2);
+  it('shows null values (dashes) when cursor is off chart', async () => {
+    let captured: TooltipData | null = null;
+    const spy = (data: TooltipData) => {
+      captured = data;
+      return React.createElement('span', null, 'spy');
+    };
 
-    expect(result.xLabel).toBe('');
-    expect(result.items).toHaveLength(2);
-    expect(result.items[0]!.label).toBe('Temperature');
-    expect(result.items[0]!.value).toBeNull();
-    expect(result.items[1]!.label).toBe('Pressure');
-    expect(result.items[1]!.value).toBeNull();
+    const { store } = renderChart(
+      { data: testData },
+      React.createElement(React.Fragment, null,
+        React.createElement(Series, { group: 0, index: 0, label: 'Temperature', stroke: 'red' }),
+        React.createElement(Series, { group: 0, index: 1, label: 'Pressure', stroke: 'blue' }),
+        React.createElement(Tooltip, { mode: 'draggable', children: spy }),
+      ),
+    );
+    await flushEffects();
+
+    // Ensure cursor is cleared (off-chart)
+    act(() => { clearCursor(store); });
+
+    expect(captured).not.toBeNull();
+    expect(captured!.xLabel).toBe('');
+    expect(captured!.items).toHaveLength(2);
+    expect(captured!.items[0]!.label).toBe('Temperature');
+    expect(captured!.items[0]!.value).toBeNull();
+    expect(captured!.items[1]!.label).toBe('Pressure');
+    expect(captured!.items[1]!.value).toBeNull();
   });
 
-  it('excludes hidden series in draggable mode', () => {
-    const store = setupStore();
-    store.toggleSeries(0, 1); // hide Pressure
-    const result = extractDraggableTooltipData(store, -1, -1, -1, 2);
+  it('excludes hidden series in draggable mode', async () => {
+    let captured: TooltipData | null = null;
+    const spy = (data: TooltipData) => {
+      captured = data;
+      return React.createElement('span', null, 'spy');
+    };
 
-    expect(result.items).toHaveLength(1);
-    expect(result.items[0]!.label).toBe('Temperature');
+    const { store } = renderChart(
+      { data: testData },
+      React.createElement(React.Fragment, null,
+        React.createElement(Series, { group: 0, index: 0, label: 'Temperature', stroke: 'red' }),
+        React.createElement(Series, { group: 0, index: 1, label: 'Pressure', stroke: 'blue' }),
+        React.createElement(Tooltip, { mode: 'draggable', children: spy }),
+      ),
+    );
+    await flushEffects();
+
+    act(() => { store.toggleSeries(0, 1); }); // hide Pressure
+    act(() => { clearCursor(store); });
+
+    expect(captured).not.toBeNull();
+    expect(captured!.items).toHaveLength(1);
+    expect(captured!.items[0]!.label).toBe('Temperature');
   });
 
-  it('preserves item colors from series config', () => {
-    const store = setupStore();
-    const result = extractDraggableTooltipData(store, 0, 0, 0, 2);
+  it('preserves item colors from series config', async () => {
+    let captured: TooltipData | null = null;
+    const spy = (data: TooltipData) => {
+      captured = data;
+      return React.createElement('span', null, 'spy');
+    };
 
-    expect(result.items[0]!.color).toBe('red');
-    expect(result.items[1]!.color).toBe('blue');
+    const { store } = renderChart(
+      { data: testData },
+      React.createElement(React.Fragment, null,
+        React.createElement(Series, { group: 0, index: 0, label: 'Temperature', stroke: 'red' }),
+        React.createElement(Series, { group: 0, index: 1, label: 'Pressure', stroke: 'blue' }),
+        React.createElement(Tooltip, { children: spy }),
+      ),
+    );
+    await flushEffects();
+
+    act(() => { simulateCursor(store, 0); });
+
+    expect(captured).not.toBeNull();
+    expect(captured!.items[0]!.color).toBe('red');
+    expect(captured!.items[1]!.color).toBe('blue');
   });
 });

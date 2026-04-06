@@ -21,9 +21,6 @@ export default function CursorBind() {
 
   return (
     <div>
-      <p className="text-demo text-muted mb-2">
-        Two charts synced via <code>syncKey=&quot;bind&quot;</code>. Hover one to see cursor on both.
-      </p>
       <div className="mb-4">
         <Chart width={800} height={200} data={data1} syncKey="bind" xlabel="Index" ylabel="Temperature">
           <Series group={0} index={0} label="Temp (C)" />

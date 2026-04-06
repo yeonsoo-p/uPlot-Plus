@@ -6,10 +6,10 @@ import { round, PI } from '../math/utils';
 import type { ResolvedTheme } from './theme';
 import { THEME_DEFAULTS } from './theme';
 
-const TOP = 'top';
-const BOTTOM = 'bottom';
-const LEFT = 'left';
-const RIGHT = 'right';
+const TOP: CanvasTextBaseline = 'top';
+const BOTTOM: CanvasTextBaseline = 'bottom';
+const LEFT: CanvasTextAlign = 'left';
+const RIGHT: CanvasTextAlign = 'right';
 
 /** Scale the px size in a CSS font string by pxRatio for HiDPI canvas rendering. */
 function scaleFontPx(font: string, pxRatio: number): string {
@@ -164,8 +164,8 @@ export function drawAxesGrid(
       const finalPos = basePos + shiftAmt;
 
       const font = scaleFontPx(config.font ?? t.tickFont, pxRatio);
-      const textAlign: CanvasTextAlign = ori === Orientation.Horizontal ? 'center' : (side === Side.Left ? RIGHT : LEFT) as CanvasTextAlign;
-      const textBaseline: CanvasTextBaseline = ori === Orientation.Horizontal ? (side === Side.Bottom ? TOP : BOTTOM) as CanvasTextBaseline : 'middle';
+      const textAlign: CanvasTextAlign = ori === Orientation.Horizontal ? 'center' : (side === Side.Left ? RIGHT : LEFT);
+      const textBaseline: CanvasTextBaseline = ori === Orientation.Horizontal ? (side === Side.Bottom ? TOP : BOTTOM) : 'middle';
 
       ctx.font = font;
       ctx.fillStyle = fillStyle;
@@ -211,7 +211,7 @@ export function drawAxesGrid(
       ctx.font = labelFont;
       ctx.fillStyle = fillStyle;
       ctx.textAlign = 'center';
-      ctx.textBaseline = side === Side.Bottom ? TOP as CanvasTextBaseline : BOTTOM as CanvasTextBaseline;
+      ctx.textBaseline = side === Side.Bottom ? TOP : BOTTOM;
 
       const baseLpos = round((axis._lpos + (config.labelGap ?? 0) * shiftDir) * pxRatio);
 

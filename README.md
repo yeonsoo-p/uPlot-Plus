@@ -2,7 +2,7 @@
 
 High-performance React charting library ripped off from [uPlot](https://github.com/leeoniya/uplot). Might perform occasionally better than original uPlot in React context (or worse). Definitely easier to use in React context.
 
-**[Live Demo (101 examples)](https://yeonsoo-p.github.io/uPlot-Plus/)**
+**[Live Demo (107 examples)](https://yeonsoo-p.github.io/uPlot-Plus/)**
 
 ## Quick Start
 
@@ -128,6 +128,7 @@ Custom function matchers for actions the built-in classifiers don't cover:
 | `<Sparkline>` | Compact inline chart for tables and dashboards |
 | `<BoxWhisker>` | Box-and-whisker plot with quartiles, whiskers, and median |
 | `<Candlestick>` | OHLC financial candlestick chart |
+| `<ThemeProvider>` | Sets CSS custom properties for descendant charts |
 | `<Heatmap>` | 2D grid of colored cells with configurable color map |
 | `<Vector>` | Directional arrows overlaid on data points |
 | `<HLine>` | Horizontal line annotation |
@@ -170,6 +171,37 @@ import { HLine, VLine, Region, AnnotationLabel } from 'uplot-plus';
 </Chart>
 ```
 
+## Theming
+
+Switch between light/dark themes, customize colors, or style via CSS custom properties:
+
+```tsx
+import { Chart, Series, ThemeProvider, DARK_THEME } from 'uplot-plus';
+
+// Dark mode via ThemeProvider
+<ThemeProvider theme={DARK_THEME}>
+  <Chart data={data} width={800} height={400}>
+    <Series group={0} index={0} />
+  </Chart>
+</ThemeProvider>
+
+// Per-chart theme override
+<Chart data={data} width={800} height={400} theme={{ seriesColors: ['#e74c3c', '#3498db'] }}>
+  <Series group={0} index={0} />
+</Chart>
+
+// CSS custom properties (no ThemeProvider needed)
+<div style={{ '--uplot-axis-stroke': '#8ab4f8', '--uplot-grid-stroke': 'rgba(138,180,248,0.1)' }}>
+  <Chart data={data} width={800} height={400}>
+    <Series group={0} index={0} />
+  </Chart>
+</div>
+```
+
+40+ themeable properties: axes, grid, cursor, selection, series palette, candlestick, box-whisker, annotations, overlay panels, zoom ranger. Nested `<ThemeProvider>` components cascade — inner providers override outer ones.
+
+> Full theme API: [docs/COMPONENTS.md](docs/COMPONENTS.md#themeprovider)
+
 ## Utilities
 
 | Category | Functions |
@@ -185,11 +217,12 @@ import { HLine, VLine, Region, AnnotationLabel } from 'uplot-plus';
 ## Development
 
 ```sh
-npm run dev         # Start demo dev server (101 examples)
+npm run dev         # Start demo dev server (107 examples)
 npm run build       # Build library (ES + CJS to dist/)
 npm run typecheck   # TypeScript strict check
 npm run lint        # ESLint
-npm run test        # Vitest test suite
+npm run test        # Vitest unit/integration tests (756 tests)
+npm run test:e2e    # Playwright e2e tests (chromium + firefox)
 ```
 
 ## License

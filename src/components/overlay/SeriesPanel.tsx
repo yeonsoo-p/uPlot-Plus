@@ -40,6 +40,12 @@ const rowStyle: React.CSSProperties = {
   alignItems: 'center',
   gap: ROW_GAP,
   padding: `1px ${ROW_PAD_X}px`,
+  background: 'none',
+  border: 'none',
+  color: 'inherit',
+  font: 'inherit',
+  width: '100%',
+  textAlign: 'left',
 };
 
 // Pre-computed row style variants to avoid object spreads on every render
@@ -77,8 +83,18 @@ export function SeriesRow({
     ? (onClick ? rowHiddenPointer : rowHiddenDefault)
     : (onClick ? rowVisiblePointer : rowVisibleDefault);
 
+  if (onClick != null) {
+    return (
+      <button type="button" onClick={onClick} style={style} aria-label={`Toggle ${label}`}>
+        <span style={getSwatchStyle(color)} />
+        <span>{label}</span>
+        {value && <span style={valueStyle}>{value}</span>}
+      </button>
+    );
+  }
+
   return (
-    <div onClick={onClick} style={style}>
+    <div style={style}>
       <span style={getSwatchStyle(color)} />
       <span>{label}</span>
       {value && <span style={valueStyle}>{value}</span>}
@@ -129,6 +145,7 @@ export function formatSeriesValue(
   activeDataIdx: number,
 ): string {
   if (activeDataIdx < 0 || activeGroup < 0) return '';
+  if (group !== activeGroup) return '';
   const yData = store.dataStore.getYValues(group, index);
   const val = yData[activeDataIdx];
   if (val == null) return '';

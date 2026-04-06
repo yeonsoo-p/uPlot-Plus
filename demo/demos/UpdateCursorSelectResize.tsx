@@ -21,7 +21,8 @@ export default function UpdateCursorSelectResize() {
         const group = prev[0];
         if (!group) return prev;
 
-        const prevY = group.series[0] as number[];
+        const prevY = group.series[0];
+        if (!prevY) return prev;
         const lastY = prevY[prevY.length - 1] ?? 50;
         const newIdx = counterRef.current++;
         const newX = [...Array.from(group.x).slice(1), newIdx];

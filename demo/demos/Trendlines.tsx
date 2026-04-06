@@ -1,4 +1,4 @@
-import { Chart, Series, linear } from 'uplot-plus';
+import { Chart, Series, linear, at } from 'uplot-plus';
 
 function generateData() {
   const n = 80;
@@ -14,15 +14,15 @@ function generateData() {
   // Linear regression
   let sumX = 0, sumY = 0;
   for (let i = 0; i < n; i++) {
-    sumX += x[i] as number;
-    sumY += y[i] as number;
+    sumX += at(x, i);
+    sumY += at(y, i);
   }
   const meanX = sumX / n;
   const meanY = sumY / n;
   let num = 0, den = 0;
   for (let i = 0; i < n; i++) {
-    const dx = (x[i] as number) - meanX;
-    const dy = (y[i] as number) - meanY;
+    const dx = at(x, i) - meanX;
+    const dy = at(y, i) - meanY;
     num += dx * dy;
     den += dx * dx;
   }

@@ -53,15 +53,17 @@ export interface SeriesConfig {
   fillTo?: number | ((min: number, max: number) => number);
   /** Per-point baseline data for stacked fills. Overrides fillTo per data point. */
   fillToData?: ArrayLike<number | null>;
-  /** @internal Whether stroke was auto-assigned from the theme palette. */
-  _autoStroke?: boolean;
-  /** @internal Whether fill was auto-derived from the stroke color. */
-  _autoFill?: boolean;
   /** Cursor behavior for this series */
   cursor?: {
     /** Whether to draw the point indicator on hover (default: true) */
     show?: boolean;
   };
+}
+
+/** @internal Resolved series config with auto-assignment tracking fields. */
+export interface ResolvedSeriesConfig extends SeriesConfig {
+  _autoStroke?: boolean;
+  _autoFill?: boolean;
 }
 
 /** Check if a CSS color string is effectively fully transparent. */

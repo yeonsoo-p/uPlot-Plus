@@ -5,24 +5,25 @@ Complete props reference for all uPlot+ React components, organized by hierarchy
 ## Component Hierarchy
 
 ```
-<Chart>                          Root container (canvas + store)
-├── <Scale>                      Scale registration (renderless)
-├── <Series>                     Data series registration (renderless)
-├── <Axis>                       Axis rendering (renderless)
-├── <Band>                       Fill between two series (renderless)
-├── <Legend>                      Interactive legend (HTML overlay)
-├── <FloatingLegend>             Draggable/cursor-following legend panel (HTML overlay)
-├── <HoverLabel>                 Nearest series info on hover delay (HTML overlay)
-├── <Tooltip>                    Cursor tooltip (HTML overlay)
-├── <Timeline>                   Event lanes (canvas draw hook)
-├── <BoxWhisker>                 Box-and-whisker plot (canvas draw hook)
-├── <Candlestick>                OHLC financial candlestick (canvas draw hook)
-├── <Heatmap>                    2D colored grid (canvas draw hook)
-├── <Vector>                     Directional arrows overlay (canvas draw hook)
-├── <HLine>                      Horizontal line annotation (canvas draw hook)
-├── <VLine>                      Vertical line annotation (canvas draw hook)
-├── <Region>                     Shaded region annotation (canvas draw hook)
-└── <AnnotationLabel>            Text label annotation (canvas draw hook)
+<ThemeProvider>                   Sets CSS custom properties for descendant charts
+└── <Chart>                      Root container (canvas + store)
+    ├── <Scale>                  Scale registration (renderless)
+    ├── <Series>                 Data series registration (renderless)
+    ├── <Axis>                   Axis rendering (renderless)
+    ├── <Band>                   Fill between two series (renderless)
+    ├── <Legend>                  Interactive legend (HTML overlay)
+    ├── <FloatingLegend>         Draggable/cursor-following legend panel (HTML overlay)
+    ├── <HoverLabel>             Nearest series info on hover delay (HTML overlay)
+    ├── <Tooltip>                Cursor tooltip (HTML overlay)
+    ├── <Timeline>               Event lanes (canvas draw hook)
+    ├── <BoxWhisker>             Box-and-whisker plot (canvas draw hook)
+    ├── <Candlestick>            OHLC candlestick (canvas draw hook, auto-registers series)
+    ├── <Heatmap>                2D colored grid (canvas draw hook)
+    ├── <Vector>                 Directional arrows overlay (canvas draw hook)
+    ├── <HLine>                  Horizontal line annotation (canvas draw hook)
+    ├── <VLine>                  Vertical line annotation (canvas draw hook)
+    ├── <Region>                 Shaded region annotation (canvas draw hook)
+    └── <AnnotationLabel>        Text label annotation (canvas draw hook)
 
 <ZoomRanger>                     Overview mini-chart (standalone, wraps Chart internally)
 <Sparkline>                      Compact inline chart (standalone, wraps Chart internally)
@@ -36,11 +37,50 @@ Complete props reference for all uPlot+ React components, organized by hierarchy
 
 ---
 
+## Theming
+
+### `<ThemeProvider>`
+
+Sets CSS custom properties on a wrapper `<div>` so descendant `<Chart>` components inherit themed styles. Provides a revision counter via React context so Charts detect ancestor theme changes and repaint the canvas.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `theme` | `ChartTheme` | — | Theme overrides **(required)** |
+| `children` | `ReactNode` | — | Child elements |
+
+```tsx
+import { Chart, Series, ThemeProvider, DARK_THEME } from 'uplot-plus';
+
+// Pre-built dark theme
+<ThemeProvider theme={DARK_THEME}>
+  <Chart data={data} width={800} height={400}>
+    <Series group={0} index={0} />
+  </Chart>
+</ThemeProvider>
+
+// Custom partial overrides
+<ThemeProvider theme={{ axisStroke: '#ccc', seriesColors: ['#e74c3c', '#3498db'] }}>
+  <Chart data={data} width={800} height={400}>
+    <Series group={0} index={0} />
+  </Chart>
+</ThemeProvider>
+```
+
+**Per-chart theming** (no provider): pass `theme` prop directly on `<Chart>`.
+
+**CSS custom properties** (no provider or prop): set `--uplot-*` variables on any ancestor element.
+
+**Themeable properties:** `axisStroke`, `gridStroke`, `titleFill`, `tickFont`, `labelFont`, `titleFont`, `bandFill`, `cursor.{stroke,width,dash,pointRadius,pointFill}`, `select.{fill,stroke,width}`, `seriesColors[]`, `candlestick.{upColor,downColor}`, `boxWhisker.{fill,stroke,medianColor,whiskerColor}`, `vector.color`, `sparkline.stroke`, `timeline.{labelColor,segmentColor,segmentTextColor}`, `annotation.{stroke,fill,font,labelFill}`, `overlay.{fontFamily,fontSize,panelBg,panelBorder,panelShadow,hiddenOpacity,zIndex,tooltipZIndex}`, `ranger.{accent,dim}`.
+
+**Demos:** `dark-mode-toggle`, `custom-theme`, `per-chart-theme`, `nested-theme-provider`, `themed-specialized`, `theme-presets`, `css-custom-properties`.
+
+---
+
 ## Core Components
 
 ### `<Chart>`
 
-Root container. Creates two canvas layers (persistent data + cursor overlay), initializes the chart store, and provides context to all children.
+Root container. Creates the canvas, initializes the chart store, and provides context to all children.
 
 **Smart defaults:** `<Scale>`, `<Axis>` children are optional. If omitted, Chart auto-creates x/y scales and bottom/left axes. Series get auto-assigned colors from a 15-color palette when `stroke` is not provided. Data accepts three forms: `{ x, y }` (single series), `[{ x, y }, ...]` (multiple groups), or `[{ x, series: [...] }, ...]` (full form).
 
@@ -653,7 +693,7 @@ import { Chart, Scale, Axis, BoxWhisker, fmtLabels } from 'uplot-plus';
 
 ### `<Candlestick>`
 
-OHLC financial candlestick chart. Reads data from the chart store (4 series: open, high, low, close). Shares the `drawRangeBox` rendering primitive with BoxWhisker. Uses `useDrawHook`. Must be inside `<Chart>`.
+OHLC financial candlestick chart. Reads data from the chart store (4 series: open, high, low, close). Shares the `drawRangeBox` rendering primitive with BoxWhisker. Uses `useDrawHook`. Must be inside `<Chart>`. 
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
@@ -666,18 +706,20 @@ OHLC financial candlestick chart. Reads data from the chart store (4 series: ope
 | `wickWidth` | `number` | `1` | Wick width in CSS pixels |
 
 ```tsx
-import { Chart, Series, Candlestick } from 'uplot-plus';
+import { Chart, Candlestick } from 'uplot-plus';
 
+// Minimal — Candlestick auto-registers hidden OHLC series
 <Chart width={800} height={400} data={data} xlabel="Day" ylabel="Price">
-  <Series group={0} index={0} show={false} label="Open" />
-  <Series group={0} index={1} show={false} label="High" />
-  <Series group={0} index={2} show={false} label="Low" />
-  <Series group={0} index={3} show={false} label="Close" />
+  <Candlestick />
+</Chart>
+
+// Custom colors via theme
+<Chart width={800} height={400} data={data} theme={{ candlestick: { upColor: '#00e676', downColor: '#ff1744' } }}>
   <Candlestick />
 </Chart>
 ```
 
-**Demos:** `candlestick-ohlc`.
+**Demos:** `candlestick-ohlc`, `themed-specialized`.
 
 ---
 

@@ -48,13 +48,13 @@ export function Tooltip({
 
   if (hasCursor) {
     const group = store.dataStore.data[activeGroup];
-    xVal = group != null ? (group.x[activeDataIdx] as number | undefined) ?? null : null;
+    xVal = group != null ? (group.x[activeDataIdx] ?? null) : null;
     xLabel = xVal != null ? parseFloat(xVal.toFixed(precision)).toString() : '';
 
     for (const cfg of store.seriesConfigs) {
       if (cfg.show === false || cfg.legend === false) continue;
       const yData = store.dataStore.getYValues(cfg.group, cfg.index);
-      const val = cfg.group === activeGroup ? (yData[activeDataIdx] as number | null) : null;
+      const val = cfg.group === activeGroup ? (yData[activeDataIdx] ?? null) : null;
       items.push({
         label: cfg.label ?? `Series ${cfg.index}`,
         value: val,

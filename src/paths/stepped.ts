@@ -5,6 +5,7 @@ import { Orientation, Direction } from '../types';
 import { valToPos } from '../core/Scale';
 import { nonNullIdxs } from '../math/utils';
 import { lineToH, lineToV, findGaps, clipGaps } from './utils';
+import { at } from '../utils/at';
 
 /**
  * Stepped (staircase) path builder.
@@ -48,8 +49,8 @@ export function stepped(defaultAlign?: -1 | 0 | 1): PathBuilder {
     let hasGap = false;
 
     const startIdx = dir === Direction.Forward ? idx0 : idx1;
-    let prevYPos = pixelForY(dataY[startIdx] as number);
-    let prevXPos = pixelForX(dataX[startIdx] as number);
+    let prevYPos = pixelForY(at(dataY, startIdx) ?? 0);
+    let prevXPos = pixelForX(at(dataX, startIdx));
 
     lineTo(stroke, prevXPos, prevYPos);
 
@@ -62,7 +63,7 @@ export function stepped(defaultAlign?: -1 | 0 | 1): PathBuilder {
         continue;
       }
 
-      const x1 = pixelForX(dataX[i] as number);
+      const x1 = pixelForX(at(dataX, i));
       const y1 = pixelForY(yVal);
 
       if (align === 1) {
@@ -101,8 +102,8 @@ export function stepped(defaultAlign?: -1 | 0 | 1): PathBuilder {
         const fillToVal = opts?.fillTo ?? scaleY.min ?? 0;
         const fillToY = pixelForY(fillToVal);
 
-        let frX = pixelForX(dataX[idx0] as number);
-        let toX = pixelForX(dataX[idx1] as number);
+        let frX = pixelForX(at(dataX, idx0));
+        let toX = pixelForX(at(dataX, idx1));
         if (dir === Direction.Backward) [toX, frX] = [frX, toX];
 
         lineTo(fill, toX, fillToY);

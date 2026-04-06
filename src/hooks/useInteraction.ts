@@ -232,13 +232,15 @@ function startDragPan(
   _ctx: ActionContext,
 ): DragContinuation {
   const scales = captureScales(store, filterOri);
-  const startClientX = (e as MouseEvent).clientX;
-  const startClientY = (e as MouseEvent).clientY;
+  if (!(e instanceof MouseEvent)) return { onMove() {}, onEnd() {} };
+  const startClientX = e.clientX;
+  const startClientY = e.clientY;
 
   return {
     onMove(_store: ChartStore, moveE: Event) {
+      if (!(moveE instanceof MouseEvent)) return;
       const plotBox = store.plotBox;
-      const me = moveE as MouseEvent;
+      const me = moveE;
       for (const s of scales) {
         const scale = store.scaleManager.getScale(s.id);
         if (scale == null) continue;
@@ -270,19 +272,21 @@ function startGutterPan(
   if (scale == null || !isScaleReady(scale)) return undefined;
 
   const isVert = ctx.ori === Orientation.Vertical;
-  const rect = (e.target as HTMLElement).closest('div')?.getBoundingClientRect();
+  if (!(e.target instanceof HTMLElement)) return undefined;
+  const rect = e.target.closest('div')?.getBoundingClientRect();
   if (rect == null) return undefined;
-  const startPos = isVert ? (e as MouseEvent).clientY - rect.top : (e as MouseEvent).clientX - rect.left;
+  if (!(e instanceof MouseEvent)) return undefined;
+  const startPos = isVert ? e.clientY - rect.top : e.clientX - rect.left;
   const startMin = scale.min;
   const startMax = scale.max;
   const scaleId = ctx.scaleId;
 
   return {
     onMove(_store: ChartStore, moveE: Event) {
+      if (!(moveE instanceof MouseEvent)) return;
       const plotBox = store.plotBox;
-      const me = moveE as MouseEvent;
       const dim = isVert ? plotBox.height : plotBox.width;
-      const pos = isVert ? me.clientY - rect.top : me.clientX - rect.left;
+      const pos = isVert ? moveE.clientY - rect.top : moveE.clientX - rect.left;
       const deltaFrac = (pos - startPos) / dim;
       const sign = (isVert ? 1 : -1) * scale.dir;
       const range = startMax - startMin;
@@ -374,7 +378,7 @@ function getBuiltinReaction(name: string): ReactionFn | undefined {
 
 /** Resolve a ReactionValue to an executable function. */
 function resolveReaction(reaction: ReactionValue): ReactionFn | undefined {
-  if (typeof reaction === 'function') return reaction as ReactionFn;
+  if (typeof reaction === 'function') return reaction;
   return getBuiltinReaction(reaction);
 }
 
@@ -492,7 +496,7 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
     function onDocumentMouseMove(e: MouseEvent): void {
       if (activeDrag == null) { removeDocumentListeners(); return; }
       // Inside chart — element-level handler processes it
-      if (el.contains(e.target as Node)) return;
+      if (e.target instanceof Node && el.contains(e.target)) return;
       didDrag = true;
       activeDrag.onMove(store, e, buildContext(e));
       updateCursor(e, e);
@@ -502,7 +506,7 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
       removeDocumentListeners();
       if (activeDrag == null) return;
       // Inside chart — element-level onMouseUp handles it
-      if (el.contains(e.target as Node)) return;
+      if (e.target instanceof Node && el.contains(e.target)) return;
       activeDrag.onEnd(store, e, buildContext(e));
       activeDrag = null;
       // Mouse is outside chart — hide cursor
@@ -628,7 +632,10 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
         const hoverReaction = store.actionMap.get('hover');
         if (hoverReaction != null && hoverReaction !== 'none') {
           const hoverFn = resolveReaction(hoverReaction);
-          if (hoverFn != null) hoverFn(store, domEvent ?? (e as unknown as Event), hoverCtx);
+          if (hoverFn != null) {
+            const hoverEvent: Event | undefined = domEvent ?? undefined;
+            if (hoverEvent != null) hoverFn(store, hoverEvent, hoverCtx);
+          }
 
           // Built-in focus behavior: auto-switch focused series
           if (store.focusAlpha < 1) {
@@ -806,8 +813,9 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
     // Touch support
     function onTouchStart(e: TouchEvent): void {
       if (e.touches.length === 2) {
-        const t0 = e.touches[0] as Touch;
-        const t1 = e.touches[1] as Touch;
+        const t0 = e.touches[0];
+        const t1 = e.touches[1];
+        if (t0 == null || t1 == null) return;
         const dx = t1.clientX - t0.clientX;
         const dy = t1.clientY - t0.clientY;
         pinchState = {
@@ -839,8 +847,9 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
       // Pinch zoom
       if (e.touches.length === 2 && pinchState != null) {
         e.preventDefault();
-        const t0 = e.touches[0] as Touch;
-        const t1 = e.touches[1] as Touch;
+        const t0 = e.touches[0];
+        const t1 = e.touches[1];
+        if (t0 == null || t1 == null) return;
         const dx = t1.clientX - t0.clientX;
         const dy = t1.clientY - t0.clientY;
         const newDist = Math.sqrt(dx * dx + dy * dy);

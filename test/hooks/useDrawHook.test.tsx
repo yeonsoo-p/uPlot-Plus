@@ -3,7 +3,12 @@ import { describe, it, expect, vi } from 'vitest';
 import { act } from '@testing-library/react';
 import { renderChart, flushEffects } from '../helpers/rtl';
 import { useDrawHook, useCursorDrawHook } from '@/hooks/useDrawHook';
-import type { DrawCallback, CursorDrawCallback } from '@/types/hooks';
+import type { DrawCallback, CursorDrawCallback, DrawContext } from '@/types/hooks';
+import { createMockCtx } from '../helpers/mockCanvas';
+
+function makeDC(): DrawContext {
+  return { ctx: createMockCtx(), plotBox: { left: 0, top: 0, width: 0, height: 0 }, pxRatio: 1, getScale: () => undefined, valToX: () => null, valToY: () => null };
+}
 
 /** Component that calls useDrawHook with the provided callback */
 function DrawHookProbe({ fn, clipped }: { fn: DrawCallback; clipped?: boolean }) {
@@ -28,7 +33,7 @@ describe('useDrawHook', () => {
     expect(sizeBefore).toBeGreaterThanOrEqual(1);
 
     // Verify our fn is callable through one of the wrappers
-    const mockDc = {} as Parameters<DrawCallback>[0];
+    const mockDc = makeDC();
     for (const w of store.drawHooks) w(mockDc);
     expect(fn).toHaveBeenCalledWith(mockDc);
   });
@@ -40,7 +45,7 @@ describe('useDrawHook', () => {
 
     expect(store.unclippedDrawHooks.size).toBeGreaterThanOrEqual(1);
 
-    const mockDc = {} as Parameters<DrawCallback>[0];
+    const mockDc = makeDC();
     for (const w of store.unclippedDrawHooks) w(mockDc);
     expect(fn).toHaveBeenCalledWith(mockDc);
   });
@@ -73,7 +78,7 @@ describe('useDrawHook', () => {
     await flushEffects();
 
     // Identify our wrapper: invoke all, only ours delegates to fn1
-    const mockDc = {} as Parameters<DrawCallback>[0];
+    const mockDc = makeDC();
     for (const w of store.drawHooks) w(mockDc);
     expect(fn1).toHaveBeenCalled();
 
@@ -110,8 +115,8 @@ describe('useCursorDrawHook', () => {
     expect(store.cursorDrawHooks.size).toBeGreaterThanOrEqual(1);
 
     // Verify our fn is callable
-    const mockDc = {} as Parameters<CursorDrawCallback>[0];
-    const mockCursor = {} as Parameters<CursorDrawCallback>[1];
+    const mockDc = makeDC();
+    const mockCursor = { left: 0, top: 0, activeGroup: -1, activeSeriesIdx: -1, activeDataIdx: -1 };
     for (const w of store.cursorDrawHooks) w(mockDc, mockCursor);
     expect(fn).toHaveBeenCalledWith(mockDc, mockCursor);
   });
@@ -132,8 +137,8 @@ describe('useCursorDrawHook', () => {
     const { store } = renderChart({}, <CursorDrawHookProbe fn={fn} />);
     await flushEffects();
 
-    const mockDc = {} as Parameters<CursorDrawCallback>[0];
-    const mockCursor = {} as Parameters<CursorDrawCallback>[1];
+    const mockDc = makeDC();
+    const mockCursor = { left: 0, top: 0, activeGroup: -1, activeSeriesIdx: -1, activeDataIdx: -1 };
     for (const w of store.cursorDrawHooks) w(mockDc, mockCursor);
 
     expect(fn).toHaveBeenCalledWith(mockDc, mockCursor);

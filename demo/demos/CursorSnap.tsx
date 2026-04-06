@@ -12,9 +12,6 @@ export default function CursorSnap() {
 
   return (
     <div>
-      <p className="text-demo text-muted mb-2">
-        Only 30 data points — cursor snaps to the nearest one. Notice the point indicator jumping between samples.
-      </p>
       <Chart width={800} height={400} data={data} xlabel="X" ylabel="Value">
         <Series
           group={0}

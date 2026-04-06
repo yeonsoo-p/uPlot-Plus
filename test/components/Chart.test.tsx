@@ -14,7 +14,7 @@ describe('Chart component', () => {
 
   it('sets container dimensions via inline style', () => {
     const { container } = renderChart({ width: 800, height: 600 });
-    const inner = container.querySelector('div[tabindex]') as HTMLElement;
+    const inner = container.querySelector<HTMLElement>('div[tabindex]')!;
     expect(inner).toBeInTheDocument();
     expect(inner.style.width).toBe('800px');
     expect(inner.style.height).toBe('600px');
@@ -22,7 +22,7 @@ describe('Chart component', () => {
 
   it('applies className to the outer wrapper div', () => {
     const { container } = renderChart({ className: 'my-chart' });
-    const wrapper = container.firstElementChild as HTMLElement;
+    const wrapper = container.firstElementChild!;
     expect(wrapper.className).toBe('my-chart');
   });
 

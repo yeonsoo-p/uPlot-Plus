@@ -4,6 +4,7 @@ import { renderChart, flushEffects, twoSeriesData } from '../helpers/rtl';
 import { Series } from '@/components/Series';
 import { Tooltip } from '@/components/Tooltip';
 import { rebuildSnapshot } from '@/hooks/useChartStore';
+import { normalizeData } from '@/core/normalizeData';
 import type { ChartStore } from '@/hooks/useChartStore';
 
 /**
@@ -108,6 +109,41 @@ describe('Tooltip component', () => {
     expect(el).toBeInTheDocument();
   });
 
+  it('re-renders with updated data after setData()', async () => {
+    const { store, container } = renderChart(
+      { data: twoSeriesData },
+      <>
+        <Series group={0} index={0} label="S1" stroke="red" />
+        <Tooltip />
+      </>,
+    );
+    await flushEffects();
+
+    // Activate cursor at data index 2 (original y[0][2] = 70)
+    act(() => { simulateCursor(store, 2); });
+
+    let tooltip = container.querySelector('[data-testid="tooltip-panel"]');
+    expect(tooltip).toBeInTheDocument();
+    const originalText = tooltip!.textContent;
+    expect(originalText).toContain('70');
+
+    // Replace data with different values (y[0][2] = 999)
+    const newData = normalizeData([
+      { x: [0, 25, 50, 75, 100], series: [[1, 2, 999, 4, 5]] },
+    ]);
+    act(() => {
+      store.setData(newData);
+    });
+
+    // Re-trigger cursor notification so snapshot rebuilds
+    act(() => { simulateCursor(store, 2); });
+
+    tooltip = container.querySelector('[data-testid="tooltip-panel"]');
+    expect(tooltip).toBeInTheDocument();
+    expect(tooltip!.textContent).toContain('999');
+    expect(tooltip!.textContent).not.toContain('70');
+  });
+
   it('positions tooltip absolutely', async () => {
     const { store, container } = renderChart(
       { data: twoSeriesData },
@@ -120,7 +156,7 @@ describe('Tooltip component', () => {
 
     act(() => { simulateCursor(store, 2); });
 
-    const tooltip = container.querySelector('[data-testid="tooltip-panel"]') as HTMLElement;
+    const tooltip = container.querySelector<HTMLElement>('[data-testid="tooltip-panel"]')!;
     expect(tooltip).toBeInTheDocument();
     expect(tooltip.style.position).toBe('absolute');
   });

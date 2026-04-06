@@ -398,7 +398,7 @@ export function findIncr(
   const intDigits = max(numIntDigits(minVal), numIntDigits(maxVal));
   const delta = maxVal - minVal;
 
-  let incrIdx = max(0, closestIdx((minSpace / dim) * delta, incrs as ArrayLike<number>) - 1);
+  let incrIdx = max(0, closestIdx((minSpace / dim) * delta, incrs) - 1);
 
   do {
     const foundIncr = incrs[incrIdx] ?? 0;

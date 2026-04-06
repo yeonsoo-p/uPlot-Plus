@@ -4,20 +4,16 @@ import { createScaleState } from '@/core/Scale';
 import type { ScaleState } from '@/types';
 import { Orientation, Direction } from '@/types';
 import { round } from '@/math/utils';
-import type { PathCall, Path2DMock } from '../setup';
+import { getMockCalls, tuple } from '../helpers/mockCanvas';
 
 function makeScale(id: string, min: number, max: number, ori: Orientation = Orientation.Horizontal): ScaleState {
   return { ...createScaleState({ id }), min, max, ori, dir: Direction.Forward };
 }
 
-function getCalls(path: Path2D): PathCall[] {
-  return (path as unknown as Path2DMock)._calls;
-}
-
 function getLineToCalls(path: Path2D): [number, number][] {
-  return getCalls(path)
+  return getMockCalls(path)
     .filter((c) => c[0] === 'lineTo')
-    .map((c) => [c[1], c[2]] as [number, number]);
+    .map((c) => tuple(c[1], c[2]));
 }
 
 const pxRound = (v: number) => round(v);
@@ -35,7 +31,7 @@ describe('stepped path builder', () => {
     expect(result.fill).toBeInstanceOf(Path2D);
 
     // Stroke should have lineTo calls for stepped path
-    const strokeLineToCount = getCalls(result.stroke).filter((c) => c[0] === 'lineTo').length;
+    const strokeLineToCount = getMockCalls(result.stroke).filter((c) => c[0] === 'lineTo').length;
     expect(strokeLineToCount).toBe(11);
   });
 
@@ -111,7 +107,7 @@ describe('stepped path builder', () => {
     expect(result.gaps!.length).toBe(1);
 
     // Clip path should have rect calls for the visible regions (before and after the gap)
-    const clipRects = getCalls(result.clip!).filter((c) => c[0] === 'rect');
+    const clipRects = getMockCalls(result.clip!).filter((c) => c[0] === 'rect');
     expect(clipRects.length).toBe(2);
   });
 
@@ -123,7 +119,7 @@ describe('stepped path builder', () => {
 
   it('handles all-null data — empty stroke, no fill', () => {
     const result = builder(dataX, [null, null, null, null, null], scaleX, scaleY, 400, 300, 0, 0, 0, 4, 1, pxRound);
-    const calls = getCalls(result.stroke);
+    const calls = getMockCalls(result.stroke);
     expect(calls.filter((c) => c[0] === 'lineTo').length).toBe(0);
     expect(result.fill).toBeNull();
   });
@@ -137,5 +133,27 @@ describe('stepped path builder', () => {
     expect(fwdCalls.length).toBe(revCalls.length);
     // First lineTo should differ since forward starts at index 0, reverse at index 4
     expect(fwdCalls[0]).not.toEqual(revCalls[0]);
+  });
+
+  it('fillToData uses per-point baseline instead of flat fillTo', () => {
+    const baseline = [5, 10, 8, 15, 12];
+    const result = builder(dataX, dataY, scaleX, scaleY, 400, 300, 0, 0, 0, 4, 1, pxRound, { fillToData: baseline });
+    expect(result.fill).toBeInstanceOf(Path2D);
+
+    const fillCalls = getMockCalls(result.fill!);
+    const fillLineTos = fillCalls.filter((c) => c[0] === 'lineTo');
+    // Fill should have more lineTo calls than stroke alone (baseline trace adds points)
+    const strokeLineTos = getMockCalls(result.stroke).filter((c) => c[0] === 'lineTo');
+    expect(fillLineTos.length).toBeGreaterThan(strokeLineTos.length);
+  });
+
+  it('fillToData with nulls in baseline skips those points', () => {
+    const baseline: (number | null)[] = [5, null, 8, null, 12];
+    const result = builder(dataX, dataY, scaleX, scaleY, 400, 300, 0, 0, 0, 4, 1, pxRound, { fillToData: baseline });
+    expect(result.fill).toBeInstanceOf(Path2D);
+
+    // Should still produce a fill path even with null baseline points
+    const fillLineTos = getMockCalls(result.fill!).filter((c) => c[0] === 'lineTo');
+    expect(fillLineTos.length).toBeGreaterThan(0);
   });
 });

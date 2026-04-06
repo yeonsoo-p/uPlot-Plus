@@ -1,4 +1,4 @@
-import { useRef, useEffect, useLayoutEffect, useState, useCallback, useMemo } from 'react';
+import { useRef, useEffect, useLayoutEffect, useState, useCallback, useContext, useMemo } from 'react';
 import type { ChartProps } from '../types';
 import { DEFAULT_ACTIONS } from '../types/interaction';
 import type { DrawCallback, CursorDrawCallback } from '../types/hooks';
@@ -8,6 +8,7 @@ import { useInteraction } from '../hooks/useInteraction';
 import { useSyncGroup } from '../sync/useSyncGroup';
 import { normalizeData } from '../core/normalizeData';
 import { themeToVars } from '../rendering/theme';
+import { ThemeRevisionContext } from './ThemeProvider';
 
 /**
  * Root chart component.
@@ -37,6 +38,17 @@ export function Chart({
     store.renderer.invalidateSnapshot();
     store.scheduleRedraw();
   }, [store, themeStyle]);
+
+  // When an ancestor ThemeProvider changes its theme, repaint the canvas
+  // so it re-resolves the new CSS custom properties.
+  const themeRevision = useContext(ThemeRevisionContext);
+  const themeRevisionRef = useRef(themeRevision);
+  useEffect(() => {
+    if (themeRevisionRef.current === themeRevision) return;
+    themeRevisionRef.current = themeRevision;
+    store.renderer.invalidateSnapshot();
+    store.scheduleRedraw();
+  }, [store, themeRevision]);
 
   // Merge user action overrides with defaults and sync to store
   useEffect(() => {
@@ -193,7 +205,6 @@ export function Chart({
             width: `${width}px`,
             height: `${height}px`,
             cursor: 'default',
-            outline: 'none',
             order: 0,
           }}
         >

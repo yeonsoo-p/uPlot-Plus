@@ -125,7 +125,10 @@ export function ZoomRanger({
     if (initialRange != null && normalized.length > 0) {
       const group = normalized[0];
       if (group != null && group.x.length > 1) {
-        return rangeToFrac(initialRange, group.x[0] as number, group.x[group.x.length - 1] as number);
+        const xFirst = group.x[0];
+        const xLast = group.x[group.x.length - 1];
+        if (xFirst == null || xLast == null) return DEFAULT_SELECTION;
+        return rangeToFrac(initialRange, xFirst, xLast);
       }
     }
     return DEFAULT_SELECTION;
@@ -138,8 +141,9 @@ export function ZoomRanger({
     const group = normalized[0];
     if (group == null || group.x.length < 2) return;
 
-    const xMin = group.x[0] as number;
-    const xMax = group.x[group.x.length - 1] as number;
+    const xMin = group.x[0];
+    const xMax = group.x[group.x.length - 1];
+    if (xMin == null || xMax == null) return;
     const [min, max] = fracToRange(selFrac, xMin, xMax);
 
     const prev = prevRangeRef.current;
@@ -213,6 +217,39 @@ export function ZoomRanger({
     if (el != null) el.releasePointerCapture(e.pointerId);
   }, []);
 
+  const KEYBOARD_STEP = 0.02;
+
+  const onKeyDown = useCallback((e: React.KeyboardEvent) => {
+    const step = e.shiftKey ? KEYBOARD_STEP * 5 : KEYBOARD_STEP;
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      if (e.altKey) {
+        // Shrink from right edge
+        setSelFrac(prev => [prev[0], Math.max(prev[0] + MIN_SELECTION_FRAC, prev[1] - step)]);
+      } else {
+        // Move selection left
+        setSelFrac(prev => {
+          const w = prev[1] - prev[0];
+          const newLeft = Math.max(0, prev[0] - step);
+          return [newLeft, newLeft + w];
+        });
+      }
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      if (e.altKey) {
+        // Expand from right edge
+        setSelFrac(prev => [prev[0], Math.min(1, prev[1] + step)]);
+      } else {
+        // Move selection right
+        setSelFrac(prev => {
+          const w = prev[1] - prev[0];
+          const newLeft = Math.min(1 - w, prev[0] + step);
+          return [newLeft, newLeft + w];
+        });
+      }
+    }
+  }, []);
+
   const leftPct = `${selFrac[0] * 100}%`;
   const widthPct = `${(selFrac[1] - selFrac[0]) * 100}%`;
 
@@ -239,9 +276,17 @@ export function ZoomRanger({
       {/* Interaction overlay */}
       <div
         ref={containerRef}
+        tabIndex={0}
+        role="slider"
+        aria-label="Zoom range"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(selFrac[0] * 100)}
+        aria-valuetext={`${Math.round(selFrac[0] * 100)}% to ${Math.round(selFrac[1] * 100)}%`}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
+        onKeyDown={onKeyDown}
         style={{
           position: 'absolute',
           top: 0,

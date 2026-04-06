@@ -163,11 +163,21 @@ export class CanvasRenderer {
     this.pathCache.set(key, paths);
   }
 
-  /** Invalidate paths for a specific series (all windows) */
+  /** Invalidate paths and band geometry for a specific series (all windows) */
   invalidateSeries(group: number, index: number): void {
     const prefix = `${group}:${index}:`;
     for (const key of this.pathCache.keys()) {
       if (key.startsWith(prefix)) this.pathCache.delete(key);
+    }
+    // Also invalidate band cache entries where this series is upper or lower
+    const groupPrefix = `${group}:`;
+    const idx = String(index);
+    for (const bk of this.bandCache.keys()) {
+      if (!bk.startsWith(groupPrefix)) continue;
+      const parts = bk.split(':');
+      if (parts[1] === idx || parts[2] === idx) {
+        this.bandCache.delete(bk);
+      }
     }
   }
 
@@ -193,16 +203,16 @@ export class CanvasRenderer {
 
   // --- Band path cache ---
 
-  private bandKey(group: number, upper: number, lower: number, i0: number, i1: number): string {
-    return `${group}:${upper}:${lower}:${i0}:${i1}`;
+  private bandKey(group: number, upper: number, lower: number, i0: number, i1: number, dir: -1 | 0 | 1): string {
+    return `${group}:${upper}:${lower}:${i0}:${i1}:${dir}`;
   }
 
-  getCachedBandPath(group: number, upper: number, lower: number, i0: number, i1: number): Path2D | undefined {
-    return this.bandCache.get(this.bandKey(group, upper, lower, i0, i1));
+  getCachedBandPath(group: number, upper: number, lower: number, i0: number, i1: number, dir: -1 | 0 | 1): Path2D | undefined {
+    return this.bandCache.get(this.bandKey(group, upper, lower, i0, i1, dir));
   }
 
-  setCachedBandPath(group: number, upper: number, lower: number, i0: number, i1: number, path: Path2D): void {
-    this.bandCache.set(this.bandKey(group, upper, lower, i0, i1), path);
+  setCachedBandPath(group: number, upper: number, lower: number, i0: number, i1: number, dir: -1 | 0 | 1, path: Path2D): void {
+    this.bandCache.set(this.bandKey(group, upper, lower, i0, i1, dir), path);
   }
 
   /**

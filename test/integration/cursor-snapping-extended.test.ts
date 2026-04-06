@@ -34,9 +34,9 @@ describe('CursorManager: multi-group snapping', () => {
   };
 
   const getScale = (id: string) => scales[id];
-  const getWindow = (_gi: number) => {
-    if (_gi === 0) return [0, 4] as [number, number];
-    return [0, 2] as [number, number];
+  const getWindow = (_gi: number): [number, number] => {
+    if (_gi === 0) return [0, 4];
+    return [0, 2];
   };
   const getGroupXScaleKey = () => 'x';
 
@@ -106,7 +106,7 @@ describe('CursorManager: hidden series', () => {
   };
 
   const getScale = (id: string) => scales[id];
-  const getWindow = () => [0, 2] as [number, number];
+  const getWindow = (): [number, number] => [0, 2];
   const getGroupXScaleKey = () => 'x';
 
   it('skips hidden series (show: false)', () => {
@@ -171,7 +171,7 @@ describe('CursorManager: null data handling', () => {
   };
 
   const getScale = (id: string) => scales[id];
-  const getWindow = () => [0, 4] as [number, number];
+  const getWindow = (): [number, number] => [0, 4];
   const getGroupXScaleKey = () => 'x';
 
   it('skips null y-values', () => {
@@ -229,15 +229,15 @@ describe('CursorManager: syncToValue', () => {
     const store = {
       dataStore: {
         data,
-        getWindow: () => [0, 4] as [number, number],
+        getWindow: (): [number, number] => [0, 4],
       },
       scaleManager: {
-        getGroupXScaleKey: () => 'x' as string | undefined,
+        getGroupXScaleKey: (): string | undefined => 'x',
         getScale: (id: string) => scales[id],
       },
       seriesConfigs: [
         { group: 0, index: 0, yScale: 'y' },
-      ] as SeriesConfig[],
+      ],
       plotBox,
     };
 
@@ -268,15 +268,15 @@ describe('CursorManager: syncToValue', () => {
     const store = {
       dataStore: {
         data,
-        getWindow: () => [0, 2] as [number, number],
+        getWindow: (): [number, number] => [0, 2],
       },
       scaleManager: {
-        getGroupXScaleKey: () => 'x' as string | undefined,
+        getGroupXScaleKey: (): string | undefined => 'x',
         getScale: (id: string) => scales[id],
       },
       seriesConfigs: [
         { group: 0, index: 0, yScale: 'y' },
-      ] as SeriesConfig[],
+      ],
       plotBox,
     };
 

@@ -19,11 +19,6 @@ export default function ZoomVariations() {
 
   return (
     <div>
-      <p className="text-demo text-muted mb-2">
-        <strong>Drag</strong> to zoom a region &middot;{' '}
-        <strong>Scroll wheel</strong> to zoom both axes &middot;{' '}
-        <strong>Double-click</strong> to reset zoom
-      </p>
       <Chart width={800} height={400} data={data} actions={[['wheel', 'zoomXY']]} xlabel="X" ylabel="Value">
         <Series group={0} index={0} label="Sine Wave" />
         <Legend />

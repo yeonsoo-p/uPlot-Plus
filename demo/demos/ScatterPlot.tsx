@@ -1,4 +1,4 @@
-import { Chart, Series, Legend, points } from 'uplot-plus';
+import { Chart, Series, Legend, points, at } from 'uplot-plus';
 
 function generateScatterData() {
   const n1 = 80;
@@ -13,8 +13,8 @@ function generateScatterData() {
   }
   // Sort x1 and reorder y1 to match (required for x array ordering)
   const indices1 = x1.map((_, i) => i).sort((a, b) => (x1[a] ?? 0) - (x1[b] ?? 0));
-  const sx1 = indices1.map(i => x1[i] as number);
-  const sy1 = indices1.map(i => y1[i] as number);
+  const sx1 = indices1.map(i => at(x1, i));
+  const sy1 = indices1.map(i => at(y1, i));
 
   // Cluster 2: centered around (65, 70)
   const x2: number[] = [];
@@ -24,8 +24,8 @@ function generateScatterData() {
     y2.push(55 + Math.random() * 30 + (Math.random() - 0.5) * 15);
   }
   const indices2 = x2.map((_, i) => i).sort((a, b) => (x2[a] ?? 0) - (x2[b] ?? 0));
-  const sx2 = indices2.map(i => x2[i] as number);
-  const sy2 = indices2.map(i => y2[i] as number);
+  const sx2 = indices2.map(i => at(x2, i));
+  const sy2 = indices2.map(i => at(y2, i));
 
   return [
     { x: sx1, series: [sy1] },

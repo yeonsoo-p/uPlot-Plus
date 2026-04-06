@@ -5,6 +5,11 @@ import { closestIdx, getMinMax } from '../math/utils';
 import { isScaleReady } from './Scale';
 import { BlockMinMaxTree } from './BlockMinMax';
 
+/** Widen a number[] or (number|null)[] to a mutable (number|null)[]. */
+function asMutableNullable(arr: number[] | (number | null)[]): (number | null)[] {
+  return arr;
+}
+
 /**
  * Manages chart data and per-xGroup visible windows.
  * The window for each group is the index range [i0, i1] of x-values
@@ -41,7 +46,7 @@ export class DataStore {
     const yData = grp.series[index];
     if (!yData || yData.length === 0) return undefined;
 
-    tree = new BlockMinMaxTree(yData as ArrayLike<number | null>);
+    tree = new BlockMinMaxTree(yData);
     this.blockTrees.set(key, tree);
     return tree;
   }
@@ -106,7 +111,9 @@ export class DataStore {
 
   /** Get y values for a specific series */
   getYValues(groupIdx: number, seriesIdx: number): ArrayLike<number | null> {
-    return (this.data[groupIdx]?.series[seriesIdx] ?? []) as ArrayLike<number | null>;
+    const s = this.data[groupIdx]?.series[seriesIdx];
+    if (!s) return [];
+    return s;
   }
 
   /** Get cached min/max for a series within a window range */
@@ -142,7 +149,7 @@ export class DataStore {
     if (tree) {
       result = tree.rangeMinMax(i0, i1);
     } else {
-      result = getMinMax(yData as ArrayLike<number | null>, i0, i1, sorted, isLog);
+      result = getMinMax(yData, i0, i1, sorted, isLog);
     }
 
     groupCache.set(key, result);
@@ -188,27 +195,30 @@ export class DataStore {
 
     // Append y values for each series
     for (let si = 0; si < group.series.length; si++) {
-      let yArr = group.series[si];
-      if (!yArr) continue;
+      const yOrig = group.series[si];
+      if (!yOrig) continue;
 
-      // Convert typed y-array → growable regular array on first append
-      if (!Array.isArray(yArr)) {
-        yArr = Array.from(yArr) as (number | null)[];
+      // Ensure we have a mutable (number | null)[] for appending.
+      // On first append, typed arrays are converted; plain arrays are widened.
+      let yArr: (number | null)[];
+      if (!Array.isArray(yOrig)) {
+        yArr = Array.from<number | null>(yOrig);
         group.series[si] = yArr;
+      } else {
+        yArr = asMutableNullable(yOrig);
       }
 
       const newY = newSeries[si];
       if (newY) {
-        const mutableY = yArr as (number | null)[];
         for (let i = 0; i < newY.length; i++) {
-          mutableY.push(newY[i] ?? null);
+          yArr.push(newY[i] ?? null);
         }
       }
 
       // Update block tree incrementally
       const tree = this.blockTrees.get(`${groupIdx}:${si}`);
       if (tree) {
-        tree.setData(yArr as ArrayLike<number | null>);
+        tree.setData(yArr);
         tree.grow(yArr.length);
       }
     }

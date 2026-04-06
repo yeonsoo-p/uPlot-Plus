@@ -5,6 +5,7 @@ import { Orientation, Direction } from '../types';
 import { valToPos } from '../core/Scale';
 import { nonNullIdxs } from '../math/utils';
 import { lineToH, lineToV, findGaps, clipGaps } from './utils';
+import { at } from '../utils/at';
 
 /**
  * Spline path builder — wraps an interpolation function.
@@ -49,7 +50,7 @@ export function splineInterp(
       const yVal = dataY[i];
 
       if (yVal != null) {
-        xCoords.push(pixelForX(dataX[i] as number));
+        xCoords.push(pixelForX(at(dataX, i)));
         yCoords.push(pixelForY(yVal));
       } else if (yVal === null && !spanGaps) {
         hasGap = true;
@@ -84,8 +85,8 @@ export function splineInterp(
         const fillToVal = opts?.fillTo ?? scaleY.min ?? 0;
         const fillToY = pixelForY(fillToVal);
 
-        let frX = pixelForX(dataX[idx0] as number);
-        let toX = pixelForX(dataX[idx1] as number);
+        let frX = pixelForX(at(dataX, idx0));
+        let toX = pixelForX(at(dataX, idx1));
         if (dir === Direction.Backward) [toX, frX] = [frX, toX];
 
         lineTo(fill, toX, fillToY);

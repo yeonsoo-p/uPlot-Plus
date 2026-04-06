@@ -20,9 +20,6 @@ export default function YScaleDrag() {
 
   return (
     <div>
-      <p className="text-demo text-muted-light mb-2">
-        Click and drag on the left or right y-axis to pan the scale. Double-click chart to reset.
-      </p>
       <Chart width={800} height={400} data={data} ylabel="Temperature">
         <Scale id="y2"  />
         <Series group={0} index={0} label="Temperature" />

@@ -64,7 +64,7 @@ describe('resolveInitialPos', () => {
 describe('formatSeriesValue', () => {
   const mockStore = {
     dataStore: {
-      getYValues: (_g: number, _i: number) => [10, 40.123, null, 70, 90] as ArrayLike<number | null>,
+      getYValues: (_g: number, _i: number): ArrayLike<number | null> => [10, 40.123, null, 70, 90],
     },
   };
 
@@ -82,6 +82,16 @@ describe('formatSeriesValue', () => {
 
   it('returns empty string when activeGroup is -1', () => {
     expect(formatSeriesValue(mockStore, 0, 0, -1, 0)).toBe('');
+  });
+
+  it('returns empty string when series group does not match activeGroup', () => {
+    expect(formatSeriesValue(mockStore, 1, 0, 0, 1)).toBe('');
+    expect(formatSeriesValue(mockStore, 2, 0, 0, 0)).toBe('');
+  });
+
+  it('returns value when series group matches activeGroup', () => {
+    expect(formatSeriesValue(mockStore, 0, 0, 0, 0)).toBe('10.00');
+    expect(formatSeriesValue(mockStore, 0, 0, 0, 1)).toBe('40.12');
   });
 });
 

@@ -21,7 +21,7 @@ export default defineConfig([
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       '@typescript-eslint/no-non-null-assertion': 'error',
-      '@typescript-eslint/consistent-type-assertions': ['warn', { assertionStyle: 'never' }],
+      '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }],
       '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
       '@typescript-eslint/no-unnecessary-condition': 'error',
       '@typescript-eslint/prefer-nullish-coalescing': 'error',
@@ -58,6 +58,7 @@ export default defineConfig([
       '@typescript-eslint/no-unsafe-argument': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/unbound-method': 'off',
+      '@typescript-eslint/consistent-type-assertions': 'off',
     },
   },
   // Relax strict type-checked rules for E2E tests (Playwright API patterns)

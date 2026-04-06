@@ -5,6 +5,7 @@ import { Orientation, Direction, Distribution } from '../types';
 import { valToPos, posToVal } from '../core/Scale';
 import { nonNullIdxs, positiveIdxs } from '../math/utils';
 import { lineToH, lineToV, findGaps, clipGaps } from './utils';
+import { at } from '../utils/at';
 
 /**
  * Accumulator drawing helper: when multiple data points map to the same
@@ -98,16 +99,16 @@ export function linear(): PathBuilder {
       let inY = 0;
       let outY = 0;
 
-      let accX = pixelForX(dataX[dir === Direction.Forward ? idx0 : idx1] as number);
+      let accX = pixelForX(at(dataX, dir === Direction.Forward ? idx0 : idx1));
 
-      const idx0px = pixelForX(dataX[idx0] as number);
-      const idx1px = pixelForX(dataX[idx1] as number);
+      const idx0px = pixelForX(at(dataX, idx0));
+      const idx1px = pixelForX(at(dataX, idx1));
 
       // tracks limit of current x bucket
       let nextAccXVal = xForPixel(dir === Direction.Forward ? idx0px + 1 : idx1px - 1);
 
       for (let i = dir === Direction.Forward ? idx0 : idx1; i >= idx0 && i <= idx1; i += dir) {
-        const xVal = dataX[i] as number;
+        const xVal = at(dataX, i);
         const reuseAccX = dir === Direction.Forward ? (xVal < nextAccXVal) : (xVal > nextAccXVal);
         const x = reuseAccX ? accX : pixelForX(xVal);
 
@@ -164,7 +165,7 @@ export function linear(): PathBuilder {
         if (yVal === null && !spanGaps)
           hasGap = true;
         else if (yVal != null)
-          lineTo(stroke, pixelForX(dataX[i] as number), pixelForY(yVal));
+          lineTo(stroke, pixelForX(at(dataX, i)), pixelForY(yVal));
       }
     }
 
@@ -186,8 +187,8 @@ export function linear(): PathBuilder {
         const fillToY = pixelForY(fillToVal);
 
         // Close fill to data extent (not plot edges) to avoid triangular overshoots
-        let frX = pixelForX(dataX[idx0] as number);
-        let toX = pixelForX(dataX[idx1] as number);
+        let frX = pixelForX(at(dataX, idx0));
+        let toX = pixelForX(at(dataX, idx1));
 
         if (dir === Direction.Backward)
           [toX, frX] = [frX, toX];

@@ -4,6 +4,7 @@ export type { PathBuilderOpts } from './types';
 import type { ScaleState } from '../types';
 import { Orientation, Direction } from '../types';
 import { valToPos } from '../core/Scale';
+import { at } from '../utils/at';
 
 function withBarDefaults(fn: PathBuilder): PathBuilder {
   fn.defaults = BAR_DEFAULTS;
@@ -50,8 +51,8 @@ export function bars(): PathBuilder {
       for (let i = idx0; i <= idx1; i++) {
         if (dataY[i] != null) {
           if (prevIdx >= 0) {
-            const dx = dataX[i] as number;
-            const dprev = dataX[prevIdx] as number;
+            const dx = at(dataX, i);
+            const dprev = at(dataX, prevIdx);
             const delta = Math.abs(pixelForX(dx) - pixelForX(dprev));
             if (delta < minDelta) minDelta = delta;
           }
@@ -79,12 +80,12 @@ export function bars(): PathBuilder {
       const yVal = dataY[i];
       if (yVal == null) continue;
 
-      const xPos = pixelForX(dataX[i] as number);
+      const xPos = pixelForX(at(dataX, i));
       const yPos = pixelForY(yVal);
 
       // Per-point baseline for stacked bars, falling back to fixed fillTo
       const ptFillToVal = fillToData != null && fillToData[i] != null
-        ? fillToData[i] as number
+        ? at(fillToData, i) ?? fillToVal
         : fillToVal;
       const ptFillToY = fillToData != null && fillToData[i] != null
         ? pixelForY(ptFillToVal)
@@ -144,7 +145,8 @@ export function groupedBars(groupIdx: number, groupCount: number): PathBuilder {
 /**
  * Stacked bar chart path builder.
  * Draws wider bars (80% column width) suited for stacking.
- * Use with stackGroup() to transform data into cumulative values and generate Band configs.
+ * Use with stackGroup() to transform data into cumulative values.
+ * Pass the previous layer's stacked data as `baselineData` so bars draw from the correct baseline.
  *
  * @param baselineData - Optional cumulative data of the layer below (previous series in the stack).
  *   When provided, bars draw from the baseline to the current cumulative value instead of from 0.

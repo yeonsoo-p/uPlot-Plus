@@ -23,8 +23,9 @@ function shallowEqualFlat(a: Record<string, unknown>, b: Record<string, unknown>
  */
 export function shallowEqual(a: object | null, b: object): boolean {
   if (a === null) return false;
-  const objA = a as Record<string, unknown>;
-  const objB = b as Record<string, unknown>;
+  if (!isPlainObject(a) || !isPlainObject(b)) return false;
+  const objA = a;
+  const objB = b;
   const keysA = Object.keys(objA);
   const keysB = Object.keys(objB);
   if (keysA.length !== keysB.length) return false;

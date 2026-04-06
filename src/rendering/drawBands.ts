@@ -37,7 +37,9 @@ export function buildBandPath(
   return buildDirectionalBandPath(dataX, upperY, lowerY, i0, i1, toXPx, toYPx, dir);
 }
 
-/** Full band: trace upper forward, lower backward, close. */
+/** Full band: trace upper forward, lower backward, close.  Splits into
+ *  separate sub-paths at indices where either series has a null value so the
+ *  fill never bridges across missing data. */
 function buildFullBandPath(
   dataX: ArrayLike<number>,
   upperY: ArrayLike<number | null>,
@@ -48,38 +50,53 @@ function buildFullBandPath(
   toYPx: (v: number) => number,
 ): Path2D | null {
   const path = new Path2D();
-  let started = false;
+  let hasSegment = false;
 
-  // Forward pass: upper series (left to right)
-  for (let i = i0; i <= i1; i++) {
-    const uv = upperY[i];
-    const xv = dataX[i];
-    if (uv == null || xv == null) continue;
-
-    const px = toXPx(xv);
-    const py = toYPx(uv);
-
-    if (!started) {
-      path.moveTo(px, py);
-      started = true;
-    } else {
-      path.lineTo(px, py);
+  let segStart = i0;
+  while (segStart <= i1) {
+    // Skip indices where either boundary is null
+    if (dataX[segStart] == null || upperY[segStart] == null || lowerY[segStart] == null) {
+      segStart++;
+      continue;
     }
+
+    // Find end of contiguous valid segment
+    let segEnd = segStart;
+    while (
+      segEnd + 1 <= i1
+      && dataX[segEnd + 1] != null
+      && upperY[segEnd + 1] != null
+      && lowerY[segEnd + 1] != null
+    ) {
+      segEnd++;
+    }
+
+    // Forward pass: upper boundary (left to right)
+    {
+      const sx = dataX[segStart];
+      const su = upperY[segStart];
+      if (sx != null && su != null) path.moveTo(toXPx(sx), toYPx(su));
+    }
+    for (let i = segStart + 1; i <= segEnd; i++) {
+      const xv = dataX[i];
+      const uv = upperY[i];
+      if (xv != null && uv != null) path.lineTo(toXPx(xv), toYPx(uv));
+    }
+
+    // Reverse pass: lower boundary (right to left)
+    for (let i = segEnd; i >= segStart; i--) {
+      const xv = dataX[i];
+      const lv = lowerY[i];
+      if (xv != null && lv != null) path.lineTo(toXPx(xv), toYPx(lv));
+    }
+
+    path.closePath();
+    hasSegment = true;
+
+    segStart = segEnd + 1;
   }
 
-  if (!started) return null;
-
-  // Reverse pass: lower series (right to left)
-  for (let i = i1; i >= i0; i--) {
-    const lv = lowerY[i];
-    const xv = dataX[i];
-    if (lv == null || xv == null) continue;
-
-    path.lineTo(toXPx(xv), toYPx(lv));
-  }
-
-  path.closePath();
-  return path;
+  return hasSegment ? path : null;
 }
 
 /** Directional band: only fill segments where upper > lower (dir=1) or lower > upper (dir=-1). */

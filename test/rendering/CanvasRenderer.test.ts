@@ -4,10 +4,12 @@ import type { RenderableSeriesInfo } from '@/rendering/CanvasRenderer';
 import type { SeriesPaths } from '@/paths/types';
 import type { ScaleState } from '@/types';
 import { createScaleState } from '@/core/Scale';
+import { tuple } from '../helpers/mockCanvas';
 
 /** Create a stub SeriesPaths object for caching tests */
 function stubPaths(label = 'a'): SeriesPaths {
-  return { stroke: new Path2D(), fill: new Path2D(), _label: label } as SeriesPaths & { _label: string };
+  const paths: SeriesPaths = { stroke: new Path2D(), fill: new Path2D(), clip: null, band: null, gaps: null };
+  return Object.assign(paths, { _label: label });
 }
 
 function makeScale(id: string, min: number, max: number): ScaleState {
@@ -21,7 +23,7 @@ function makeRenderInfo(xScale: ScaleState, yScale: ScaleState): RenderableSerie
     dataY: [10, 20, 30, 40, 50],
     xScale,
     yScale,
-    window: [0, 4] as [number, number],
+    window: tuple(0, 4),
   };
 }
 
@@ -175,30 +177,47 @@ describe('CanvasRenderer: band cache', () => {
 
   it('stores and retrieves band paths', () => {
     const path = new Path2D();
-    r.setCachedBandPath(0, 1, 2, 10, 20, path);
-    expect(r.getCachedBandPath(0, 1, 2, 10, 20)).toBe(path);
+    r.setCachedBandPath(0, 1, 2, 10, 20, 0, path);
+    expect(r.getCachedBandPath(0, 1, 2, 10, 20, 0)).toBe(path);
   });
 
   it('returns undefined for band cache miss', () => {
-    expect(r.getCachedBandPath(0, 1, 2, 10, 20)).toBeUndefined();
+    expect(r.getCachedBandPath(0, 1, 2, 10, 20, 0)).toBeUndefined();
+  });
+
+  it('differentiates cache entries by dir', () => {
+    const pFull = new Path2D();
+    const pUp = new Path2D();
+    const pDown = new Path2D();
+    r.setCachedBandPath(0, 1, 2, 0, 100, 0, pFull);
+    r.setCachedBandPath(0, 1, 2, 0, 100, 1, pUp);
+    r.setCachedBandPath(0, 1, 2, 0, 100, -1, pDown);
+
+    expect(r.getCachedBandPath(0, 1, 2, 0, 100, 0)).toBe(pFull);
+    expect(r.getCachedBandPath(0, 1, 2, 0, 100, 1)).toBe(pUp);
+    expect(r.getCachedBandPath(0, 1, 2, 0, 100, -1)).toBe(pDown);
   });
 
   it('clearGroupCache clears band paths for that group', () => {
     const p0 = new Path2D();
     const p1 = new Path2D();
-    r.setCachedBandPath(0, 1, 2, 0, 100, p0);
-    r.setCachedBandPath(1, 0, 1, 0, 100, p1);
+    r.setCachedBandPath(0, 1, 2, 0, 100, 0, p0);
+    r.setCachedBandPath(0, 1, 2, 0, 100, 1, new Path2D());
+    r.setCachedBandPath(1, 0, 1, 0, 100, 0, p1);
 
     r.clearGroupCache(0);
 
-    expect(r.getCachedBandPath(0, 1, 2, 0, 100)).toBeUndefined();
-    expect(r.getCachedBandPath(1, 0, 1, 0, 100)).toBe(p1);
+    expect(r.getCachedBandPath(0, 1, 2, 0, 100, 0)).toBeUndefined();
+    expect(r.getCachedBandPath(0, 1, 2, 0, 100, 1)).toBeUndefined();
+    expect(r.getCachedBandPath(1, 0, 1, 0, 100, 0)).toBe(p1);
   });
 
   it('clearCache clears all band paths', () => {
-    r.setCachedBandPath(0, 1, 2, 0, 100, new Path2D());
+    r.setCachedBandPath(0, 1, 2, 0, 100, 0, new Path2D());
+    r.setCachedBandPath(0, 1, 2, 0, 100, 1, new Path2D());
     r.clearCache();
-    expect(r.getCachedBandPath(0, 1, 2, 0, 100)).toBeUndefined();
+    expect(r.getCachedBandPath(0, 1, 2, 0, 100, 0)).toBeUndefined();
+    expect(r.getCachedBandPath(0, 1, 2, 0, 100, 1)).toBeUndefined();
   });
 });
 
@@ -221,7 +240,7 @@ describe('CanvasRenderer: snapshot', () => {
     canvas.height = 50;
     const ctx = canvas.getContext('2d')!;
     // The stub sets canvas: null — point it at the real canvas for restoreSnapshot
-    (ctx as unknown as Record<string, unknown>).canvas = canvas;
+    Object.defineProperty(ctx, 'canvas', { value: canvas, writable: true });
 
     r.saveSnapshot(ctx, 100, 50);
     expect(r.restoreSnapshot(ctx)).toBe(true);

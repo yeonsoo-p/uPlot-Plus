@@ -67,10 +67,6 @@ export default function SelectFetch() {
           <span className="text-demo font-mono text-muted">{rangeText}</span>
         )}
       </div>
-      <p className="mt-0 text-demo text-muted mb-2">
-        Drag to select a region — instead of zooming, the chart fetches higher-resolution data for that range.
-        The onScaleChange callback displays the current x-range.
-      </p>
       <Chart
         width={800}
         height={400}

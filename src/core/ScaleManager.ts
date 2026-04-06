@@ -3,6 +3,7 @@ import type { ChartData } from '../types';
 import { Distribution } from '../types';
 import { createScaleState, invalidateScaleCache } from './Scale';
 import { rangeNum, rangeLog, rangeAsinh, autoRangePart, inf } from '../math/utils';
+import { at } from '../utils/at';
 import type { DataStore } from './DataStore';
 
 /**
@@ -99,7 +100,7 @@ export class ScaleManager {
         for (let i = 0; i < group.x.length; i++) {
           if (!Number.isInteger(group.x[i])) allIntegers = false;
           if (i > 0) {
-            const d = (group.x[i] as number) - (group.x[i - 1] as number);
+            const d = at(group.x, i) - at(group.x, i - 1);
             if (d > 0 && d < minDelta) minDelta = d;
           }
         }

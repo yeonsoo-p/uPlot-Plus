@@ -220,7 +220,8 @@ export function useDraggableOverlay({
     draggingRef.current = true;
     setIsDragging(true);
     didDrag.current = false;
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    if (!(e.currentTarget instanceof HTMLElement)) return;
+    const rect = e.currentTarget.getBoundingClientRect();
     dragOffset.current = { dx: e.clientX - rect.left, dy: e.clientY - rect.top };
   };
 

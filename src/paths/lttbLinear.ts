@@ -4,6 +4,7 @@ import type { ScaleState } from '../types';
 import type { Direction } from '../types';
 import { linear } from './linear';
 import { lttb } from '../math/lttb';
+import { at } from '../utils/at';
 
 export interface LttbLinearOpts {
   /** Target points multiplier relative to pixel width. Default: 1 (one point per pixel) */
@@ -44,7 +45,7 @@ export function lttbLinear(lttbOpts?: LttbLinearOpts): PathBuilder {
       const windowY: (number | null)[] = new Array<number | null>(windowLen);
 
       for (let i = 0; i < windowLen; i++) {
-        windowX[i] = dataX[idx0 + i] as number;
+        windowX[i] = at(dataX, idx0 + i);
         windowY[i] = dataY[idx0 + i] ?? null;
       }
 

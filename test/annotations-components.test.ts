@@ -1,37 +1,19 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { drawHLine, drawVLine, drawRegion } from '@/annotations';
 import type { DrawContext } from '@/types/hooks';
 import { createScaleState } from '@/core/Scale';
 import type { ScaleState } from '@/types';
+import { createMockCtx } from './helpers/mockCanvas';
 
 /** Minimal scale state for testing */
 function makeScale(min: number, max: number): ScaleState {
   return { ...createScaleState({ id: 'y', min, max }) };
 }
 
-function makeMockCtx() {
-  return {
-    beginPath: vi.fn(),
-    moveTo: vi.fn(),
-    lineTo: vi.fn(),
-    stroke: vi.fn(),
-    setLineDash: vi.fn(),
-    fillRect: vi.fn(),
-    strokeRect: vi.fn(),
-    fillText: vi.fn(),
-    strokeStyle: '',
-    fillStyle: '',
-    lineWidth: 1,
-    font: '',
-    textAlign: '' as CanvasTextAlign,
-    textBaseline: '' as CanvasTextBaseline,
-  };
-}
-
 function makeDC(overrides?: Partial<DrawContext>) {
-  const mockCtx = makeMockCtx();
+  const mockCtx = createMockCtx();
   const dc: DrawContext = {
-    ctx: mockCtx as unknown as CanvasRenderingContext2D,
+    ctx: mockCtx,
     plotBox: { left: 50, top: 20, width: 700, height: 400 },
     pxRatio: 1,
     getScale: () => undefined,

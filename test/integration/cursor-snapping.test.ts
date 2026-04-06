@@ -33,7 +33,7 @@ describe('CursorManager snapping', () => {
   };
 
   const getScale = (id: string) => scales[id];
-  const getWindow = () => [0, 4] as [number, number];
+  const getWindow = (): [number, number] => [0, 4];
   const getGroupXScaleKey = () => 'x';
 
   it('snaps to the correct nearest data index', () => {

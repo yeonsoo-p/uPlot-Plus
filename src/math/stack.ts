@@ -1,15 +1,17 @@
 import type { XGroup } from '../types/data';
 import type { BandConfig } from '../types/bands';
 import type { NumArray, NullableNumArray } from '../types/common';
+import { at } from '../utils/at';
 
 /**
  * Stack series within a data group by computing cumulative sums.
- * Returns a new XGroup with stacked y-values and auto-generated band configs.
+ * Returns a new XGroup with stacked y-values and band configs pairing adjacent layers.
+ * Fill colors and direction are left to the caller.
  *
  * @param group - The data group to stack
  * @param seriesIndices - Which series indices to include (default: all)
  * @param groupIdx - Group index for band configs (default: 0)
- * @returns Stacked group and band configs for fills between layers
+ * @returns Stacked group and band configs pairing adjacent layers
  */
 export function stackGroup(
   group: XGroup,
@@ -33,8 +35,8 @@ export function stackGroup(
     for (let i = 0; i < len; i++) {
       const v = src[i];
       if (v != null) {
-        accumulator[i] = (accumulator[i] as number) + v;
-        dst[i] = accumulator[i] as number;
+        accumulator[i] = at(accumulator, i) + v;
+        dst[i] = at(accumulator, i);
       } else {
         dst[i] = null;
       }

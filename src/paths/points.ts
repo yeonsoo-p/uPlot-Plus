@@ -3,6 +3,7 @@ import type { SeriesPaths, PathBuilder, PathBuilderOpts } from './types';
 import type { ScaleState } from '../types';
 import { Orientation, Direction } from '../types';
 import { valToPos } from '../core/Scale';
+import { at } from '../utils/at';
 
 /**
  * Points-only path builder.
@@ -38,7 +39,7 @@ export function points(ptSize = 4): PathBuilder {
       const yVal = dataY[i];
       if (yVal == null) continue;
 
-      const x = pixelForX(dataX[i] as number);
+      const x = pixelForX(at(dataX, i));
       const y = pixelForY(yVal);
 
       if (isHoriz) {

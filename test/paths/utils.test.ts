@@ -3,26 +3,21 @@ import { findGaps, clipGaps, lineToH, lineToV } from '@/paths/utils';
 import { createScaleState, valToPos } from '@/core/Scale';
 import { Orientation } from '@/types';
 
-import type { PathCall, Path2DMock } from '../setup';
-
-/** Helper to extract recorded calls from Path2D mock */
-function getCalls(path: Path2D): PathCall[] {
-  return (path as unknown as Path2DMock)._calls;
-}
+import { getMockCalls } from '../helpers/mockCanvas';
 
 // ---- lineToH / lineToV ----
 describe('lineToH / lineToV', () => {
   it('lineToH calls lineTo(x, y) in original order', () => {
     const path = new Path2D();
     lineToH(path, 10, 20);
-    const calls = getCalls(path);
+    const calls = getMockCalls(path);
     expect(calls).toEqual([['lineTo', 10, 20]]);
   });
 
   it('lineToV swaps args: lineTo(x, y) becomes lineTo(second, first)', () => {
     const path = new Path2D();
     lineToV(path, 10, 20);
-    const calls = getCalls(path);
+    const calls = getMockCalls(path);
     // lineToV(path, y, x) calls path.lineTo(x, y) — args are swapped
     expect(calls).toEqual([['lineTo', 20, 10]]);
   });
@@ -84,7 +79,7 @@ describe('clipGaps', () => {
   it('creates clip rects excluding gap regions for horizontal', () => {
     const gaps: [number, number][] = [[100, 200]];
     const clip = clipGaps(gaps, Orientation.Horizontal, 0, 0, 500, 300);
-    const calls = getCalls(clip);
+    const calls = getMockCalls(clip);
     // Should create 2 rects: [0..100] and [200..500]
     const rects = calls.filter((c) => c[0] === 'rect');
     expect(rects.length).toBe(2);
@@ -97,7 +92,7 @@ describe('clipGaps', () => {
   it('creates clip rects for vertical orientation', () => {
     const gaps: [number, number][] = [[50, 150]];
     const clip = clipGaps(gaps, Orientation.Vertical, 0, 0, 300, 500);
-    const calls = getCalls(clip);
+    const calls = getMockCalls(clip);
     const rects = calls.filter((c) => c[0] === 'rect');
     expect(rects.length).toBe(2);
     // Vertical: rect(crossOff, prevEnd, crossDim, gapStart - prevEnd)
@@ -108,7 +103,7 @@ describe('clipGaps', () => {
 
   it('handles empty gaps array — single rect covering full area', () => {
     const clip = clipGaps([], Orientation.Horizontal, 0, 0, 500, 300);
-    const calls = getCalls(clip);
+    const calls = getMockCalls(clip);
     const rects = calls.filter((c) => c[0] === 'rect');
     // No gaps → one rect covering the entire dimension
     expect(rects.length).toBe(1);
@@ -118,7 +113,7 @@ describe('clipGaps', () => {
   it('handles multiple gaps', () => {
     const gaps: [number, number][] = [[50, 100], [200, 250], [400, 450]];
     const clip = clipGaps(gaps, Orientation.Horizontal, 0, 0, 500, 300);
-    const calls = getCalls(clip);
+    const calls = getMockCalls(clip);
     const rects = calls.filter((c) => c[0] === 'rect');
     // 3 gaps → 4 visible rects: [0,50], [100,200], [250,400], [450,500]
     expect(rects.length).toBe(4);

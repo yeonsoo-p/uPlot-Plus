@@ -20,10 +20,6 @@ export default function NearestNonNull() {
 
   return (
     <div>
-      <p className="text-demo text-muted mb-2">
-        Sparse data with ~40% null values. Cursor snaps to the nearest non-null point,
-        skipping over null gaps.
-      </p>
       <Chart width={800} height={400} data={data} xlabel="Index" ylabel="Value">
         <Series
           group={0}

@@ -1,5 +1,6 @@
 import { Orientation, Direction } from '../types';
 import { clamp } from '../math/utils';
+import { at } from '../utils/at';
 
 /** Line-to for horizontal orientation */
 export function lineToH(path: Path2D, x: number, y: number): void {
@@ -35,18 +36,18 @@ export function findGaps(
         // Use the previous non-null point's x pixel as gap start.
         // i - dir gives the previous index in iteration order; clamp to [idx0, idx1].
         const prevI = clamp(i - dir, idx0, idx1);
-        gapStart = pixelForX(dataX[prevI] as number);
+        gapStart = pixelForX(at(dataX, prevI));
       }
     } else {
       if (gapStart !== -1) {
-        gaps.push([gapStart, pixelForX(dataX[i] as number)]);
+        gaps.push([gapStart, pixelForX(at(dataX, i))]);
         gapStart = -1;
       }
     }
   }
 
   if (gapStart !== -1) {
-    gaps.push([gapStart, pixelForX(dataX[idx1] as number)]);
+    gaps.push([gapStart, pixelForX(at(dataX, idx1))]);
   }
 
   return gaps;

@@ -17,9 +17,6 @@ export default function SyncCursor() {
 
   return (
     <div>
-      <p className="text-demo text-muted mb-2">
-        Move your cursor over either chart — the other will follow.
-      </p>
       <div className="mb-4">
         <Chart width={800} height={200} data={data1} syncKey="demo-sync" xlabel="Time">
           <Axis scale="y" label="CPU" values={fmtSuffix('%')} />

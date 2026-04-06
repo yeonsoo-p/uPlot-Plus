@@ -83,13 +83,6 @@ export default function CustomActions() {
     <div
       onKeyUp={(e) => { if (e.key === 'q' || e.key === 'Q') qHeld.current = false; }}
     >
-      <p className="mt-0 mb-2 text-demo text-muted">
-        <b>Shift+click</b> toggles stroke width.{' '}
-        <b>Ctrl+click</b> logs data point.{' '}
-        <b>Shift+X</b> resets widths.{' '}
-        <b>Hold Q + click</b> logs nearest point (custom function matcher).{' '}
-        <b>Middle-drag</b> pans.
-      </p>
       <Chart width={800} height={400} data={data} actions={actions} xlabel="Sample" ylabel="Value">
         <Series group={0} index={0} label="Signal A" width={thickSeries.has(0) ? 5 : 2} />
         <Series group={0} index={1} label="Signal B" width={thickSeries.has(1) ? 5 : 2} />

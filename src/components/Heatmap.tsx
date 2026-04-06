@@ -16,8 +16,9 @@ function defaultColorMap(t: number): string {
   ];
 
   // Find the two surrounding stops
-  let lo = stops[0] as [number, number, number, number];
-  let hi = stops[stops.length - 1] as [number, number, number, number];
+  let lo = stops[0];
+  let hi = stops[stops.length - 1];
+  if (lo == null || hi == null) return 'rgb(0,0,0)';
   for (let i = 0; i < stops.length - 1; i++) {
     const s0 = stops[i];
     const s1 = stops[i + 1];

@@ -1,6 +1,7 @@
 import type { NumArray, NullableNumArray } from '../types/common';
 import type { XGroup } from '../types/data';
 import type { LttbResult } from '../types/downsample';
+import { at } from '../utils/at';
 
 /**
  * Largest Triangle Three Buckets (LTTB) downsampling.
@@ -30,7 +31,7 @@ export function lttb(
     const y: (number | null)[] = new Array<number | null>(len);
     for (let i = 0; i < len; i++) {
       indices[i] = i;
-      x[i] = xData[i] as number;
+      x[i] = at(xData, i);
       y[i] = yData[i] ?? null;
     }
     return { indices, x, y };
@@ -74,8 +75,8 @@ export function lttb(
     for (let i = 0; i < len; i++) {
       if (yData[i] != null) {
         indices[k] = i;
-        x[k] = xData[i] as number;
-        y[k] = yData[i] as number;
+        x[k] = at(xData, i);
+        y[k] = at(yData, i);
         k++;
       }
     }
@@ -101,10 +102,10 @@ export function lttb(
   const y: (number | null)[] = new Array<number | null>(n);
 
   for (let i = 0; i < n; i++) {
-    const idx = selectedIndices[i] as number;
+    const idx = at(selectedIndices, i);
     indices[i] = idx;
-    x[i] = xData[idx] as number;
-    y[i] = yData[idx] as number;
+    x[i] = at(xData, idx);
+    y[i] = at(yData, idx);
   }
 
   return { indices, x, y };
@@ -153,14 +154,14 @@ function lttbCore(
       const nextStart = i0 + 1 + Math.floor((b + 1) * bucketSize);
       const nextEnd = Math.min(i0 + 1 + Math.floor((b + 2) * bucketSize) - 1, i1 - 1);
       for (let i = nextStart; i <= nextEnd; i++) {
-        avgX += xData[i] as number;
-        avgY += (yData[i] as number);
+        avgX += at(xData, i);
+        avgY += (at(yData, i) ?? 0);
         avgCount++;
       }
     } else {
       // Last bucket: use the last point as the anchor
-      avgX = xData[i1] as number;
-      avgY = yData[i1] as number;
+      avgX = at(xData, i1);
+      avgY = at(yData, i1) ?? 0;
       avgCount = 1;
     }
 
@@ -170,15 +171,15 @@ function lttbCore(
     }
 
     // Find point in current bucket with largest triangle area
-    const prevX = xData[prevSelectedIdx] as number;
-    const prevY = yData[prevSelectedIdx] as number;
+    const prevX = at(xData, prevSelectedIdx);
+    const prevY = at(yData, prevSelectedIdx) ?? 0;
 
     let bestIdx = bucketStart;
     let bestArea = -1;
 
     for (let i = bucketStart; i <= bucketEnd; i++) {
-      const cx = xData[i] as number;
-      const cy = yData[i] as number;
+      const cx = at(xData, i);
+      const cy = at(yData, i) ?? 0;
 
       // Triangle area = 0.5 * |x_a(y_b - y_c) + x_b(y_c - y_a) + x_c(y_a - y_b)|
       // Since we only compare, skip the 0.5 multiplier
@@ -226,7 +227,7 @@ export function lttbGroup(
   for (const series of group.series) {
     const result = lttb(group.x, series, targetPoints);
     for (let i = 0; i < result.indices.length; i++) {
-      indexSet.add(result.indices[i] as number);
+      indexSet.add(at(result.indices, i));
     }
   }
 
@@ -237,7 +238,7 @@ export function lttbGroup(
   // Build new XGroup
   const newX = new Float64Array(n);
   for (let i = 0; i < n; i++) {
-    newX[i] = group.x[sortedIndices[i] as number] as number;
+    newX[i] = at(group.x, at(sortedIndices, i));
   }
 
   const newSeries: (NumArray | NullableNumArray)[] = [];
@@ -246,13 +247,13 @@ export function lttbGroup(
     if (hasNulls) {
       const arr: (number | null)[] = new Array<number | null>(n);
       for (let i = 0; i < n; i++) {
-        arr[i] = series[sortedIndices[i] as number] ?? null;
+        arr[i] = series[at(sortedIndices, i)] ?? null;
       }
       newSeries.push(arr);
     } else {
       const arr = new Float64Array(n);
       for (let i = 0; i < n; i++) {
-        arr[i] = series[sortedIndices[i] as number] as number;
+        arr[i] = at(series, at(sortedIndices, i)) ?? 0;
       }
       newSeries.push(arr);
     }

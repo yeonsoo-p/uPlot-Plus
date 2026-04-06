@@ -103,6 +103,9 @@ export { DEFAULT_ACTIONS, focus } from './types/interaction';
 // Enums
 export { Side, Orientation, Direction, Distribution, SortOrder, sideOrientation } from './types';
 
+// Utility helpers
+export { at } from './utils/at';
+
 // Axis value formatters
 export { fmtCompact, fmtSuffix, fmtPrefix, fmtWrap, fmtHourMin, fmtMonthName, fmtDateStr, fmtLabels } from './formatters';
 export type { AxisValueFormatter } from './formatters';

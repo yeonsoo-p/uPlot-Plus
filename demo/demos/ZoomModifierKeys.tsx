@@ -21,12 +21,6 @@ export default function ZoomModifierKeys() {
 
   return (
     <div>
-      <p className="text-demo text-muted mb-2">
-        <strong>Shift + Scroll</strong> to zoom X axis &middot;{' '}
-        <strong>Alt + Scroll</strong> to zoom Y axis &middot;{' '}
-        <strong>Drag</strong> to zoom a region &middot;{' '}
-        <strong>Double-click</strong> to reset
-      </p>
       <Chart
         width={800}
         height={400}

@@ -1,10 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createChartStore } from '@/hooks/useChartStore';
 import type { DrawContext } from '@/types/hooks';
+import { createMockCtx } from '../helpers/mockCanvas';
 
 function makeDC(): DrawContext {
   return {
-    ctx: {} as CanvasRenderingContext2D,
+    ctx: createMockCtx(),
     plotBox: { left: 10, top: 10, width: 780, height: 380 },
     pxRatio: 1,
     getScale: () => undefined,

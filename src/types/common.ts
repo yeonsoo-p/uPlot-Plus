@@ -55,7 +55,9 @@ export const enum SortOrder {
 
 /** Derive orientation from side: top/bottom → Horizontal, left/right → Vertical */
 export function sideOrientation(side: Side): Orientation {
-  return (side % 2) as Orientation;
+  // Side values 0,2 → 0 (Horizontal), 1,3 → 1 (Vertical)
+  const ori: Orientation = (side % 2) === 0 ? Orientation.Horizontal : Orientation.Vertical;
+  return ori;
 }
 
 /** Pixel rounding function */

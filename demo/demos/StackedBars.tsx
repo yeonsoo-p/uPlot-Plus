@@ -14,7 +14,8 @@ function makeStackedData() {
     ],
   };
   const result = stackGroup(raw);
-  return { data: [result.group] as ChartData, stackedSeries: result.group.series };
+  const data: ChartData = [result.group];
+  return { data, stackedSeries: result.group.series };
 }
 
 export default function StackedBars() {

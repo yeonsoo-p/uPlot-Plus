@@ -1,6 +1,7 @@
 import { bench, describe } from 'vitest';
 import { CanvasRenderer } from '@/rendering/CanvasRenderer';
 import type { SeriesPaths } from '@/paths/types';
+import { tuple } from '../helpers/mockCanvas';
 import { createScaleState } from '@/core/Scale';
 import type { ScaleState } from '@/types';
 
@@ -57,7 +58,7 @@ describe('path cache: scale stamp invalidation', () => {
     const yScale = makeScaleState('y', 0, 50);
     const info = [{
       config: { group: 0, index: 0, yScale: 'y', show: true, stroke: 'red' },
-      dataX: [0], dataY: [0], xScale, yScale, window: [0, 0] as [number, number],
+      dataX: [0], dataY: [0], xScale, yScale, window: tuple(0, 0),
     }];
     // Set initial stamp
     r.checkScaleStamp(info);
@@ -71,7 +72,7 @@ describe('path cache: scale stamp invalidation', () => {
     const yScale = makeScaleState('y', 0, 50);
     const info1 = [{
       config: { group: 0, index: 0, yScale: 'y', show: true, stroke: 'red' },
-      dataX: [0], dataY: [0], xScale, yScale, window: [0, 0] as [number, number],
+      dataX: [0], dataY: [0], xScale, yScale, window: tuple(0, 0),
     }];
     r.checkScaleStamp(info1);
     r.setCachedPaths(0, 0, 0, 100, stubPaths());
@@ -80,7 +81,7 @@ describe('path cache: scale stamp invalidation', () => {
     const xZoomed = makeScaleState('x', 20, 80);
     const info2 = [{
       config: { group: 0, index: 0, yScale: 'y', show: true, stroke: 'red' },
-      dataX: [0], dataY: [0], xScale: xZoomed, yScale, window: [0, 0] as [number, number],
+      dataX: [0], dataY: [0], xScale: xZoomed, yScale, window: tuple(0, 0),
     }];
     r.checkScaleStamp(info2);
   });

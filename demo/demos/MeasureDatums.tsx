@@ -91,9 +91,6 @@ export default function MeasureDatums() {
 
   return (
     <div>
-      <p className="mt-0 mb-2 text-demo text-muted">
-        Click to set a reference point, click again to clear. Move cursor to measure distance.
-      </p>
       <Chart width={800} height={400} data={data} onCursorDraw={onCursorDraw} actions={actions} xlabel="Sample" ylabel="Value">
         <Series group={0} index={0} label="Signal" />
       </Chart>

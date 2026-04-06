@@ -98,7 +98,9 @@ export function Vector({
       const dir = directions[i];
       if (yVal == null || dir == null) continue;
 
-      const px = valToX(xArr[i] as number);
+      const xVal2 = xArr[i];
+      if (xVal2 == null) continue;
+      const px = valToX(xVal2);
       const py = valToY(yVal, yScaleId);
       if (px == null || py == null) continue;
 
