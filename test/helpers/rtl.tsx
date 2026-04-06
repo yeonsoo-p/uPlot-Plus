@@ -21,7 +21,7 @@ export const twoSeriesData: DataInput = [
  * Tiny component that exposes the internal ChartStore via a ref callback.
  * Placed as a child of <Chart> to access the context without breaking encapsulation.
  */
-function StoreProbe({ storeRef }: { storeRef: React.MutableRefObject<ChartStore | null> }) {
+export function StoreProbe({ storeRef }: { storeRef: React.MutableRefObject<ChartStore | null> }) {
   const store = useStore();
   storeRef.current = store;
   return null;

@@ -16,7 +16,7 @@ describe('Legend component', () => {
     );
     await flushEffects();
 
-    const items = container.querySelectorAll('span[style*="cursor: pointer"]');
+    const items = container.querySelectorAll('[data-testid^="legend-item-"]');
     expect(items.length).toBe(2);
   });
 
@@ -45,8 +45,10 @@ describe('Legend component', () => {
     );
     await flushEffects();
 
-    const swatch = container.querySelector('span[style*="background-color: red"]');
-    expect(swatch).toBeInTheDocument();
+    const item = container.querySelector('[data-testid="legend-item-0-0"]');
+    expect(item).toBeInTheDocument();
+    const swatch = item!.querySelector('span');
+    expect(swatch!.style.backgroundColor).toBe('red');
   });
 
   it('clicking a legend item toggles series visibility', async () => {

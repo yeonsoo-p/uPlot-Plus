@@ -70,6 +70,7 @@ export function bars(): PathBuilder {
 
     const fillToVal = opts?.fillTo ?? scaleY.min ?? 0;
     const fillToY = pixelForY(fillToVal);
+    const fillToData = opts?.fillToData;
 
     const stroke = new Path2D();
     const isHorizontal = scaleX.ori === Orientation.Horizontal;
@@ -81,21 +82,29 @@ export function bars(): PathBuilder {
       const xPos = pixelForX(dataX[i] as number);
       const yPos = pixelForY(yVal);
 
+      // Per-point baseline for stacked bars, falling back to fixed fillTo
+      const ptFillToVal = fillToData != null && fillToData[i] != null
+        ? fillToData[i] as number
+        : fillToVal;
+      const ptFillToY = fillToData != null && fillToData[i] != null
+        ? pixelForY(ptFillToVal)
+        : fillToY;
+
       // Offset for grouped bars: center the group, then shift by groupIdx
       const groupOffset = groupCount > 1
         ? (groupIdx - (groupCount - 1) / 2) * barWid
         : 0;
 
       const lft = pxRound(xPos - barWid / 2 + groupOffset);
-      const top = Math.min(yPos, fillToY);
-      const btm = Math.max(yPos, fillToY);
+      const top = Math.min(yPos, ptFillToY);
+      const btm = Math.max(yPos, ptFillToY);
       const barHgt = btm - top;
 
       if (barHgt === 0) continue;
 
       if (radiusFrac > 0) {
         const rad = Math.min(radiusFrac * barWid, barHgt / 2);
-        drawRoundedRect(stroke, isHorizontal, lft, top, barWid, barHgt, rad, yVal < fillToVal);
+        drawRoundedRect(stroke, isHorizontal, lft, top, barWid, barHgt, rad, yVal < ptFillToVal);
       } else {
         if (isHorizontal)
           stroke.rect(lft, top, barWid, barHgt);
@@ -137,14 +146,17 @@ export function groupedBars(groupIdx: number, groupCount: number): PathBuilder {
  * Draws wider bars (80% column width) suited for stacking.
  * Use with stackGroup() to transform data into cumulative values and generate Band configs.
  *
- * Wraps bars() with a wider default barWidth (0.8 vs 0.6).
+ * @param baselineData - Optional cumulative data of the layer below (previous series in the stack).
+ *   When provided, bars draw from the baseline to the current cumulative value instead of from 0.
+ *   First (bottom) series should omit this; subsequent series pass the previous layer's stacked data.
  */
-export function stackedBars(): PathBuilder {
+export function stackedBars(baselineData?: ArrayLike<number | null>): PathBuilder {
   const inner = bars();
   const fn: PathBuilder = (dataX, dataY, scaleX, scaleY, xDim, yDim, xOff, yOff, idx0, idx1, dir, pxRound, opts) => {
     const merged: PathBuilderOpts = {
       barWidth: 0.8,
       ...opts,
+      ...(baselineData != null ? { fillToData: baselineData } : {}),
     };
     return inner(dataX, dataY, scaleX, scaleY, xDim, yDim, xOff, yOff, idx0, idx1, dir, pxRound, merged);
   };

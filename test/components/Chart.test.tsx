@@ -1,6 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
 import React from 'react';
-import { renderChart, flushEffects, defaultData } from '../helpers/rtl';
+import { render, act } from '@testing-library/react';
+import { Chart } from '@/components/Chart';
+import { renderChart, flushEffects, defaultData, StoreProbe } from '../helpers/rtl';
+import type { ChartStore } from '@/hooks/useChartStore';
 
 describe('Chart component', () => {
   it('renders a canvas element inside the container', () => {
@@ -51,18 +54,28 @@ describe('Chart component', () => {
   });
 
   it('updates store size when width/height props change', async () => {
-    const { store, rerender } = renderChart({ width: 800, height: 600 });
-    await flushEffects();
+    const storeRef: React.MutableRefObject<ChartStore | null> = { current: null };
 
-    rerender(
-      <React.Fragment>
-        {/* Re-render full tree — renderChart can't rerender, so we test via store */}
-      </React.Fragment>,
+    const result = render(
+      <Chart width={800} height={600} data={defaultData}>
+        <StoreProbe storeRef={storeRef} />
+      </Chart>,
     );
+    await act(async () => {});
 
-    // Verify initial values were set
+    const store = storeRef.current!;
     expect(store.width).toBe(800);
     expect(store.height).toBe(600);
+
+    result.rerender(
+      <Chart width={1000} height={400} data={defaultData}>
+        <StoreProbe storeRef={storeRef} />
+      </Chart>,
+    );
+    await act(async () => {});
+
+    expect(store.width).toBe(1000);
+    expect(store.height).toBe(400);
   });
 
   it('loads data into store', async () => {

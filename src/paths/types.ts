@@ -29,6 +29,8 @@ export interface PathBuilderOpts {
   barGroupIdx?: number;
   /** For grouped bars: total number of series in the group */
   barGroupCount?: number;
+  /** Per-point baseline values for stacked bars. When set, overrides fillTo per data point. */
+  fillToData?: ArrayLike<number | null>;
 }
 
 /** Path builder function signature */
