@@ -15,6 +15,8 @@ export interface UseDraggableOverlayOptions {
   offset: OverlayOffset;
   idleOpacity: number;
   estimatedSize: { w: number; h: number };
+  /** Called with the new position whenever the panel is dragged. */
+  onPositionChange?: (pos: { x: number; y: number }) => void;
 }
 
 export interface DraggableOverlayResult {
@@ -139,6 +141,7 @@ export function useDraggableOverlay({
   offset,
   idleOpacity,
   estimatedSize,
+  onPositionChange,
 }: UseDraggableOverlayOptions): DraggableOverlayResult {
   const store = useStore();
   const snap = useSyncExternalStore(store.subscribeCursor, store.getSnapshot);
@@ -195,6 +198,10 @@ export function useDraggableOverlay({
     if (clamped !== pos) setPos(clamped);
   });
 
+  // Stable ref for onPositionChange to avoid re-creating the drag effect
+  const onPositionChangeRef = useRef(onPositionChange);
+  onPositionChangeRef.current = onPositionChange;
+
   // 4. Window mousemove/mouseup for drag.
   useEffect(() => {
     if (!show || mode !== 'draggable') return;
@@ -204,7 +211,9 @@ export function useDraggableOverlay({
       const container = store.canvas?.parentElement;
       if (!container) return;
       const r = container.getBoundingClientRect();
-      setPos({ x: e.clientX - r.left - dragOffset.current.dx, y: e.clientY - r.top - dragOffset.current.dy });
+      const newPos = { x: e.clientX - r.left - dragOffset.current.dx, y: e.clientY - r.top - dragOffset.current.dy };
+      setPos(newPos);
+      onPositionChangeRef.current?.(newPos);
     };
     const onUp = () => { draggingRef.current = false; setIsDragging(false); };
     window.addEventListener('mousemove', onMove);

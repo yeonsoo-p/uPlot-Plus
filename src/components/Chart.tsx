@@ -17,6 +17,7 @@ import { ThemeRevisionContext } from './ThemeProvider';
  */
 export function Chart({
   width, height, data, children, className, pxRatio: pxRatioOverride, title, xlabel, ylabel,
+  minWidth, minHeight,
   onDraw, onCursorDraw, syncKey, actions, theme, locale, timezone,
   onClick, onContextMenu, onDblClick, onCursorMove, onCursorLeave,
   onScaleChange, onSelect,
@@ -25,6 +26,11 @@ export function Chart({
   const [containerEl, setContainerEl] = useState<HTMLDivElement | null>(null);
 
   const pxRatio = pxRatioOverride ?? (typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1);
+
+  const autoW = width === 'auto';
+  const autoH = height === 'auto';
+  // When auto-sizing, we wait for the first ResizeObserver measurement before rendering the canvas.
+  const [measured, setMeasured] = useState(!autoW && !autoH);
 
   // Convert theme prop to CSS custom properties for the wrapper div
   const themeStyle = useMemo(() => theme != null ? themeToVars(theme) : undefined, [theme]);
@@ -126,7 +132,9 @@ export function Chart({
 
   // Synchronous size update — runs last among layout effects in this component,
   // after labels, data, and draw refs are all current.
+  // When auto-sizing, the ResizeObserver handles size updates instead.
   useLayoutEffect(() => {
+    if (typeof width !== 'number' || typeof height !== 'number') return;
     store.setSize(width, height, pxRatio);
     if (mountedRef.current) {
       store.redrawSync();
@@ -143,7 +151,8 @@ export function Chart({
     };
   }, [store]);
 
-  // ResizeObserver — depends on containerEl (state) so re-runs when DOM element changes
+  // ResizeObserver — depends on containerEl (state) so re-runs when DOM element changes.
+  // In auto-sizing mode, this is the primary size driver.
   useEffect(() => {
     if (containerEl == null || typeof ResizeObserver === 'undefined') return;
 
@@ -151,15 +160,21 @@ export function Chart({
       const entry = entries[0];
       if (entry == null) return;
       const { width: w, height: h } = entry.contentRect;
-      if (w > 0 && h > 0 && (w !== store.width || h !== store.height)) {
-        store.setSize(Math.round(w), Math.round(h));
+      // In mixed mode (one auto, one explicit), use the explicit prop for the fixed dimension
+      const resolvedW = typeof width === 'number' ? width : Math.round(w);
+      const resolvedH = typeof height === 'number' ? height : Math.round(h);
+      if (resolvedW > 0 && resolvedH > 0 && (resolvedW !== store.width || resolvedH !== store.height)) {
+        store.setSize(resolvedW, resolvedH, pxRatio);
+        if (!measured) setMeasured(true);
         store.scheduleRedraw();
+      } else if (!measured && resolvedW > 0 && resolvedH > 0) {
+        setMeasured(true);
       }
     });
 
     observer.observe(containerEl);
     return () => { observer.disconnect(); };
-  }, [store, containerEl]);
+  }, [store, containerEl, width, height, pxRatio, measured]);
 
   // Watch for CSS class changes on <html> (e.g. dark mode toggle) and repaint.
   // This avoids needing to remount charts when the theme class changes.
@@ -195,7 +210,10 @@ export function Chart({
           position: 'relative',
           display: 'flex',
           flexDirection: 'column',
-          width: `${width}px`,
+          width: autoW ? '100%' : `${width}px`,
+          height: autoH ? '100%' : undefined,
+          minWidth: minWidth != null ? `${minWidth}px` : undefined,
+          minHeight: minHeight != null ? `${minHeight}px` : undefined,
           isolation: 'isolate',
         }}
       >
@@ -205,13 +223,14 @@ export function Chart({
           data-testid="chart-container"
           style={{
             position: 'relative',
-            width: `${width}px`,
-            height: `${height}px`,
+            width: autoW ? '100%' : `${width}px`,
+            height: autoH ? '100%' : `${height}px`,
             cursor: 'default',
             order: 0,
             outline: 'none',
           }}
         >
+          {measured && (
           <canvas
             ref={canvasRef}
             style={{
@@ -220,6 +239,7 @@ export function Chart({
               top: 0,
             }}
           />
+          )}
         </div>
         {children}
       </div>

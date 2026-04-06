@@ -15,6 +15,9 @@ export { BoxWhisker } from './components/BoxWhisker';
 export { Heatmap } from './components/Heatmap';
 export { Vector } from './components/Vector';
 
+// Overlay components
+export { DraggableLabel } from './components/DraggableLabel';
+
 // Annotation components (declarative)
 export { HLine, VLine, Region, VRegion, DiagonalLine, AnnotationLabel } from './components/annotations';
 
@@ -32,6 +35,7 @@ export { useDrawHook, useCursorDrawHook } from './hooks/useDrawHook';
 // Types
 export type {
   ChartProps,
+  SizeValue,
   ChartData,
   XGroup,
   SeriesRef,
@@ -78,6 +82,7 @@ export type { CandlestickProps } from './components/Candlestick';
 export type { SparklineProps } from './components/Sparkline';
 export type { FloatingLegendProps } from './components/FloatingLegend';
 export type { HoverLabelProps } from './components/HoverLabel';
+export type { DraggableLabelProps } from './components/DraggableLabel';
 export type { HLineProps, VLineProps, RegionProps, VRegionProps, DiagonalLineProps, AnnotationLabelProps } from './components/annotations';
 export type { BoxWhiskerProps } from './components/BoxWhisker';
 export type { HeatmapProps } from './components/Heatmap';

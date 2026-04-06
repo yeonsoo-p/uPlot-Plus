@@ -6,7 +6,7 @@ export type { SeriesConfig, ResolvedSeriesConfig, SeriesState, PointsConfig, Gra
 export { getSeriesColor } from './series';
 export type { AxisConfig, AxisState, GridConfig, TickConfig, BorderConfig } from './axes';
 export type { CursorState, SelectState } from './cursor';
-export type { ChartProps } from './chart';
+export type { ChartProps, SizeValue } from './chart';
 export type { ChartTheme } from './theme';
 export type { ActionList, ActionEntry, ActionKey, BuiltinAction, ReactionValue, BuiltinReaction, ActionContext, DragContinuation } from './interaction';
 export { DEFAULT_ACTIONS } from './interaction';

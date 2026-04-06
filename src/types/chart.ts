@@ -4,12 +4,19 @@ import type { ChartEventInfo, SelectEventInfo, ScaleChangeCallback } from './eve
 import type { ActionList } from './interaction';
 import type { ChartTheme } from './theme';
 
+/** Size value: explicit pixels or "auto" to fill container */
+export type SizeValue = number | 'auto';
+
 /** Props for the Chart component */
 export interface ChartProps {
-  /** Width in CSS pixels */
-  width: number;
-  /** Height in CSS pixels */
-  height: number;
+  /** Width in CSS pixels, or "auto" to fill container width */
+  width: SizeValue;
+  /** Height in CSS pixels, or "auto" to fill container height */
+  height: SizeValue;
+  /** Minimum width in CSS pixels (only used when width="auto") */
+  minWidth?: number;
+  /** Minimum height in CSS pixels (only used when height="auto") */
+  minHeight?: number;
   /** Chart data — accepts {x,y}, [{x,y}], or [{x, series:[...]}] */
   data: DataInput;
   /** React children (Scale, Series, Axis, Legend, Tooltip, Band) */
