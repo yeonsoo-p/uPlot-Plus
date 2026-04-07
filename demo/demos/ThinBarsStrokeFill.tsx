@@ -15,7 +15,7 @@ export default function ThinBarsStrokeFill() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data} xlabel="Item" ylabel="Value">
+    <Chart width="auto" height={400} data={data} xlabel="Item" ylabel="Value">
       {/* No specifics — auto palette assigns stroke and fill */}
       <Series group={0} index={0} label="Stroke and Fill" paths={groupedBars(0, 4)} />
       {/* Fill only — transparent stroke hides the outline */}

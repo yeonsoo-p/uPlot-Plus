@@ -68,7 +68,7 @@ export default function SelectFetch() {
         )}
       </div>
       <Chart
-        width={800}
+        width="auto"
         height={400}
         data={data}
         actions={[['leftDblclick', 'none']]}

@@ -37,6 +37,8 @@ export interface ChartProps {
   xlabel?: string;
   /** Y-axis label for the default axis (default: 'Y Axis') */
   ylabel?: string;
+  /** Accessible label for the chart container (overrides auto-generated label from title) */
+  ariaLabel?: string;
   /**
    * Action overrides: array of [action, reaction] tuples merged with defaults.
    * Example: `actions={[['wheel', 'zoomXY'], ['leftDblclick', 'none']]}`

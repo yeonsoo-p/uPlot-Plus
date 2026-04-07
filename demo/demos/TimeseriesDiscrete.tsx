@@ -38,7 +38,7 @@ export default function TimeseriesDiscrete() {
 
   return (
     <div>
-      <Chart width={800} height={300} data={data}>
+      <Chart width="auto" height={300} data={data}>
         <Scale id="y" min={-0.5} max={2.5} />
         <Axis scale="x" label="Time" values={fmtTime} />
         <Axis scale="y" label="Status" values={fmtStatus} />

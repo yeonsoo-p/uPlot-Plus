@@ -668,7 +668,7 @@ export function createChartStore(): ChartStore {
           drawPoints(
             ctx, info.dataX, info.dataY,
             info.xScale, info.yScale,
-            store.plotBox, pxRatio,
+            store.plotBox, 1,
             wi0, wi1,
             ptsCfg, ptDia, (typeof cfg.stroke === 'string' ? cfg.stroke : null) ?? '#000',
           );

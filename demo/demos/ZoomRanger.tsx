@@ -25,7 +25,7 @@ export default function ZoomRangerDemo() {
 
   return (
     <div>
-      <Chart width={800} height={300} data={data}>
+      <Chart width="auto" height={300} data={data}>
         <Scale id="x" auto={range == null} min={range?.[0]} max={range?.[1]} />
         <Series group={0} index={0} label="Signal A" />
         <Series group={0} index={1} label="Signal B" />
@@ -33,7 +33,7 @@ export default function ZoomRangerDemo() {
 
       <div className="mt-2">
         <ZoomRanger
-          width={800}
+          width="auto"
           height={60}
           data={data}
           onRangeChange={onRangeChange}

@@ -35,7 +35,7 @@ export default function BarsValuesAutosize() {
 
   return (
     <div>
-      <Chart width={800} height={400} data={data} onDraw={onDraw} xlabel="Category" ylabel="Value">
+      <Chart width="auto" height={400} data={data} onDraw={onDraw} xlabel="Category" ylabel="Value">
         <Scale id="y" min={0} max={100} />
         <Series
           group={0}

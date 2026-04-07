@@ -20,7 +20,7 @@ export default function YScaleDrag() {
 
   return (
     <div>
-      <Chart width={800} height={400} data={data} ylabel="Temperature">
+      <Chart width="auto" height={400} data={data} ylabel="Temperature">
         <Scale id="y2"  />
         <Series group={0} index={0} label="Temperature" />
         <Series group={0} index={1} yScale="y2" stroke="#1f78b4" label="Humidity" />

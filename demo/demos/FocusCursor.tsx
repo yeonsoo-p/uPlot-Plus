@@ -29,7 +29,7 @@ export default function FocusCursor() {
 
   return (
     <Chart
-      width={800}
+      width="auto"
       height={400}
       data={data}
       actions={[['hover', focus(0.15)]]}

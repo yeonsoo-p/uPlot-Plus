@@ -37,7 +37,7 @@ export default function DataSmoothing() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data} xlabel="Sample" ylabel="Value">
+    <Chart width="auto" height={400} data={data} xlabel="Sample" ylabel="Value">
       <Series
         group={0}
         index={0}

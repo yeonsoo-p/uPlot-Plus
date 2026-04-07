@@ -92,7 +92,7 @@ export default function ThemePresets() {
 
       <ThemeProvider theme={preset.theme}>
         <div style={{ background: preset.bg, padding: 10, borderRadius: 6, transition: 'background 0.3s' }}>
-          <Chart width={800} height={360} data={data} title="Theme Presets">
+          <Chart width="auto" height={360} data={data} title="Theme Presets">
             <Scale id="x" />
             <Scale id="y" />
             <Axis scale="x" />

@@ -23,7 +23,7 @@ export default function TimeSeries() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data}>
+    <Chart width="auto" height={400} data={data}>
       <Scale id="req"  />
       <Scale id="err"  />
       <Axis scale="x" label="Time (UTC)" values={fmtHourMin({ utc: true })} space={80} />

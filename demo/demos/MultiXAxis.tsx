@@ -31,7 +31,7 @@ export default function MultiXAxis() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data} xlabel="X" ylabel="Value">
+    <Chart width="auto" height={400} data={data} xlabel="X" ylabel="Value">
       <Series group={0} index={0} label="Sine (Group 0)" />
       <Series group={1} index={0} label="Cosine (Group 1)" />
     </Chart>

@@ -18,13 +18,13 @@ export default function SyncCursor() {
   return (
     <div>
       <div className="mb-4">
-        <Chart width={800} height={200} data={data1} syncKey="demo-sync" xlabel="Time">
+        <Chart width="auto" height={200} data={data1} syncKey="demo-sync" xlabel="Time">
           <Axis scale="y" label="CPU" values={fmtSuffix('%')} />
           <Series group={0} index={0} fill="rgba(231,76,60,0.1)" label="CPU %" />
           <Legend />
         </Chart>
       </div>
-      <Chart width={800} height={200} data={data2} syncKey="demo-sync" xlabel="Time">
+      <Chart width="auto" height={200} data={data2} syncKey="demo-sync" xlabel="Time">
         <Axis scale="y" label="Memory" values={fmtSuffix('%')} />
         <Series group={0} index={0} fill="rgba(52,152,219,0.1)" label="Memory %" />
         <Legend />

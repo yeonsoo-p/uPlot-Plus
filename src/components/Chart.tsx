@@ -16,7 +16,7 @@ import { ThemeRevisionContext } from './ThemeProvider';
  * Canvas drawing is completely decoupled from React's reconciliation cycle.
  */
 export function Chart({
-  width, height, data, children, className, pxRatio: pxRatioOverride, title, xlabel, ylabel,
+  width, height, data, children, className, pxRatio: pxRatioOverride, title, xlabel, ylabel, ariaLabel,
   minWidth, minHeight,
   onDraw, onCursorDraw, syncKey, actions, theme, locale, timezone,
   onClick, onContextMenu, onDblClick, onCursorMove, onCursorLeave,
@@ -27,10 +27,29 @@ export function Chart({
 
   const pxRatio = pxRatioOverride ?? (typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1);
 
+  const ariaDesc = useMemo(() => {
+    const parts: string[] = [];
+    if (xlabel) parts.push(`X: ${xlabel}`);
+    if (ylabel) parts.push(`Y: ${ylabel}`);
+    return parts.length > 0 ? parts.join(', ') : undefined;
+  }, [xlabel, ylabel]);
+
   const autoW = width === 'auto';
   const autoH = height === 'auto';
   // When auto-sizing, we wait for the first ResizeObserver measurement before rendering the canvas.
   const [measured, setMeasured] = useState(!autoW && !autoH);
+
+  // Refs for values accessed inside ResizeObserver callback — avoids
+  // disconnecting/reconnecting the observer when only the explicit
+  // dimension or pxRatio changes.
+  const measuredRef = useRef(measured);
+  const widthRef = useRef(width);
+  const heightRef = useRef(height);
+  const pxRatioRef = useRef(pxRatio);
+  useLayoutEffect(() => { measuredRef.current = measured; }, [measured]);
+  useLayoutEffect(() => { widthRef.current = width; }, [width]);
+  useLayoutEffect(() => { heightRef.current = height; }, [height]);
+  useLayoutEffect(() => { pxRatioRef.current = pxRatio; }, [pxRatio]);
 
   // Convert theme prop to CSS custom properties for the wrapper div
   const themeStyle = useMemo(() => theme != null ? themeToVars(theme) : undefined, [theme]);
@@ -96,6 +115,14 @@ export function Chart({
     store.setCanvas(node);
     if (node) {
       Object.defineProperty(node, '__chartStore', { value: store, configurable: true });
+      // If setSize already ran before canvas mounted (auto-sizing), apply
+      // stored dimensions now — setSize() would no-op (values unchanged).
+      if (store.width > 0 && store.height > 0) {
+        node.width = store.width * store.pxRatio;
+        node.height = store.height * store.pxRatio;
+        node.style.width = `${store.width}px`;
+        node.style.height = `${store.height}px`;
+      }
       store.scheduleRedraw();
     }
   }, [store]);
@@ -141,6 +168,23 @@ export function Chart({
     }
   }, [store, width, height, pxRatio]);
 
+  // Mixed mode: one dimension is auto, the other is explicit.
+  // When the explicit dimension changes (e.g. height during drag-resize),
+  // apply it synchronously so the chart redraws every frame.
+  useLayoutEffect(() => {
+    if (!measured) return;
+    const hasAutoW = typeof width !== 'number';
+    const hasAutoH = typeof height !== 'number';
+    if (hasAutoW === hasAutoH) return; // both auto or both explicit — skip
+    const resolvedW = typeof width === 'number' ? width : store.width;
+    const resolvedH = typeof height === 'number' ? height : store.height;
+    if (resolvedW <= 0 || resolvedH <= 0) return;
+    store.setSize(resolvedW, resolvedH, pxRatio);
+    if (mountedRef.current) {
+      store.redrawSync();
+    }
+  }, [store, width, height, pxRatio, measured]);
+
   // Clean up on unmount
   useEffect(() => {
     return () => {
@@ -151,30 +195,41 @@ export function Chart({
     };
   }, [store]);
 
-  // ResizeObserver — depends on containerEl (state) so re-runs when DOM element changes.
-  // In auto-sizing mode, this is the primary size driver.
+  // ResizeObserver — primary size driver for auto-sizing mode.
+  // Uses refs for width/height/pxRatio/measured so the observer stays
+  // connected when only the explicit dimension or pxRatio changes.
   useEffect(() => {
     if (containerEl == null || typeof ResizeObserver === 'undefined') return;
+    if (!autoW && !autoH) return; // no auto dimensions — skip observer
 
     const observer = new ResizeObserver((entries) => {
       const entry = entries[0];
       if (entry == null) return;
       const { width: w, height: h } = entry.contentRect;
+      const curWidth = widthRef.current;
+      const curHeight = heightRef.current;
+      const curPxRatio = pxRatioRef.current;
       // In mixed mode (one auto, one explicit), use the explicit prop for the fixed dimension
-      const resolvedW = typeof width === 'number' ? width : Math.round(w);
-      const resolvedH = typeof height === 'number' ? height : Math.round(h);
+      const resolvedW = typeof curWidth === 'number' ? curWidth : Math.round(w);
+      const resolvedH = typeof curHeight === 'number' ? curHeight : Math.round(h);
       if (resolvedW > 0 && resolvedH > 0 && (resolvedW !== store.width || resolvedH !== store.height)) {
-        store.setSize(resolvedW, resolvedH, pxRatio);
-        if (!measured) setMeasured(true);
-        store.scheduleRedraw();
-      } else if (!measured && resolvedW > 0 && resolvedH > 0) {
+        store.setSize(resolvedW, resolvedH, curPxRatio);
+        if (!measuredRef.current) {
+          measuredRef.current = true;
+          setMeasured(true);
+        }
+        // Redraw synchronously — setSize clears the canvas bitmap,
+        // so deferring to RAF would flash a blank frame.
+        store.redrawSync();
+      } else if (!measuredRef.current && resolvedW > 0 && resolvedH > 0) {
+        measuredRef.current = true;
         setMeasured(true);
       }
     });
 
     observer.observe(containerEl);
     return () => { observer.disconnect(); };
-  }, [store, containerEl, width, height, pxRatio, measured]);
+  }, [store, containerEl, autoW, autoH]);
 
   // Watch for CSS class changes on <html> (e.g. dark mode toggle) and repaint.
   // This avoids needing to remount charts when the theme class changes.
@@ -220,6 +275,10 @@ export function Chart({
         <div
           ref={containerRef}
           tabIndex={0}
+          role="img"
+          aria-label={ariaLabel ?? title ?? 'Chart'}
+          aria-roledescription="interactive chart"
+          aria-description={ariaDesc}
           data-testid="chart-container"
           style={{
             position: 'relative',

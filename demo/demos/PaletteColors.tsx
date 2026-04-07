@@ -20,7 +20,7 @@ export default function PaletteColors() {
   return (
     <div>
       <h4 className="mt-3 mb-1">palette() &mdash; {N} auto-generated colors</h4>
-      <Chart width={800} height={250} data={data}>
+      <Chart width="auto" height={250} data={data}>
         {colors.map((c, i) => (
           <Series key={i} group={0} index={i} label={`S${i + 1}`} stroke={c} />
         ))}
@@ -28,7 +28,7 @@ export default function PaletteColors() {
       </Chart>
 
       <h4 className="mt-3 mb-1">withAlpha() &mdash; semi-transparent fills</h4>
-      <Chart width={800} height={250} data={data}>
+      <Chart width="auto" height={250} data={data}>
         {colors.slice(0, 4).map((c, i) => (
           <Series key={i} group={0} index={i} label={`S${i + 1}`} stroke={c} fill={withAlpha(c, 0.15)} />
         ))}
@@ -36,7 +36,7 @@ export default function PaletteColors() {
       </Chart>
 
       <h4 className="mt-3 mb-1">fadeGradient() &mdash; vertical gradient fills</h4>
-      <Chart width={800} height={250} data={data}>
+      <Chart width="auto" height={250} data={data}>
         {colors.slice(0, 3).map((c, i) => (
           <Series key={i} group={0} index={i} label={`S${i + 1}`} stroke={c} fill={fadeGradient(c, 0.5, 0.0)} />
         ))}

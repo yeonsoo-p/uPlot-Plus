@@ -19,7 +19,7 @@ export default function MultipleScales() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data} xlabel="Sample">
+    <Chart width="auto" height={400} data={data} xlabel="Sample">
       <Scale id="temp"  />
       <Scale id="humid"  />
       <Axis scale="temp" label="Temperature" values={fmtSuffix('°C', 1)} stroke="#e74c3c" />

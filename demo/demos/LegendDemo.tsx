@@ -16,7 +16,7 @@ export default function LegendDemo() {
   return (
     <div>
       <div className="mb-4">
-        <Chart width={800} height={250} data={data} title="Legend at bottom (default)">
+        <Chart width="auto" height={250} data={data} title="Legend at bottom (default)">
           <Series group={0} index={0} label="Alpha" />
           <Series group={0} index={1} label="Beta" />
           <Series group={0} index={2} label="Gamma" />
@@ -25,7 +25,7 @@ export default function LegendDemo() {
         </Chart>
       </div>
       <div>
-        <Chart width={800} height={250} data={data} title="Legend at top — click series to toggle">
+        <Chart width="auto" height={250} data={data} title="Legend at top — click series to toggle">
           <Series group={0} index={0} label="Alpha" />
           <Series group={0} index={1} label="Beta" />
           <Series group={0} index={2} label="Gamma" />

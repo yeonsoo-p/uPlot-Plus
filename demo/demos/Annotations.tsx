@@ -12,7 +12,7 @@ export default function Annotations() {
 
   return (
     <div>
-      <Chart width={800} height={400} data={data} xlabel="Sample" ylabel="Value">
+      <Chart width="auto" height={400} data={data} xlabel="Sample" ylabel="Value">
         <Scale id="y" auto={false} min={10} max={90} />
         <Series group={0} index={0} label="Signal" />
 

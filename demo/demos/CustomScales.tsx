@@ -13,13 +13,13 @@ export default function CustomScales() {
   return (
     <div>
       <div className="mb-4">
-        <Chart width={800} height={220} data={data} title="Fixed scale: 0 to 100" xlabel="Index" ylabel="Value (0-100)">
+        <Chart width="auto" height={220} data={data} title="Fixed scale: 0 to 100" xlabel="Index" ylabel="Value (0-100)">
           <Scale id="y" auto={false} min={0} max={100} />
           <Series group={0} index={0} label="Fixed Range" />
         </Chart>
       </div>
       <div>
-        <Chart width={800} height={220} data={data} title="Auto scale (for comparison)" xlabel="Index" ylabel="Value (auto)">
+        <Chart width="auto" height={220} data={data} title="Auto scale (for comparison)" xlabel="Index" ylabel="Value (auto)">
           <Series group={0} index={0} label="Auto Range" />
         </Chart>
       </div>

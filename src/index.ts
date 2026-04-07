@@ -102,7 +102,7 @@ export { alignData } from './math/align';
 export { lttb, lttbGroup } from './math/lttb';
 
 // Annotation helpers
-export { drawHLine, drawVLine, drawLabel, drawRegion, drawVRegion, drawDiagonalLine } from './annotations';
+export { drawHLine, drawVLine, drawLabel, drawRegion, drawVRegion, drawDiagonalLine, drawSlopeInterceptLine } from './annotations';
 
 // Scale utilities (for advanced draw hooks that need raw access)
 export { valToPos, posToVal } from './core/Scale';

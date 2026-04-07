@@ -14,6 +14,8 @@ export interface DraggableLabelProps {
   show?: boolean;
   /** Called with the new position whenever the label is dragged. */
   onPositionChange?: (pos: { x: number; y: number }) => void;
+  /** Accessible label for the draggable control. Default: 'Draggable label'. */
+  ariaLabel?: string;
   /** CSS class for custom styling. */
   className?: string;
   /** Inline style overrides. */
@@ -35,6 +37,7 @@ export function DraggableLabel({
   idleOpacity = 0.8,
   show = true,
   onPositionChange,
+  ariaLabel = 'Draggable label',
   className,
   style: styleProp,
 }: DraggableLabelProps): React.ReactElement | null {
@@ -50,11 +53,25 @@ export function DraggableLabel({
 
   if (!show || overlay.renderPos == null) return null;
 
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    const step = e.shiftKey ? 1 : 10;
+    switch (e.key) {
+      case 'ArrowUp':    overlay.moveBy(0, -step); e.preventDefault(); break;
+      case 'ArrowDown':  overlay.moveBy(0, step);  e.preventDefault(); break;
+      case 'ArrowLeft':  overlay.moveBy(-step, 0); e.preventDefault(); break;
+      case 'ArrowRight': overlay.moveBy(step, 0);  e.preventDefault(); break;
+    }
+  };
+
   return (
     <div
       ref={overlay.panelRef}
       className={className}
       data-testid="draggable-label"
+      tabIndex={0}
+      role="group"
+      aria-label={ariaLabel}
+      onKeyDown={onKeyDown}
       style={{
         ...panelStyle,
         ...overlay.panelStyle,

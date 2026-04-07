@@ -20,7 +20,7 @@ export default function BasicLine() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data} xlabel="Time (s)" ylabel="Value">
+    <Chart width="auto" height={400} data={data} xlabel="Time (s)" ylabel="Value">
       <Series group={0} index={0} label="Sine" />
       <Series group={0} index={1} label="Cosine" />
     </Chart>

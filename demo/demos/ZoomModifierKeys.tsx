@@ -22,7 +22,7 @@ export default function ZoomModifierKeys() {
   return (
     <div>
       <Chart
-        width={800}
+        width="auto"
         height={400}
         data={data}
         actions={[['shiftWheel', 'zoomX'], ['altWheel', 'zoomY'], ['wheel', 'none']]}

@@ -1,17 +1,9 @@
 import { useDrawHook } from '../../hooks/useDrawHook';
 import { useLayoutEffect, useRef } from 'react';
 import { useStore } from '../../hooks/useChart';
-import { drawDiagonalLine } from '../../annotations';
+import { drawDiagonalLine, drawSlopeInterceptLine } from '../../annotations';
 
-export interface DiagonalLineProps {
-  /** Start x data value */
-  x1: number;
-  /** Start y data value */
-  y1: number;
-  /** End x data value */
-  x2: number;
-  /** End y data value */
-  y2: number;
+interface DiagonalLineCommonProps {
   /** Scale id for the x-axis (default: 'x') */
   xScale?: string;
   /** Scale id for the y-axis (default: 'y') */
@@ -30,9 +22,37 @@ export interface DiagonalLineProps {
   extend?: boolean;
 }
 
+interface DiagonalLineTwoPointProps extends DiagonalLineCommonProps {
+  /** Start x data value */
+  x1: number;
+  /** Start y data value */
+  y1: number;
+  /** End x data value */
+  x2: number;
+  /** End y data value */
+  y2: number;
+  slope?: never;
+  intercept?: never;
+}
+
+interface DiagonalLineSlopeProps extends DiagonalLineCommonProps {
+  /** Slope of the line (y = slope * x + intercept) */
+  slope: number;
+  /** Y-intercept of the line (y = slope * x + intercept) */
+  intercept: number;
+  x1?: never;
+  y1?: never;
+  x2?: never;
+  y2?: never;
+}
+
+export type DiagonalLineProps = DiagonalLineTwoPointProps | DiagonalLineSlopeProps;
+
 /**
- * Declarative diagonal line annotation between two data points.
+ * Declarative diagonal line annotation.
+ * Accepts either two data points (`x1,y1,x2,y2`) or a `slope` and `intercept`.
  * When `extend` is true the line is extrapolated to the plot-box edges.
+ * Slope/intercept lines default to `extend: true`.
  * Place inside `<Chart>`.
  */
 export function DiagonalLine(props: DiagonalLineProps): null {
@@ -47,7 +67,7 @@ export function DiagonalLine(props: DiagonalLineProps): null {
     if (xScale == null || yScale == null) return;
 
     const t = store.theme;
-    drawDiagonalLine(dc, xScale, yScale, p.x1, p.y1, p.x2, p.y2, {
+    const style = {
       stroke: p.stroke ?? t.annotationStroke,
       width: p.width,
       dash: p.dash,
@@ -55,7 +75,13 @@ export function DiagonalLine(props: DiagonalLineProps): null {
       label: p.label,
       labelFont: p.labelFont,
       font: t.annotationFont,
-    });
+    };
+
+    if ('slope' in p && p.slope !== undefined) {
+      drawSlopeInterceptLine(dc, xScale, yScale, p.slope, p.intercept, style);
+    } else {
+      drawDiagonalLine(dc, xScale, yScale, p.x1, p.y1, p.x2, p.y2, style);
+    }
   });
 
   return null;

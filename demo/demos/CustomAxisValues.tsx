@@ -26,7 +26,7 @@ export default function CustomAxisValues() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data}>
+    <Chart width="auto" height={400} data={data}>
       <Axis scale="x" label="Time of Day" values={fmtTime} space={80} />
       <Axis scale="y" label="Throughput" values={fmtSuffix(' MB/s')} />
       <Series group={0} index={0} stroke="#2980b9" fill="rgba(41,128,185,0.1)" label="Throughput" />

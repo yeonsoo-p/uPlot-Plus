@@ -28,17 +28,17 @@ export default function NiceScale() {
   return (
     <div>
       <div className="mb-4">
-        <Chart width={800} height={180} data={data1} title="Small range (~2-20)">
+        <Chart width="auto" height={180} data={data1} title="Small range (~2-20)">
           <Series group={0} index={0} label="Small" />
         </Chart>
       </div>
       <div className="mb-4">
-        <Chart width={800} height={180} data={data2} title="Medium range (~3700-6200)">
+        <Chart width="auto" height={180} data={data2} title="Medium range (~3700-6200)">
           <Series group={0} index={0} label="Medium" />
         </Chart>
       </div>
       <div>
-        <Chart width={800} height={180} data={data3} title="Tiny range (~0.004-0.056)">
+        <Chart width="auto" height={180} data={data3} title="Tiny range (~0.004-0.056)">
           <Series group={0} index={0} label="Tiny" />
         </Chart>
       </div>

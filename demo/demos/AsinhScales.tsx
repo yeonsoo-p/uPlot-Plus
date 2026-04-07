@@ -21,7 +21,7 @@ export default function AsinhScales() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data} xlabel="Sample">
+    <Chart width="auto" height={400} data={data} xlabel="Sample">
       <Scale id="y"  distr={Distribution.Asinh} asinh={1} />
       <Axis scale="y" label="Value (asinh)" values={fmtVal} />
       <Series group={0} index={0} stroke="#8e44ad" fill="rgba(142,68,173,0.1)" label="Symmetric Data" />

@@ -35,7 +35,7 @@ export default function BoxWhiskerDemo() {
   const { boxes, chartData } = generateBoxData(CATEGORIES);
 
   return (
-    <Chart width={800} height={400} data={chartData} ylabel="Value">
+    <Chart width="auto" height={400} data={chartData} ylabel="Value">
       <Axis scale="x" label="Category" values={fmtLabels(categoryLabels, 1)} />
       <Axis scale="y" />
       <BoxWhisker boxes={boxes} />

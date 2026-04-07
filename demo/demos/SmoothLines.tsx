@@ -11,7 +11,7 @@ export default function SmoothLines() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data} xlabel="Index" ylabel="Value">
+    <Chart width="auto" height={400} data={data} xlabel="Index" ylabel="Value">
       <Series group={0} index={0} label="Linear" paths={linear()} />
       <Series group={0} index={1} label="Monotone Cubic" paths={monotoneCubic()} />
       <Series group={0} index={2} label="Catmull-Rom" paths={catmullRom()} />

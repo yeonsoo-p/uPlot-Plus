@@ -24,7 +24,7 @@ export default function ZoomRangerXYDemo() {
 
   return (
     <div>
-      <Chart width={800} height={300} data={data} actions={[['wheel', 'zoomXY']]} title="Detail view (controlled by ranger below)" ylabel="Signal A">
+      <Chart width="auto" height={300} data={data} actions={[['wheel', 'zoomXY']]} title="Detail view (controlled by ranger below)" ylabel="Signal A">
         <Scale id="x" auto={range == null} min={range?.[0]} max={range?.[1]} />
         <Scale id="y2"  />
         <Axis scale="y2" side={Side.Right} label="Signal B" />
@@ -35,7 +35,7 @@ export default function ZoomRangerXYDemo() {
       <div className="mt-2">
         <h4 className="m-0 mb-1">Overview (drag to select range)</h4>
         <ZoomRanger
-          width={800}
+          width="auto"
           height={80}
           data={data}
           onRangeChange={onRangeChange}

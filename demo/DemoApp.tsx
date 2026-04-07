@@ -157,7 +157,7 @@ export function DemoApp() {
           <h2 className="text-xl font-bold mb-1">{active.title}</h2>
           <p className="text-muted text-sm mb-4">{active.description}</p>
           <div className="flex gap-4 items-stretch min-h-125 max-[1200px]:flex-col">
-            <div className="flex-[0_1_auto] min-w-0 overflow-hidden">
+            <div className="flex-1 min-w-0 overflow-hidden">
               <Component />
             </div>
             {source && <SourceHighlight source={source} />}

@@ -20,7 +20,7 @@ export default function BarsGroupedStacked() {
 
   return (
     <div>
-      <Chart width={800} height={400} data={data} title="Grouped Bars" ylabel="Sales">
+      <Chart width="auto" height={400} data={data} title="Grouped Bars" ylabel="Sales">
         <Axis scale="x" label="Month" values={fmtLabels(MONTH_NAMES)} />
         <Series group={0} index={0} stroke="#2980b9" label="Product A" paths={groupedBars(0, 3)} />
         <Series group={0} index={1} stroke="#27ae60" label="Product B" paths={groupedBars(1, 3)} />

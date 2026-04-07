@@ -40,7 +40,7 @@ export default function AddDelSeries() {
           </button>
         ))}
       </div>
-      <Chart width={800} height={400} data={data} xlabel="Index" ylabel="Value">
+      <Chart width="auto" height={400} data={data} xlabel="Index" ylabel="Value">
         {LABELS.map((label, i) =>
           visible[i] ? (
             <Series

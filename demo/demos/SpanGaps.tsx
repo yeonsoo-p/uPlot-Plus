@@ -17,7 +17,7 @@ export default function SpanGaps() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data} xlabel="Index" ylabel="Value">
+    <Chart width="auto" height={400} data={data} xlabel="Index" ylabel="Value">
       <Series group={0} index={0} label="With Gaps (default)" />
       <Series group={0} index={1} label="spanGaps = true" spanGaps />
     </Chart>

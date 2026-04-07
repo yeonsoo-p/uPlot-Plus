@@ -20,7 +20,7 @@ export default function AlignData() {
 
   return (
     <div>
-      <Chart width={800} height={400} data={data} xlabel="X" ylabel="Value">
+      <Chart width="auto" height={400} data={data} xlabel="X" ylabel="Value">
         <Series group={0} index={0} label="Dataset A" />
         <Series group={0} index={1} label="Dataset B" />
       </Chart>

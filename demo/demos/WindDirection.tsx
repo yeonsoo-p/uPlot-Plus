@@ -29,7 +29,7 @@ export default function WindDirection() {
   const { directions, chartData } = useMemo(() => generateWindData(), []);
 
   return (
-    <Chart width={800} height={400} data={chartData} ylabel="Wind Speed (km/h)">
+    <Chart width="auto" height={400} data={chartData} ylabel="Wind Speed (km/h)">
       <Axis scale="x" label="Time (hours)" values={fmtSuffix('h')} />
       <Series group={0} index={0} label="Speed"
         dash={[4, 3]} />

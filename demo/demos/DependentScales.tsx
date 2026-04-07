@@ -15,7 +15,7 @@ export default function DependentScales() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data} xlabel="Day">
+    <Chart width="auto" height={400} data={data} xlabel="Day">
       <Scale id="f"  />
       <Axis scale="f" label="Fahrenheit" values={fmtSuffix('°F')} stroke="#e74c3c" />
       <Axis scale="f" side={Side.Right} label="Celsius" values={fmtC} stroke="#3498db" grid={{ show: false }} />

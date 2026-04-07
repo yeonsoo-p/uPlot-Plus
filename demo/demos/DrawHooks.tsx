@@ -38,7 +38,7 @@ export default function DrawHooks() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data} onCursorDraw={onCursorDraw} xlabel="Sample" ylabel="Value">
+    <Chart width="auto" height={400} data={data} onCursorDraw={onCursorDraw} xlabel="Sample" ylabel="Value">
       <Scale id="y" auto={false} min={10} max={90} />
       <Series group={0} index={0} label="Signal" />
       <Region yMin={65} yMax={90} fill="rgba(231, 76, 60, 0.08)" />

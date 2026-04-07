@@ -35,6 +35,8 @@ export interface DraggableOverlayResult {
     onMouseEnter?: React.MouseEventHandler;
     onMouseLeave?: React.MouseEventHandler;
   };
+  /** Move the panel by (dx, dy) pixels. Clamped to plot bounds. No-op in cursor mode. */
+  moveBy: (dx: number, dy: number) => void;
 }
 
 // ---- Pure helpers (exported for testing) ----
@@ -279,6 +281,20 @@ export function useDraggableOverlay({
       }
     : NOOP_HANDLERS;
 
+  const moveBy = (dx: number, dy: number) => {
+    if (mode !== 'draggable') return;
+    setPos(prev => {
+      if (prev == null) return prev;
+      const el = panelRef.current;
+      const w = el?.offsetWidth ?? estimatedSize.w;
+      const h = el?.offsetHeight ?? estimatedSize.h;
+      const next = { x: prev.x + dx, y: prev.y + dy };
+      const clamped = clampToBounds(next, store.plotBox.left, store.plotBox.top, store.plotBox.width, store.plotBox.height, w, h);
+      onPositionChangeRef.current?.(clamped);
+      return clamped;
+    });
+  };
+
   return {
     panelRef,
     renderPos,
@@ -287,5 +303,6 @@ export function useDraggableOverlay({
     didDrag,
     panelStyle,
     panelHandlers,
+    moveBy,
   };
 }

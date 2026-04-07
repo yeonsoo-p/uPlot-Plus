@@ -13,7 +13,7 @@ export default function DashPatterns() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data}>
+    <Chart width="auto" height={400} data={data}>
       <Series group={0} index={0} label="Solid" />
       <Series group={0} index={1} label="Dashed [5,5]" dash={[5, 5]} />
       <Series group={0} index={2} label="Dash-dot [10,5,2,5]" dash={[10, 5, 2, 5]} />

@@ -27,7 +27,7 @@ export default function TimezonesDST() {
 
   return (
     <div>
-      <Chart width={800} height={400} data={data} ylabel="Temperature (C)">
+      <Chart width="auto" height={400} data={data} ylabel="Temperature (C)">
         <Axis scale="x" label="Date/Time" values={fmtDateTime} rotate={-45} />
         <Series group={0} index={0} label="Temp" />
         <Legend />

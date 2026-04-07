@@ -13,7 +13,7 @@ export default function SoftMinMax() {
 
   return (
     <div>
-      <Chart width={800} height={400} data={data} xlabel="Index" ylabel="Value">
+      <Chart width="auto" height={400} data={data} xlabel="Index" ylabel="Value">
         <Scale
           id="y"
           auto

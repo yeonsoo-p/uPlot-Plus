@@ -25,7 +25,7 @@ export default function MinimalChart() {
       {/* 1. Minimal — auto scales, axes, and colors */}
       <div>
         <h4 className="mt-0 mb-2">Minimal: just data + series</h4>
-        <Chart width={800} height={180} data={{ x, y: y1 }}>
+        <Chart width="auto" height={180} data={{ x, y: y1 }}>
           <Series group={0} index={0} />
         </Chart>
       </div>
@@ -33,7 +33,7 @@ export default function MinimalChart() {
       {/* 2. Custom axis labels via Chart props */}
       <div>
         <h4 className="mt-0 mb-2">Custom labels via xlabel / ylabel props</h4>
-        <Chart width={800} height={180} data={{ x, y: y1 }} xlabel="Time (s)" ylabel="Temperature">
+        <Chart width="auto" height={180} data={{ x, y: y1 }} xlabel="Time (s)" ylabel="Temperature">
           <Series group={0} index={0} label="Sensor A" />
         </Chart>
       </div>
@@ -41,7 +41,7 @@ export default function MinimalChart() {
       {/* 3. Full control when needed */}
       <div>
         <h4 className="mt-0 mb-2">Full control with explicit children</h4>
-        <Chart width={800} height={200} data={[{ x, series: [y1, y2] }]} xlabel="Time (s)" ylabel="Temperature">
+        <Chart width="auto" height={200} data={[{ x, series: [y1, y2] }]} xlabel="Time (s)" ylabel="Temperature">
           <Series group={0} index={0} label="Indoor" />
           <Series group={0} index={1} label="Outdoor" />
         </Chart>

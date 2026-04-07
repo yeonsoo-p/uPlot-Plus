@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { drawHLine, drawVLine, drawLabel, drawRegion, drawVRegion, drawDiagonalLine } from '@/annotations';
+import { drawHLine, drawVLine, drawLabel, drawRegion, drawVRegion, drawDiagonalLine, drawSlopeInterceptLine } from '@/annotations';
 import { createScaleState } from '@/core/Scale';
 import type { ScaleState } from '@/types';
 import { Orientation } from '@/types';
@@ -235,5 +235,56 @@ describe('drawDiagonalLine', () => {
     // Midpoint: x=(50+450)/2=250, y=(320+20)/2=170, offset by LABEL_OFFSET_Y=4
     expect(callArgs[1]).toBe(250);
     expect(callArgs[2]).toBe(166);
+  });
+});
+
+describe('drawSlopeInterceptLine', () => {
+  it('draws line from slope and intercept using scale range', () => {
+    const { dc, ctx } = makeDC();
+    const xScale = makeScale('x', 0, 100);
+    const yScale = makeScale('y', 0, 100, Orientation.Vertical);
+
+    // slope=1, intercept=0 → y=x → points (0,0) and (100,100)
+    // Same as drawDiagonalLine(0,0,100,100) with extend
+    drawSlopeInterceptLine(dc, xScale, yScale, 1, 0);
+
+    expect(ctx.beginPath).toHaveBeenCalled();
+    expect(ctx.moveTo).toHaveBeenCalled();
+    expect(ctx.lineTo).toHaveBeenCalled();
+    expect(ctx.stroke).toHaveBeenCalled();
+  });
+
+  it('defaults to extend behavior', () => {
+    const { dc, ctx } = makeDC();
+    const xScale = makeScale('x', 0, 100);
+    const yScale = makeScale('y', 0, 100, Orientation.Vertical);
+
+    // slope=1, intercept=50 → line from (0,50) to (100,150)
+    // With extend, should clip to plot box edges
+    drawSlopeInterceptLine(dc, xScale, yScale, 1, 50);
+
+    const moveArgs = ctx.moveTo.mock.calls[0]!;
+    const lineArgs = ctx.lineTo.mock.calls[0]!;
+    // Extended line should reach plot box edges
+    expect(moveArgs[0]).toBeGreaterThanOrEqual(50); // plotBox.left
+    expect(lineArgs[0]).toBeLessThanOrEqual(450); // plotBox.left + plotBox.width
+  });
+
+  it('handles zero slope (horizontal line)', () => {
+    const { dc, ctx } = makeDC();
+    const xScale = makeScale('x', 0, 100);
+    const yScale = makeScale('y', 0, 100, Orientation.Vertical);
+
+    // slope=0, intercept=50 → horizontal line at y=50
+    drawSlopeInterceptLine(dc, xScale, yScale, 0, 50);
+
+    expect(ctx.moveTo).toHaveBeenCalled();
+    expect(ctx.lineTo).toHaveBeenCalled();
+    const moveArgs = ctx.moveTo.mock.calls[0]!;
+    const lineArgs = ctx.lineTo.mock.calls[0]!;
+    // Both y-coordinates should be the same (y=50 → pixel 170)
+    // valToPos(50, yScale) = 20 + (1 - 50/100) * 300 = 20 + 150 = 170
+    expect(moveArgs[1]).toBe(170);
+    expect(lineArgs[1]).toBe(170);
   });
 });

@@ -17,7 +17,7 @@ export default function LogScales() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data} xlabel="Index">
+    <Chart width="auto" height={400} data={data} xlabel="Index">
       <Scale id="y"  distr={Distribution.Log} log={10} />
       <Axis scale="y" label="Value (log)" values={fmtCompact({ decimals: 0 })} />
       <Series group={0} index={0} label="Exponential" />

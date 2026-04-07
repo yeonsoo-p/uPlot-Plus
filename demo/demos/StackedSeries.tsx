@@ -19,7 +19,7 @@ export default function StackedSeries() {
 
   return (
     <div>
-      <Chart width={800} height={400} data={stackedData} xlabel="Sample" ylabel="Value">
+      <Chart width="auto" height={400} data={stackedData} xlabel="Sample" ylabel="Value">
         <Series group={0} index={0} stroke="#e74c3c" fill="rgba(231,76,60,0.4)" label="Series A" />
         <Series group={0} index={1} stroke="#2ecc71" fill="rgba(46,204,113,0.4)" label="Series B" fillToData={stackedSeries[0]} />
         <Series group={0} index={2} stroke="#3498db" fill="rgba(52,152,219,0.4)" label="Series C" fillToData={stackedSeries[1]} />

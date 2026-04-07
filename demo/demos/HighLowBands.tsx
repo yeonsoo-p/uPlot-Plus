@@ -22,7 +22,7 @@ export default function HighLowBands() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data} xlabel="Sample" ylabel="Value">
+    <Chart width="auto" height={400} data={data} xlabel="Sample" ylabel="Value">
       <Series group={0} index={0} label="Mean" />
       <Series group={0} index={1} label="Upper" dash={[4, 4]} />
       <Series group={0} index={2} label="Lower" dash={[4, 4]} />

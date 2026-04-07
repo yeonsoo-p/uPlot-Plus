@@ -40,7 +40,7 @@ export default function EventCallbacks() {
     <div>
       <div className="relative">
         <Chart
-          width={800}
+          width="auto"
           height={400}
           data={data}
           onClick={onClick}

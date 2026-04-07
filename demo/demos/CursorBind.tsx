@@ -22,12 +22,12 @@ export default function CursorBind() {
   return (
     <div>
       <div className="mb-4">
-        <Chart width={800} height={200} data={data1} syncKey="bind" xlabel="Index" ylabel="Temperature">
+        <Chart width="auto" height={200} data={data1} syncKey="bind" xlabel="Index" ylabel="Temperature">
           <Series group={0} index={0} label="Temp (C)" />
           <Legend />
         </Chart>
       </div>
-      <Chart width={800} height={200} data={data2} syncKey="bind" xlabel="Index" ylabel="Humidity">
+      <Chart width="auto" height={200} data={data2} syncKey="bind" xlabel="Index" ylabel="Humidity">
         <Series group={0} index={0} label="Humidity (%)" />
         <Legend />
       </Chart>

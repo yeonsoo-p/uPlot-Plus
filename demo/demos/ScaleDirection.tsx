@@ -15,7 +15,7 @@ export default function ScaleDirection() {
   const data = useMemo(() => generateData(), []);
 
   return (
-    <Chart width={800} height={400} data={data} xlabel="Sample">
+    <Chart width="auto" height={400} data={data} xlabel="Sample">
       <Scale id="depth"  dir={Direction.Backward} />
       <Scale id="temp"  />
       <Axis scale="depth" label="Depth" values={fmtSuffix('m')} stroke="#2980b9" />

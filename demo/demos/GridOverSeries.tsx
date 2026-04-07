@@ -47,13 +47,13 @@ export default function GridOverSeries() {
   return (
     <div>
       <div className="mb-4">
-        <Chart width={800} height={200} data={data} title="Default (grid behind series)">
+        <Chart width="auto" height={200} data={data} title="Default (grid behind series)">
           <Series group={0} index={0} stroke="#e74c3c" fill="rgba(231,76,60,0.3)" label="Series A" />
           <Series group={0} index={1} stroke="#3498db" fill="rgba(52,152,219,0.3)" label="Series B" />
         </Chart>
       </div>
       <div>
-        <Chart width={800} height={200} data={data} onDraw={gridOverlay} title="Grid over series (via onDraw hook)">
+        <Chart width="auto" height={200} data={data} onDraw={gridOverlay} title="Grid over series (via onDraw hook)">
           <Axis scale="x" grid={{ show: false }} />
           <Axis scale="y" grid={{ show: false }} />
           <Series group={0} index={0} stroke="#e74c3c" fill="rgba(231,76,60,0.3)" label="Series A" />

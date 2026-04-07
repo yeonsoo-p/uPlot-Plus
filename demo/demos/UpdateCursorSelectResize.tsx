@@ -45,7 +45,7 @@ export default function UpdateCursorSelectResize() {
           Data updates every 200ms. Hover to test cursor stability during updates.
         </span>
       </div>
-      <Chart width={800} height={400} data={data} xlabel="Tick" ylabel="Value">
+      <Chart width="auto" height={400} data={data} xlabel="Tick" ylabel="Value">
         <Series group={0} index={0} label="Live" />
         <Legend />
       </Chart>

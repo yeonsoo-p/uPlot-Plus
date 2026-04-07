@@ -91,7 +91,7 @@ export default function MeasureDatums() {
 
   return (
     <div>
-      <Chart width={800} height={400} data={data} onCursorDraw={onCursorDraw} actions={actions} xlabel="Sample" ylabel="Value">
+      <Chart width="auto" height={400} data={data} onCursorDraw={onCursorDraw} actions={actions} xlabel="Sample" ylabel="Value">
         <Series group={0} index={0} label="Signal" />
       </Chart>
     </div>

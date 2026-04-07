@@ -13,7 +13,7 @@ export default function SyncYZero() {
 
   return (
     <div>
-      <Chart width={800} height={400} data={data} xlabel="Index">
+      <Chart width="auto" height={400} data={data} xlabel="Index">
         <Scale id="y1"  min={0} />
         <Scale id="y2"  min={0} />
         <Axis scale="y1" label="Small (0-80)" stroke="#e74c3c" />

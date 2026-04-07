@@ -17,7 +17,7 @@ export default function AxisControl() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data} xlabel="Sample Index">
+    <Chart width="auto" height={400} data={data} xlabel="Sample Index">
       <Scale id="y" auto={false} min={-50} max={50} />
       <Axis scale="y" label="Amplitude" labelSize={20} space={50} />
       <Series group={0} index={0} label="Signal" />

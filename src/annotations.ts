@@ -204,3 +204,29 @@ export function drawDiagonalLine(
     ctx.fillText(style.label, mx, my - LABEL_OFFSET_Y);
   }
 }
+
+/** Convert slope + intercept to two data-space points using the current x-scale range. */
+function slopeInterceptToPoints(
+  slope: number,
+  intercept: number,
+  xScale: ScaleState,
+): [number, number, number, number] {
+  const xMin = xScale.min ?? 0;
+  const xMax = xScale.max ?? 1;
+  return [xMin, slope * xMin + intercept, xMax, slope * xMax + intercept];
+}
+
+/** Draw a line defined by slope and intercept (y = slope * x + intercept).
+ *  Defaults to `extend: true` since the line is conceptually infinite.
+ *  Assumes ctx is already pxRatio-scaled (handled by the library). */
+export function drawSlopeInterceptLine(
+  dc: DrawContext,
+  xScale: ScaleState,
+  yScale: ScaleState,
+  slope: number,
+  intercept: number,
+  style: DiagonalLineStyle = {},
+): void {
+  const [x1, y1, x2, y2] = slopeInterceptToPoints(slope, intercept, xScale);
+  drawDiagonalLine(dc, xScale, yScale, x1, y1, x2, y2, { ...style, extend: style.extend ?? true });
+}

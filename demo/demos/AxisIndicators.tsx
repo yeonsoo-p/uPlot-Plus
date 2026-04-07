@@ -12,7 +12,7 @@ export default function AxisIndicators() {
 
   return (
     <div>
-      <Chart width={800} height={400} data={data}>
+      <Chart width="auto" height={400} data={data}>
         {/* Bottom x-axis: blue grid dashed, red ticks, green border */}
         <Axis
           scale="x"

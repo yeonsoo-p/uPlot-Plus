@@ -20,7 +20,7 @@ export default function NearestNonNull() {
 
   return (
     <div>
-      <Chart width={800} height={400} data={data} xlabel="Index" ylabel="Value">
+      <Chart width="auto" height={400} data={data} xlabel="Index" ylabel="Value">
         <Series
           group={0}
           index={0}

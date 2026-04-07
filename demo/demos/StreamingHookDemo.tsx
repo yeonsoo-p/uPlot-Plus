@@ -68,7 +68,7 @@ export default function StreamingHookDemo() {
           {running ? `${fps} FPS` : 'Paused'} &middot; window: {WINDOW}
         </span>
       </div>
-      <Chart width={800} height={350} data={data}>
+      <Chart width="auto" height={350} data={data}>
         <Series group={0} index={0} label="Sine" stroke="#e74c3c" />
         <Series group={0} index={1} label="Cosine" stroke="#3498db" />
         <Legend />

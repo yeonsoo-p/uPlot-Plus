@@ -31,7 +31,7 @@ export default function CandlestickOHLC() {
   const data = generateOHLC();
 
   return (
-    <Chart width={800} height={400} data={data} xlabel="Day" ylabel="Price">
+    <Chart width="auto" height={400} data={data} xlabel="Day" ylabel="Price">
       <Candlestick />
     </Chart>
   );

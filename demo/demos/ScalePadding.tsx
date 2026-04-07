@@ -13,7 +13,7 @@ export default function ScalePadding() {
   return (
     <div>
       <div className="mb-4">
-        <Chart width={800} height={200} data={data} title="With padding (10%)">
+        <Chart width="auto" height={200} data={data} title="With padding (10%)">
           <Scale
             id="y"
             auto
@@ -28,7 +28,7 @@ export default function ScalePadding() {
         </Chart>
       </div>
       <div>
-        <Chart width={800} height={200} data={data} title="Without padding (default)">
+        <Chart width="auto" height={200} data={data} title="Without padding (default)">
           <Series group={0} index={0} label="Default" />
         </Chart>
       </div>

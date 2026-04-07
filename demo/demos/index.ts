@@ -93,12 +93,14 @@ import DataTypes from './DataTypes';
 
 // --- Tooltips & Legends ---
 import CustomTooltipDemo from './CustomTooltipDemo';
+import DraggableLabelDemo from './DraggableLabelDemo';
 
 // --- Layout & Streaming ---
 import StreamingHookDemo from './StreamingHookDemo';
 import Sparklines from './Sparklines';
 import ResizeDemo from './ResizeDemo';
 import ResponsiveDemo from './ResponsiveDemo';
+import FlexAutoResize from './FlexAutoResize';
 import ScrollSync from './ScrollSync';
 import StreamData from './StreamData';
 import RealtimeSine from './RealtimeSine';
@@ -222,6 +224,7 @@ export const demos: DemoEntry[] = [
   { id: 'hover-label', title: 'Hover Label', description: 'Hover over a series for 1 second to show its label as a floating tag.', category: 'Cursor & Interaction', component: HoverLabel, sourceFile: 'HoverLabel' },
   { id: 'floating-legend', title: 'Floating Legend', description: 'Draggable legend widget inside the chart area with live values.', category: 'Tooltips & Legends', component: FloatingLegendDemo, sourceFile: 'FloatingLegendDemo' },
   { id: 'custom-tooltip', title: 'Custom Tooltip', description: 'Fully custom tooltip UI via the Tooltip children render prop.', category: 'Tooltips & Legends', component: CustomTooltipDemo, sourceFile: 'CustomTooltipDemo' },
+  { id: 'draggable-label', title: 'Draggable Label', description: 'Draggable text overlay with keyboard accessibility and position tracking.', category: 'Tooltips & Legends', component: DraggableLabelDemo, sourceFile: 'DraggableLabelDemo' },
 
   // --- Zoom & Pan ---
   { id: 'zoom-wheel', title: 'Wheel Zoom', description: 'Mouse wheel zoom on x-axis centered at cursor position.', category: 'Zoom & Pan', component: ZoomWheel, sourceFile: 'ZoomWheel' },
@@ -251,6 +254,7 @@ export const demos: DemoEntry[] = [
   { id: 'sparklines', title: 'Sparklines', description: 'Tiny 150x30 charts with hidden axes, embedded in a table.', category: 'Layout & Streaming', component: Sparklines, sourceFile: 'Sparklines' },
   { id: 'resize-demo', title: 'Resize', description: 'Dynamically resize chart with width/height sliders.', category: 'Layout & Streaming', component: ResizeDemo, sourceFile: 'ResizeDemo' },
   { id: 'responsive-demo', title: 'Responsive', description: 'Auto-size chart to container via ResizeObserver.', category: 'Layout & Streaming', component: ResponsiveDemo, sourceFile: 'ResponsiveDemo' },
+  { id: 'flex-auto-resize', title: 'Flex Auto Resize', description: 'Drag-resizable flex layout with width="auto" chart.', category: 'Layout & Streaming', component: FlexAutoResize, sourceFile: 'FlexAutoResize' },
   { id: 'scroll-sync', title: 'Scroll Sync', description: 'Multiple synced charts in a scrollable container.', category: 'Layout & Streaming', component: ScrollSync, sourceFile: 'ScrollSync' },
   { id: 'streaming-hook', title: 'Streaming Demo', description: 'Streaming with plain useState: start/stop, FPS counter, sliding window.', category: 'Layout & Streaming', component: StreamingHookDemo, sourceFile: 'StreamingHookDemo' },
   { id: 'stream-data', title: 'Stream Data', description: '3-series 60fps streaming with 2000-point sliding window and FPS counter.', category: 'Layout & Streaming', component: StreamData, sourceFile: 'StreamData' },

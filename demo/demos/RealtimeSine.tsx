@@ -90,7 +90,7 @@ export default function RealtimeSine() {
           {fps} FPS
         </span>
       </div>
-      <Chart width={800} height={350} data={data} xlabel="Time (s)" ylabel="Amplitude">
+      <Chart width="auto" height={350} data={data} xlabel="Time (s)" ylabel="Amplitude">
         <Scale id="y" min={-1.5} max={1.5} />
         <Series group={0} index={0} width={1.5} label="1 Hz" />
         <Series group={0} index={1} width={1.5} label="2.5 Hz" />

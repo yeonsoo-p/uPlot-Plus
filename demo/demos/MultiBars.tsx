@@ -17,7 +17,7 @@ export default function MultiBars() {
 
   return (
     <div>
-      <Chart width={800} height={400} data={data}>
+      <Chart width="auto" height={400} data={data}>
         <Axis scale="x" label="Quarter" values={fmtPrefix('Q')} />
         <Axis scale="y" label="Revenue" values={fmtWrap('$', 'K')} />
         <Series group={0} index={0} stroke="#2980b9" label="Widgets" paths={groupedBars(0, 3)} />

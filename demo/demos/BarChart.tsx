@@ -15,7 +15,7 @@ export default function BarChart() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data}>
+    <Chart width="auto" height={400} data={data}>
       <Axis scale="x" label="Month" values={fmtLabels(MONTHS)} />
       <Axis scale="y" label="Amount" values={fmtWrap('$', 'K')} />
       <Series group={0} index={0} stroke="#2980b9" label="Revenue" paths={groupedBars(0, 2)} />

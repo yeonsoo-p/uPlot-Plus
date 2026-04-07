@@ -34,7 +34,7 @@ export default function HeatmapDemo() {
   const { grid, chartData } = generateHeatmapData();
 
   return (
-    <Chart width={800} height={400} data={chartData}>
+    <Chart width="auto" height={400} data={chartData}>
       <Scale id="x" auto={false} min={0} max={HOURS} />
       <Scale id="y" auto={false} min={0} max={MAX_LATENCY} />
       <Axis scale="x" label="Hour" values={fmtHour} />

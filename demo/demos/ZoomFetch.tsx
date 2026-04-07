@@ -74,7 +74,7 @@ export default function ZoomFetch() {
         <button className="px-3 py-1 text-demo rounded border border-border-light bg-surface hover:bg-border-lighter cursor-pointer dark:bg-white/8 dark:border-white/10 dark:hover:bg-white/15 dark:text-white transition-colors" onClick={handleReset}>Reset</button>
         {loading && <span className="text-[#e67e22] font-bold">Loading...</span>}
       </div>
-      <Chart width={800} height={400} data={data} xlabel="X" ylabel="Value">
+      <Chart width="auto" height={400} data={data} xlabel="X" ylabel="Value">
         <Series group={0} index={0} label="Signal" />
         <Legend />
       </Chart>

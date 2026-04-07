@@ -35,15 +35,14 @@ function generateData() {
 }
 
 export default function Trendlines() {
-  const { data, slope, intercept, n, trendLabel } = generateData();
+  const { data, slope, intercept, trendLabel } = generateData();
 
   return (
-    <Chart width={800} height={400} data={data} xlabel="X" ylabel="Y">
+    <Chart width="auto" height={400} data={data} xlabel="X" ylabel="Y">
       <Series group={0} index={0} label="Data"
         points={{ show: true, size: 4, fill: '#3498db' }} />
       <DiagonalLine
-        x1={0} y1={intercept}
-        x2={n - 1} y2={slope * (n - 1) + intercept}
+        slope={slope} intercept={intercept}
         stroke="#e74c3c" width={2.5} dash={[8, 4]}
         label={trendLabel}
       />

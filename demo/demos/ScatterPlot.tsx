@@ -37,7 +37,7 @@ export default function ScatterPlot() {
   const data = generateScatterData();
 
   return (
-    <Chart width={800} height={400} data={data} actions={[['wheel', 'zoomXY']]} xlabel="X" ylabel="Y">
+    <Chart width="auto" height={400} data={data} actions={[['wheel', 'zoomXY']]} xlabel="X" ylabel="Y">
       <Series
         group={0}
         index={0}

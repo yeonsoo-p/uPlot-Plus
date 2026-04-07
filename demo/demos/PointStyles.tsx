@@ -26,7 +26,7 @@ export default function PointStyles() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data}>
+    <Chart width="auto" height={400} data={data}>
       {/* Line only (default) */}
       <Series group={0} index={0} label="Line only" />
       {/* Line + points */}

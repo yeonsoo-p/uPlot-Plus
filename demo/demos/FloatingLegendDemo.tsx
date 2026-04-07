@@ -28,7 +28,7 @@ export default function FloatingLegendDemo() {
     <div className="flex flex-col gap-6">
       <div>
         <h4 className="mt-0 mb-2">Cursor mode — follows cursor</h4>
-        <Chart width={800} height={350} data={data} xlabel="Time" ylabel="Value">
+        <Chart width="auto" height={350} data={data} xlabel="Time" ylabel="Value">
           <Series group={0} index={0} label="Temperature" />
           <Series group={0} index={1} label="Humidity" />
           <Series group={0} index={2} label="Pressure" />
@@ -38,7 +38,7 @@ export default function FloatingLegendDemo() {
 
       <div>
         <h4 className="mt-0 mb-2">Draggable mode — fades when idle, drag to reposition</h4>
-        <Chart width={800} height={350} data={data} xlabel="Time" ylabel="Value">
+        <Chart width="auto" height={350} data={data} xlabel="Time" ylabel="Value">
           <Series group={0} index={0} label="Sensor A" />
           <Series group={0} index={1} label="Sensor B" />
           <Series group={0} index={2} label="Sensor C" />

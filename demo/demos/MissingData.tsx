@@ -25,7 +25,7 @@ export default function MissingData() {
   const data = generateData();
 
   return (
-    <Chart width={800} height={400} data={data}>
+    <Chart width="auto" height={400} data={data}>
       <Scale id="pct"  />
       <Scale id="mb"  />
       <Axis scale="pct" values={fmtSuffix('%', 1)} />

@@ -13,7 +13,7 @@ export default function SparseData() {
 
   return (
     <div>
-      <Chart width={800} height={400} data={data} xlabel="X Position" ylabel="Value">
+      <Chart width="auto" height={400} data={data} xlabel="X Position" ylabel="Value">
         <Series
           group={0}
           index={0}
