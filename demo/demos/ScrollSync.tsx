@@ -17,7 +17,7 @@ export default function ScrollSync() {
       <div className="max-h-125 overflow-y-auto border border-border-light p-2">
         {LABELS.map((label, i) => (
           <div key={label} className="mb-3">
-            <Chart width={760} height={150} data={datasets[i] ?? []} syncKey="scroll" ylabel={label}>
+            <Chart width="auto" height={150} data={datasets[i] ?? []} syncKey="scroll" ylabel={label}>
               <Series group={0} index={0} label={label} />
               <Legend />
             </Chart>

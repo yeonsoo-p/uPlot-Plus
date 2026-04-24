@@ -139,7 +139,7 @@ export function SourceHighlight({ source }: { source: string }) {
           {copied ? 'Copied!' : 'Copy'}
         </button>
       </div>
-      <pre className="thin-scrollbar flex-1 overflow-auto p-3 m-0 font-mono text-xs leading-normal text-text dark:text-[#cdd6f4] [tab-size:2] transition-colors duration-200">
+      <pre className="no-scrollbar flex-1 overflow-auto p-3 m-0 font-mono text-xs leading-normal text-text dark:text-[#cdd6f4] [tab-size:2] transition-colors duration-200">
         <code dangerouslySetInnerHTML={{ __html: html }} />
       </pre>
     </div>

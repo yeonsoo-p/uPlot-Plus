@@ -15,6 +15,14 @@
 }
 
 @layer base {
+  html, body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none;
+  }
   body {
     @apply font-sans bg-surface text-text transition-colors duration-200;
   }
@@ -49,25 +57,6 @@
 }
 .no-scrollbar::-webkit-scrollbar {
   display: none;
-}
-
-.thin-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: #ccc transparent;
-}
-.dark .thin-scrollbar {
-  scrollbar-color: #444 transparent;
-}
-.thin-scrollbar::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-.thin-scrollbar::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 3px;
-}
-.dark .thin-scrollbar::-webkit-scrollbar-thumb {
-  background: #444;
 }
 
 /* Syntax highlighting — applied via innerHTML, can't use Tailwind */
