@@ -175,7 +175,11 @@ export function useDraggableOverlay({
   onPositionChange,
 }: UseDraggableOverlayOptions): DraggableOverlayResult {
   const store = useStore();
-  const snap = useSyncExternalStore(store.subscribeCursor, store.getSnapshot);
+  // Draggable mode reads only plot-box fields, which only change on full redraws.
+  // Subscribing to the cursor channel here would re-render (and re-run layout-reading
+  // effects) on every cursor pixel move for no reason.
+  const subscribe = mode === 'draggable' ? store.subscribe : store.subscribeCursor;
+  const snap = useSyncExternalStore(subscribe, store.getSnapshot);
 
   // ---- State ----
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
