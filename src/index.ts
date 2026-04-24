@@ -105,7 +105,7 @@ export { lttb, lttbGroup } from './math/lttb';
 export { drawHLine, drawVLine, drawLabel, drawRegion, drawVRegion, drawDiagonalLine, drawSlopeInterceptLine } from './annotations';
 
 // Scale utilities (for advanced draw hooks that need raw access)
-export { valToPos, posToVal } from './core/Scale';
+export { valToPos, posToVal, valToPx, projectPoint, scaleAxis } from './core/Scale';
 
 // Interaction defaults and reaction factories
 export { DEFAULT_ACTIONS, focus } from './types/interaction';

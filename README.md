@@ -44,18 +44,24 @@ const data = [{ x: [1, 2, 3, 4, 5], series: [[10, 25, 13, 30, 18], [5, 15, 20, 1
 All chart types are configured via the `paths` prop on `<Series>`, or via specialized components:
 
 ```tsx
-import { Series, bars, stepped, monotoneCubic, points } from 'uplot-plus';
+import { Series, bars, horizontalBars, stepped, monotoneCubic, points } from 'uplot-plus';
 
-<Series paths={bars()} />          // Bar / column charts
-<Series paths={stepped()} />       // Step charts
-<Series paths={monotoneCubic()} /> // Smooth curves
-<Series paths={points()} />        // Scatter plots
+<Series paths={bars()} />           // Bar / column charts
+<Series paths={horizontalBars()} /> // Horizontal bars (data-axis-swapped)
+<Series paths={stepped()} />        // Step charts
+<Series paths={monotoneCubic()} />  // Smooth curves
+<Series paths={points()} />         // Scatter plots
 ```
+
+`horizontalBars()` sets the series' `transposed` flag, which flips the associated
+x-scale to `Orientation.Vertical` and the y-scale to `Orientation.Horizontal`.
+Axes, cursor, annotations, and band fills all adapt automatically. Use separate
+scales for horizontal and vertical bar series if they share a chart.
 
 | Type | How to use |
 | ---- | ---------- |
 | Line / area | Default — just `<Series />` with optional `fill` |
-| Bar / column | `<Series paths={bars()} />` — also `groupedBars()`, `stackedBars()` |
+| Bar / column | `<Series paths={bars()} />` — also `groupedBars()`, `stackedBars()`, `horizontalBars()` |
 | Step | `<Series paths={stepped()} />` — step-after, step-before, mid-step |
 | Smooth curve | `<Series paths={monotoneCubic()} />` or `catmullRom()` |
 | Scatter | `<Series paths={points()} />` |
@@ -209,6 +215,7 @@ import { Chart, Series, ThemeProvider, DARK_THEME } from 'uplot-plus';
 | Axis formatters | `fmtCompact`, `fmtSuffix`, `fmtPrefix`, `fmtWrap`, `fmtHourMin`, `fmtMonthName`, `fmtDateStr`, `fmtLabels` |
 | Color helpers | `fadeGradient`, `withAlpha`, `palette` |
 | Data transforms | `stackGroup`, `alignData`, `lttb`, `lttbGroup` |
+| Scale projection | `valToPos`, `posToVal`, `valToPx`, `projectPoint`, `scaleAxis` |
 | Theme presets | `THEME_DEFAULTS`, `DARK_THEME` |
 
 > Full API and examples: [docs/UTILITIES.md](docs/UTILITIES.md)

@@ -19,6 +19,9 @@ All callbacks receive resolved chart data — nearest point, data values, pixel 
     return false; // prevent default action (e.g. zoom reset)
   }}
   onSelect={(sel) => {
+    // ranges is keyed by scale id — each entry has data-space min/max plus
+    // fracStart/fracEnd along the scale's own axis (0..1). left/right are
+    // legacy horizontal-width fractions retained for back-compat.
     fetchData(sel.ranges['x'].min, sel.ranges['x'].max);
     return false; // prevent zoom
   }}
@@ -102,3 +105,22 @@ function ThresholdZone() {
   return null;
 }
 ```
+
+#### Orientation-aware projection
+
+`valToX` / `valToY` return positions along each scale's own axis, which only
+matches screen X/Y when the scale keeps its default orientation (x=Horizontal,
+y=Vertical). On transposed charts (anything using `horizontalBars()` or a scale
+with an explicit `ori` flip), use `dc.project(xVal, yVal, xScaleId?, yScaleId?)`
+instead — it returns screen `{px, py}` with the axis swap already applied:
+
+```tsx
+useDrawHook((dc) => {
+  const pos = dc.project(xVal, yVal);          // defaults to 'x' / 'y'
+  if (pos == null) return;                      // scales not ready
+  dc.ctx.fillRect(pos.px - 2, pos.py - 2, 4, 4);
+});
+```
+
+The same helpers are exported as free functions (`valToPx`, `projectPoint`,
+`scaleAxis`) for draw code outside the hook system.

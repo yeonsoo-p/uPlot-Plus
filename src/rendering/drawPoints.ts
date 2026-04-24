@@ -1,6 +1,6 @@
 import type { ScaleState, BBox } from '../types';
 import type { PointsConfig } from '../types/series';
-import { valToPos } from '../core/Scale';
+import { projectPoint } from '../core/Scale';
 import { round } from '../math/utils';
 
 /**
@@ -41,8 +41,9 @@ export function drawPoints(
     const xVal = dataX[i];
     if (xVal == null) continue;
 
-    const px = round(valToPos(xVal, xScale, plotBox.width, plotBox.left) * pxRatio);
-    const py = round(valToPos(yVal, yScale, plotBox.height, plotBox.top) * pxRatio);
+    const { px: pxCss, py: pyCss } = projectPoint(xScale, yScale, xVal, yVal, plotBox);
+    const px = round(pxCss * pxRatio);
+    const py = round(pyCss * pxRatio);
 
     ctx.beginPath();
     ctx.arc(px, py, rad, 0, Math.PI * 2);

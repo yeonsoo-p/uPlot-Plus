@@ -7,7 +7,7 @@ import type { DrawCallback, CursorDrawCallback, DrawContext } from '@/types/hook
 import { createMockCtx } from '../helpers/mockCanvas';
 
 function makeDC(): DrawContext {
-  return { ctx: createMockCtx(), plotBox: { left: 0, top: 0, width: 0, height: 0 }, pxRatio: 1, getScale: () => undefined, valToX: () => null, valToY: () => null };
+  return { ctx: createMockCtx(), plotBox: { left: 0, top: 0, width: 0, height: 0 }, pxRatio: 1, getScale: () => undefined, valToX: () => null, valToY: () => null, project: () => null };
 }
 
 /** Component that calls useDrawHook with the provided callback */

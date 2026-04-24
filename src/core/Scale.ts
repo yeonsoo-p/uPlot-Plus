@@ -1,4 +1,4 @@
-import type { ScaleConfig, ScaleState } from '../types';
+import type { ScaleConfig, ScaleState, BBox } from '../types';
 import { Orientation, Direction, Distribution } from '../types';
 import { log10, log2, sinh, asinh } from '../math/utils';
 
@@ -141,6 +141,46 @@ export function valToPos(val: number, scale: ScaleState, dim: number, off: numbe
   }
 
   return off + pos * dim;
+}
+
+/**
+ * Resolve the plot-box dimension and offset a scale maps into, based on its orientation.
+ * Horizontal → plotBox.width/left; Vertical → plotBox.height/top.
+ */
+export function scaleAxis(scale: ScaleState, plotBox: BBox): { dim: number; off: number } {
+  return scale.ori === Orientation.Horizontal
+    ? { dim: plotBox.width, off: plotBox.left }
+    : { dim: plotBox.height, off: plotBox.top };
+}
+
+/**
+ * Convert a data value to a CSS pixel position, using the scale's own orientation
+ * to pick the correct plot-box dimension. Returns a position along the scale's axis.
+ */
+export function valToPx(val: number, scale: ScaleState, plotBox: BBox): number {
+  const horiz = scale.ori === Orientation.Horizontal;
+  const dim = horiz ? plotBox.width : plotBox.height;
+  const off = horiz ? plotBox.left : plotBox.top;
+  return valToPos(val, scale, dim, off);
+}
+
+/**
+ * Project an (xVal, yVal) pair to screen-space {px, py}, accounting for scale
+ * orientation. When xScale is Vertical (transposed chart), the x data value lands
+ * on the screen Y axis and vice versa.
+ */
+export function projectPoint(
+  xScale: ScaleState,
+  yScale: ScaleState,
+  xVal: number,
+  yVal: number,
+  plotBox: BBox,
+): { px: number; py: number } {
+  const xPx = valToPx(xVal, xScale, plotBox);
+  const yPx = valToPx(yVal, yScale, plotBox);
+  return xScale.ori === Orientation.Horizontal
+    ? { px: xPx, py: yPx }
+    : { px: yPx, py: xPx };
 }
 
 /**

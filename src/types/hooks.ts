@@ -8,8 +8,11 @@ import type { ScaleState } from './scales';
  * - **Clipped** to the plot area (persistent hooks only) — drawing outside is impossible
  * - **Scaled** by `pxRatio` — all coordinates are in CSS pixels, not device pixels
  *
- * Use the `valToX` / `valToY` helpers to convert data values to CSS pixel positions
- * without needing to look up scales or call `valToPos` manually.
+ * Use `project()` for orientation-safe (xVal, yVal) → screen (px, py) conversion.
+ * `valToX` / `valToY` remain for simple single-scale lookups; they compute the
+ * position along each scale's own axis and only match screen X/Y when the scale
+ * keeps its default orientation (x=Horizontal, y=Vertical). For charts that use
+ * `horizontalBars()` or otherwise flip scale `ori`, prefer `project()`.
  */
 export interface DrawContext {
   ctx: CanvasRenderingContext2D;
@@ -17,10 +20,16 @@ export interface DrawContext {
   pxRatio: number;
   /** Get a live scale state by id (reflects current zoom/pan). */
   getScale: (id: string) => ScaleState | undefined;
-  /** Convert a data value to CSS pixel X position. Uses scale `'x'` by default. Returns `null` if scale is not ready. */
+  /** Convert a data value to CSS pixel position along the scale's own axis.
+   *  Returns `null` if scale is not ready. Matches screen X only when the scale is Horizontal. */
   valToX: (val: number, scaleId?: string) => number | null;
-  /** Convert a data value to CSS pixel Y position. Returns `null` if scale is not ready. */
+  /** Convert a data value to CSS pixel position along the scale's own axis.
+   *  Returns `null` if scale is not ready. Matches screen Y only when the scale is Vertical. */
   valToY: (val: number, scaleId: string) => number | null;
+  /** Orientation-aware projection: maps (xVal, yVal) → CSS pixel screen (px, py).
+   *  Handles transposed charts (where xScale.ori=Vertical) by swapping axes.
+   *  Returns `null` if either scale is missing or not ready. */
+  project: (xVal: number, yVal: number, xScaleId?: string, yScaleId?: string) => { px: number; py: number } | null;
 }
 
 /** Callback that draws persistent content (included in snapshot, not redrawn on cursor move). */

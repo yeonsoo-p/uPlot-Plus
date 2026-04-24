@@ -1,6 +1,8 @@
 import { drawVLine } from '../../annotations';
 import { useAnnotationDraw } from './useAnnotationDraw';
 import { useStore } from '../../hooks/useChart';
+import { valToPx } from '../../core/Scale';
+import { Orientation } from '../../types';
 
 export interface VLineProps {
   /** X data value where the line is drawn */
@@ -34,14 +36,21 @@ export function VLine(props: VLineProps): null {
     });
 
     if (p.label != null) {
-      const x = dc.valToX(p.value, p.xScale ?? 'x');
-      if (x == null) return;
       const { ctx, plotBox } = dc;
+      const pos = valToPx(p.value, scale, plotBox);
       ctx.font = p.labelFont ?? t.annotationFont;
       ctx.fillStyle = p.stroke ?? t.annotationStroke;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'bottom';
-      ctx.fillText(p.label, x, plotBox.top - 4);
+      if (scale.ori === Orientation.Horizontal) {
+        // Line is vertical on screen — label above the top edge.
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(p.label, pos, plotBox.top - 4);
+      } else {
+        // Transposed: line is horizontal on screen — label at the right edge.
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(p.label, plotBox.left + plotBox.width - 4, pos - 4);
+      }
     }
   });
 

@@ -13,12 +13,12 @@ Library code lives at the project root. The `uPlot/` and `uplot-wrappers/` direc
 │   │                  ZoomRanger, Timeline, Sparkline, BoxWhisker, Candlestick, Heatmap, Vector,
 │   │                  ThemeProvider, annotations/{HLine,VLine,Region,VRegion,DiagonalLine,AnnotationLabel},
 │   │                  overlay/SeriesPanel
-│   ├── core/          DataStore, ScaleManager, CursorManager, RenderScheduler, Scale, BlockMinMax, normalizeData
+│   ├── core/          DataStore, ScaleManager, CursorManager, RenderScheduler, Scale (valToPos/posToVal/valToPx/projectPoint/scaleAxis), BlockMinMax, normalizeData
 │   ├── rendering/     CanvasRenderer, drawSeries, drawAxes, drawCursor, drawSelect, drawBands, drawPoints, drawRangeBox, theme
 │   ├── hooks/         useChart, useDrawHook, useCursorDrawHook (public); useInteraction, useChartStore, useDraggableOverlay, useRegisterConfig (internal)
 │   ├── math/          utils, increments, stack, align, lttb
 │   ├── axes/          ticks, layout
-│   ├── paths/         lttbLinear (default), linear, stepped, bars, monotoneCubic, catmullRom, points, spline, types, utils
+│   ├── paths/         lttbLinear (default), linear, stepped, bars, horizontalBars, monotoneCubic, catmullRom, points, spline, types, utils
 │   ├── sync/          SyncGroup, useSyncGroup
 │   ├── utils/         shallowEqual, estimatePanelSize, textMeasure, at
 │   ├── types/         all type definitions (common, scales, axes, hooks, bands, theme, etc.)
@@ -60,7 +60,7 @@ npm run test:e2e    # Playwright e2e tests (requires dev server running)
 ## Features
 
 - **23 components**: Chart, Scale, Series, Axis, Band, Legend, Tooltip, FloatingLegend, HoverLabel, ZoomRanger, Timeline, Sparkline, BoxWhisker, Candlestick, Heatmap, Vector, ThemeProvider, HLine, VLine, Region, VRegion, DiagonalLine, AnnotationLabel
-- **8 exported path builders**: linear (pixel decimation), stepped, bars, groupedBars, stackedBars, monotoneCubic, catmullRom, points. Internal default is lttbLinear (LTTB downsampling + pixel decimation), applied by CanvasRenderer when no `paths` prop is set.
+- **9 exported path builders**: linear (pixel decimation), stepped, bars, groupedBars, stackedBars, horizontalBars, monotoneCubic, catmullRom, points. Internal default is lttbLinear (LTTB downsampling + pixel decimation), applied by CanvasRenderer when no `paths` prop is set.
 - **Theming**: `ThemeProvider` sets CSS custom properties on a wrapper div; `Chart.theme` prop for per-chart overrides. Pre-built `DARK_THEME` preset. 40+ themeable properties (axes, grid, cursor, selection, series palette, candlestick, box-whisker, overlay panels, zoom ranger, annotations). CSS custom properties (`--uplot-*`) also work without ThemeProvider. `resolveTheme()` reads from `getComputedStyle(canvas)` on each full redraw.
 - **Default injection**: Chart auto-creates missing x/y scales, axes, and series colors — minimal config: just `<Chart data={data}><Series group={0} index={0} /></Chart>`
 - **Candlestick**: `<Candlestick />` auto-registers hidden OHLC series — no manual `<Series show={false}>` declarations needed.
@@ -87,6 +87,7 @@ npm run test:e2e    # Playwright e2e tests (requires dev server running)
 - **Rendering**: Canvas 2D via `CanvasRenderer`. Axis layout uses a convergence loop (max 3 cycles). Single canvas with snapshot-based cursor overlay (offscreen canvas caches persistent layer; cursor redraws restore snapshot + draw cursor without full redraw).
 - **Theme system**: Two-layer — React props (`Chart.theme` or `ThemeProvider`) set CSS custom properties on wrapper divs; `resolveTheme(canvas)` reads `getComputedStyle(canvas)` once per full redraw to produce a `ResolvedTheme`. ThemeProvider uses a revision counter (`ThemeRevisionContext`) so descendant Charts detect ancestor theme changes and trigger canvas repaint.
 - **Auto-ranging**: y-scales auto-range from visible series data. When a y-scale has NO visible series (e.g. Candlestick with all `show={false}`), hidden series are included as fallback so the scale still gets a range.
+- **Orientation model**: each scale owns an `ori` (Horizontal|Vertical); series with `transposed: true` (set by `horizontalBars()`) flip their xScale → Vertical and yScale → Horizontal at render time. `applySeriesOrientations()` re-derives auto-side axis sides each pass. Orientation-aware helpers (`scaleAxis`, `valToPx`, `projectPoint`) live in `core/Scale.ts` and back the `drawCursor`, `drawPoints`, `drawBands`, `annotations.ts`, and `DrawContext.project` / `valToX` / `valToY` paths. Auto-side axes dedupe by scale alone so prop updates survive orientation flips.
 
 ## Testing
 

@@ -1,6 +1,7 @@
 import type { DrawContext } from './types/hooks';
 import type { ScaleState } from './types';
-import { valToPos } from './core/Scale';
+import { Orientation } from './types';
+import { valToPx, projectPoint } from './core/Scale';
 
 /** Vertical offset (px) above the data point for label text baseline */
 const LABEL_OFFSET_Y = 4;
@@ -23,7 +24,9 @@ export interface AnnotationStyle {
   font?: string;
 }
 
-/** Draw a horizontal line at a y-value.
+/** Draw a line at a constant scale value, perpendicular to the scale's axis.
+ *  For a vertical (default) y-scale, this renders as a horizontal screen line.
+ *  For a horizontal-ori y-scale (transposed chart), it renders as a vertical screen line.
  *  Assumes ctx is already pxRatio-scaled (handled by the library). */
 export function drawHLine(
   dc: DrawContext,
@@ -32,17 +35,24 @@ export function drawHLine(
   style: AnnotationStyle = {},
 ): void {
   const { ctx, plotBox } = dc;
-  const y = valToPos(value, yScale, plotBox.height, plotBox.top);
+  const pos = valToPx(value, yScale, plotBox);
 
   ctx.beginPath();
-  ctx.moveTo(plotBox.left, y);
-  ctx.lineTo(plotBox.left + plotBox.width, y);
+  if (yScale.ori === Orientation.Horizontal) {
+    ctx.moveTo(pos, plotBox.top);
+    ctx.lineTo(pos, plotBox.top + plotBox.height);
+  } else {
+    ctx.moveTo(plotBox.left, pos);
+    ctx.lineTo(plotBox.left + plotBox.width, pos);
+  }
   applyStrokeStyle(ctx, style);
   ctx.stroke();
   resetDash(ctx, style);
 }
 
-/** Draw a vertical line at an x-value.
+/** Draw a line at a constant scale value, perpendicular to the scale's axis.
+ *  For a horizontal (default) x-scale, this renders as a vertical screen line.
+ *  For a vertical-ori x-scale (transposed chart), it renders as a horizontal screen line.
  *  Assumes ctx is already pxRatio-scaled (handled by the library). */
 export function drawVLine(
   dc: DrawContext,
@@ -51,11 +61,16 @@ export function drawVLine(
   style: AnnotationStyle = {},
 ): void {
   const { ctx, plotBox } = dc;
-  const x = valToPos(value, xScale, plotBox.width, plotBox.left);
+  const pos = valToPx(value, xScale, plotBox);
 
   ctx.beginPath();
-  ctx.moveTo(x, plotBox.top);
-  ctx.lineTo(x, plotBox.top + plotBox.height);
+  if (xScale.ori === Orientation.Horizontal) {
+    ctx.moveTo(pos, plotBox.top);
+    ctx.lineTo(pos, plotBox.top + plotBox.height);
+  } else {
+    ctx.moveTo(plotBox.left, pos);
+    ctx.lineTo(plotBox.left + plotBox.width, pos);
+  }
   applyStrokeStyle(ctx, style);
   ctx.stroke();
   resetDash(ctx, style);
@@ -73,16 +88,17 @@ export function drawLabel(
   style: AnnotationStyle = {},
 ): void {
   const { ctx, plotBox } = dc;
-  const x = valToPos(xVal, xScale, plotBox.width, plotBox.left);
-  const y = valToPos(yVal, yScale, plotBox.height, plotBox.top);
+  const { px, py } = projectPoint(xScale, yScale, xVal, yVal, plotBox);
 
   ctx.font = style.font ?? '12px sans-serif';
   ctx.fillStyle = style.fill ?? '#000';
   ctx.textBaseline = 'bottom';
-  ctx.fillText(text, x, y - LABEL_OFFSET_Y);
+  ctx.fillText(text, px, py - LABEL_OFFSET_Y);
 }
 
-/** Draw a shaded region between two y-values.
+/** Draw a shaded region between two scale values, perpendicular to the scale's axis.
+ *  For a vertical (default) y-scale, this renders as a horizontal band spanning x.
+ *  For a horizontal-ori y-scale (transposed), it renders as a vertical band spanning y.
  *  Assumes ctx is already pxRatio-scaled (handled by the library). */
 export function drawRegion(
   dc: DrawContext,
@@ -92,19 +108,27 @@ export function drawRegion(
   style: AnnotationStyle = {},
 ): void {
   const { ctx, plotBox } = dc;
-  const top = valToPos(yMax, yScale, plotBox.height, plotBox.top);
-  const btm = valToPos(yMin, yScale, plotBox.height, plotBox.top);
+  const p1 = valToPx(yMax, yScale, plotBox);
+  const p2 = valToPx(yMin, yScale, plotBox);
+  const isHoriz = yScale.ori === Orientation.Horizontal;
+
+  const x = isHoriz ? Math.min(p1, p2) : plotBox.left;
+  const y = isHoriz ? plotBox.top : Math.min(p1, p2);
+  const w = isHoriz ? Math.abs(p2 - p1) : plotBox.width;
+  const h = isHoriz ? plotBox.height : Math.abs(p2 - p1);
 
   ctx.fillStyle = style.fill ?? 'rgba(255,0,0,0.1)';
-  ctx.fillRect(plotBox.left, Math.min(top, btm), plotBox.width, Math.abs(btm - top));
+  ctx.fillRect(x, y, w, h);
   if (style.stroke) {
     applyStrokeStyle(ctx, style);
-    ctx.strokeRect(plotBox.left, Math.min(top, btm), plotBox.width, Math.abs(btm - top));
+    ctx.strokeRect(x, y, w, h);
     resetDash(ctx, style);
   }
 }
 
-/** Draw a shaded region between two x-values (vertical band).
+/** Draw a shaded region between two scale values, perpendicular to the scale's axis.
+ *  For a horizontal (default) x-scale, this renders as a vertical band spanning y.
+ *  For a vertical-ori x-scale (transposed), it renders as a horizontal band spanning x.
  *  Assumes ctx is already pxRatio-scaled (handled by the library). */
 export function drawVRegion(
   dc: DrawContext,
@@ -114,14 +138,20 @@ export function drawVRegion(
   style: AnnotationStyle = {},
 ): void {
   const { ctx, plotBox } = dc;
-  const left = valToPos(xMin, xScale, plotBox.width, plotBox.left);
-  const right = valToPos(xMax, xScale, plotBox.width, plotBox.left);
+  const p1 = valToPx(xMin, xScale, plotBox);
+  const p2 = valToPx(xMax, xScale, plotBox);
+  const isHoriz = xScale.ori === Orientation.Horizontal;
+
+  const x = isHoriz ? Math.min(p1, p2) : plotBox.left;
+  const y = isHoriz ? plotBox.top : Math.min(p1, p2);
+  const w = isHoriz ? Math.abs(p2 - p1) : plotBox.width;
+  const h = isHoriz ? plotBox.height : Math.abs(p2 - p1);
 
   ctx.fillStyle = style.fill ?? 'rgba(255,0,0,0.1)';
-  ctx.fillRect(Math.min(left, right), plotBox.top, Math.abs(right - left), plotBox.height);
+  ctx.fillRect(x, y, w, h);
   if (style.stroke) {
     applyStrokeStyle(ctx, style);
-    ctx.strokeRect(Math.min(left, right), plotBox.top, Math.abs(right - left), plotBox.height);
+    ctx.strokeRect(x, y, w, h);
     resetDash(ctx, style);
   }
 }
@@ -146,10 +176,8 @@ export function drawDiagonalLine(
   style: DiagonalLineStyle = {},
 ): void {
   const { ctx, plotBox } = dc;
-  const px1 = valToPos(x1, xScale, plotBox.width, plotBox.left);
-  const py1 = valToPos(y1, yScale, plotBox.height, plotBox.top);
-  const px2 = valToPos(x2, xScale, plotBox.width, plotBox.left);
-  const py2 = valToPos(y2, yScale, plotBox.height, plotBox.top);
+  const { px: px1, py: py1 } = projectPoint(xScale, yScale, x1, y1, plotBox);
+  const { px: px2, py: py2 } = projectPoint(xScale, yScale, x2, y2, plotBox);
 
   let drawX1 = px1;
   let drawY1 = py1;

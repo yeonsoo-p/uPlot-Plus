@@ -1,7 +1,7 @@
 import type { CursorState, ScaleState, BBox } from '../types';
 import type { ChartData } from '../types/data';
 import type { SeriesConfig } from '../types/series';
-import { valToPos, isScaleReady } from '../core/Scale';
+import { projectPoint, isScaleReady } from '../core/Scale';
 import { round } from '../math/utils';
 import type { ResolvedTheme } from './theme';
 import { THEME_DEFAULTS } from './theme';
@@ -128,8 +128,9 @@ export function drawCursor(
           const yScale = yScaleId != null ? getScale(yScaleId) : undefined;
 
           if (xScale != null && yScale != null && isScaleReady(xScale) && isScaleReady(yScale)) {
-            const px = round(valToPos(xVal, xScale, plotBox.width, plotBox.left) * pr);
-            const py = round(valToPos(yVal, yScale, plotBox.height, plotBox.top) * pr);
+            const { px: pxCss, py: pyCss } = projectPoint(xScale, yScale, xVal, yVal, plotBox);
+            const px = round(pxCss * pr);
+            const py = round(pyCss * pr);
             const r = cfg.pointRadius * pr;
 
             const strokeW = round(POINT_STROKE_WIDTH * pr);

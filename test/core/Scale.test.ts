@@ -6,6 +6,9 @@ import {
   pctToVal,
   valToPos,
   posToVal,
+  scaleAxis,
+  valToPx,
+  projectPoint,
 } from '@/core/Scale';
 import type { ScaleState } from '@/types';
 import { Distribution, Orientation, Direction } from '@/types';
@@ -168,5 +171,72 @@ describe('valToPos / posToVal', () => {
       const pos = valToPos(60, scale, 400, 20);
       expect(posToVal(pos, scale, 400, 20)).toBeCloseTo(60);
     });
+  });
+});
+
+// ---- orientation-aware helpers ----
+describe('scaleAxis', () => {
+  const box = { left: 10, top: 20, width: 400, height: 300 };
+
+  it('returns plot-box width/left for horizontal scales', () => {
+    const s = makeLinearScale(0, 100, { ori: Orientation.Horizontal });
+    expect(scaleAxis(s, box)).toEqual({ dim: 400, off: 10 });
+  });
+
+  it('returns plot-box height/top for vertical scales', () => {
+    const s = makeLinearScale(0, 100, { ori: Orientation.Vertical });
+    expect(scaleAxis(s, box)).toEqual({ dim: 300, off: 20 });
+  });
+});
+
+describe('valToPx', () => {
+  const box = { left: 10, top: 20, width: 400, height: 300 };
+
+  it('maps horizontal scale values to X positions', () => {
+    const s = makeLinearScale(0, 100, { ori: Orientation.Horizontal });
+    expect(valToPx(50, s, box)).toBeCloseTo(10 + 200); // half of width + left
+  });
+
+  it('maps vertical scale values to inverted Y positions (canvas Y grows down)', () => {
+    const s = makeLinearScale(0, 100, { ori: Orientation.Vertical });
+    expect(valToPx(50, s, box)).toBeCloseTo(20 + 150); // half of height + top (value 50/100, inverted)
+  });
+
+  it('matches valToPos with the scale-derived dim/off', () => {
+    const s = makeLinearScale(0, 100, { ori: Orientation.Vertical });
+    const { dim, off } = scaleAxis(s, box);
+    expect(valToPx(75, s, box)).toBeCloseTo(valToPos(75, s, dim, off));
+  });
+});
+
+describe('projectPoint', () => {
+  const box = { left: 10, top: 20, width: 400, height: 300 };
+
+  it('default (x=Horizontal, y=Vertical) returns (xPx, yPx) untouched', () => {
+    const xs = makeLinearScale(0, 100, { ori: Orientation.Horizontal });
+    const ys = makeLinearScale(0, 100, { ori: Orientation.Vertical });
+    const p = projectPoint(xs, ys, 50, 50, box);
+    expect(p.px).toBeCloseTo(10 + 200);
+    expect(p.py).toBeCloseTo(20 + 150);
+  });
+
+  it('transposed (x=Vertical, y=Horizontal) swaps axes so xVal lands on screen Y', () => {
+    const xs = makeLinearScale(0, 100, { ori: Orientation.Vertical });
+    const ys = makeLinearScale(0, 100, { ori: Orientation.Horizontal });
+    const p = projectPoint(xs, ys, 50, 50, box);
+    // xVal=50 should project onto the vertical axis, yVal=50 onto the horizontal axis
+    expect(p.px).toBeCloseTo(10 + 200); // yVal along width
+    expect(p.py).toBeCloseTo(20 + 150); // xVal along height (inverted)
+  });
+
+  it('transposed extremes stay within the plot box', () => {
+    const xs = makeLinearScale(0, 100, { ori: Orientation.Vertical });
+    const ys = makeLinearScale(0, 100, { ori: Orientation.Horizontal });
+    const pMin = projectPoint(xs, ys, 0, 0, box);
+    const pMax = projectPoint(xs, ys, 100, 100, box);
+    expect(pMin.px).toBeCloseTo(10);
+    expect(pMin.py).toBeCloseTo(20 + 300); // xVal=0 at bottom (vertical inverted)
+    expect(pMax.px).toBeCloseTo(10 + 400);
+    expect(pMax.py).toBeCloseTo(20);
   });
 });

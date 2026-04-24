@@ -23,9 +23,9 @@ export function Axis(props: AxisProps): null {
 
   useRegisterConfig(
     resolved,
-    [resolved.scale, resolved.side],
+    [resolved.scale, resolved.side, resolved._autoSide],
     (store, cfg) => store.registerAxis(cfg),
-    (store, cfg) => store.unregisterAxis(cfg.scale, cfg.side),
+    (store, cfg) => store.unregisterAxis(cfg),
     (store, cfg) => store.updateAxis(cfg),
   );
   return null;

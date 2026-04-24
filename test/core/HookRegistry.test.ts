@@ -11,6 +11,7 @@ function makeDC(): DrawContext {
     getScale: () => undefined,
     valToX: () => null,
     valToY: () => null,
+    project: () => null,
   };
 }
 

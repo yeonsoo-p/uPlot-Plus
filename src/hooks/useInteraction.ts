@@ -443,7 +443,7 @@ function buildSelectInfo(store: ChartStore, sel: SelectState, filterScale?: Scal
   const fracLeft = sel.left / plotBox.width;
   const fracRight = (sel.left + sel.width) / plotBox.width;
 
-  const ranges: Record<string, { min: number; max: number }> = {};
+  const ranges: SelectEventInfo['ranges'] = {};
   for (const scale of store.scaleManager.getAllScales()) {
     if (!isScaleReady(scale)) continue;
     // If a filter is provided (e.g. from a zoom reaction), only report on those scales.
@@ -461,7 +461,12 @@ function buildSelectInfo(store: ChartStore, sel: SelectState, filterScale?: Scal
     const minVal = posToVal(off + fracStart * dim, scale, dim, off);
     const maxVal = posToVal(off + fracEnd   * dim, scale, dim, off);
 
-    ranges[scale.id] = { min: Math.min(minVal, maxVal), max: Math.max(minVal, maxVal) };
+    ranges[scale.id] = {
+      min: Math.min(minVal, maxVal),
+      max: Math.max(minVal, maxVal),
+      fracStart,
+      fracEnd,
+    };
   }
 
   return { left: fracLeft, right: fracRight, ranges };

@@ -19,6 +19,7 @@ function makeDC(overrides?: Partial<DrawContext>) {
     getScale: () => undefined,
     valToX: () => null,
     valToY: () => null,
+    project: () => null,
     ...overrides,
   };
   return { dc, mockCtx };

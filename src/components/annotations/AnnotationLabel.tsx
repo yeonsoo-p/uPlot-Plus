@@ -34,9 +34,8 @@ export function AnnotationLabel(props: AnnotationLabelProps): null {
 
   useDrawHook((dc) => {
     const p = propsRef.current;
-    const px = dc.valToX(p.x, p.xScale ?? 'x');
-    const py = dc.valToY(p.y, p.yScale ?? 'y');
-    if (px == null || py == null) return;
+    const pos = dc.project(p.x, p.y, p.xScale ?? 'x', p.yScale ?? 'y');
+    if (pos == null) return;
 
     const t = store.theme;
     const { ctx } = dc;
@@ -44,7 +43,7 @@ export function AnnotationLabel(props: AnnotationLabelProps): null {
     ctx.fillStyle = p.fill ?? t.annotationLabelFill;
     ctx.textAlign = p.align ?? 'left';
     ctx.textBaseline = p.baseline ?? 'bottom';
-    ctx.fillText(p.text, px, py - 4);
+    ctx.fillText(p.text, pos.px, pos.py - 4);
   });
 
   return null;

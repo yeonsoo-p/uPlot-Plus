@@ -20,6 +20,7 @@ function makeDC() {
     getScale: () => undefined,
     valToX: () => null,
     valToY: () => null,
+    project: () => null,
   };
 
   return { dc, ctx };

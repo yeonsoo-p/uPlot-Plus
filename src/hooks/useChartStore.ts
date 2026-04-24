@@ -21,7 +21,7 @@ import { buildBandPath, drawBandPath } from '../rendering/drawBands';
 import type { BandConfig } from '../types/bands';
 import { Side, DirtyFlag, Orientation } from '../types/common';
 import type { DrawContext, DrawCallback, CursorDrawCallback } from '../types/hooks';
-import { valToPos, isScaleReady } from '../core/Scale';
+import { valToPx, projectPoint, isScaleReady } from '../core/Scale';
 import type { EventCallbacks } from '../types/events';
 import { withAlpha } from '../colors';
 
@@ -190,7 +190,7 @@ export function notifyScaleChanges(store: ChartStore): void {
   }
 }
 
-/** Build a DrawContext with valToX/valToY helpers bound to current scales. */
+/** Build a DrawContext with valToX/valToY/project helpers bound to current scales. */
 function buildDrawContext(
   ctx: CanvasRenderingContext2D,
   plotBox: BBox,
@@ -200,14 +200,25 @@ function buildDrawContext(
   const valToX = (val: number, scaleId = 'x'): number | null => {
     const s = getScale(scaleId);
     if (s == null || !isScaleReady(s)) return null;
-    return valToPos(val, s, plotBox.width, plotBox.left);
+    return valToPx(val, s, plotBox);
   };
   const valToY = (val: number, scaleId: string): number | null => {
     const s = getScale(scaleId);
     if (s == null || !isScaleReady(s)) return null;
-    return valToPos(val, s, plotBox.height, plotBox.top);
+    return valToPx(val, s, plotBox);
   };
-  return { ctx, plotBox, pxRatio, getScale, valToX, valToY };
+  const project = (
+    xVal: number,
+    yVal: number,
+    xScaleId = 'x',
+    yScaleId = 'y',
+  ): { px: number; py: number } | null => {
+    const xs = getScale(xScaleId);
+    const ys = getScale(yScaleId);
+    if (xs == null || ys == null || !isScaleReady(xs) || !isScaleReady(ys)) return null;
+    return projectPoint(xs, ys, xVal, yVal, plotBox);
+  };
+  return { ctx, plotBox, pxRatio, getScale, valToX, valToY, project };
 }
 
 /**
@@ -367,11 +378,13 @@ export interface ChartStore {
   updateScale: (cfg: ScaleConfig) => void;
   /** Update a series config in-place (replaces seriesConfigs entry + rebuilds map + invalidates render) */
   updateSeries: (cfg: ResolvedSeriesConfig) => void;
-  /** Register an axis config (deduplicates by scale+side) */
+  /** Register an axis config. Auto-side axes (`_autoSide=true`) dedupe by scale alone
+   *  — at most one per scale. Explicit-side axes dedupe by (scale, side). */
   registerAxis: (cfg: AxisConfig) => void;
-  /** Unregister an axis config by scale+side */
-  unregisterAxis: (scale: string, side: Side) => void;
-  /** Update an axis config in-place */
+  /** Unregister an axis config. Matches with the same rules as `registerAxis`. */
+  unregisterAxis: (cfg: AxisConfig) => void;
+  /** Update an axis config in-place. Auto-side updates preserve the store-derived
+   *  `side` (which may have been flipped by orientation handling). */
   updateAxis: (cfg: AxisConfig) => void;
   /** Register a band config */
   registerBand: (cfg: BandConfig) => void;
@@ -383,6 +396,19 @@ export interface ChartStore {
   setCanvas: (node: HTMLCanvasElement | null) => void;
   /** Set title, axis labels, locale, and timezone */
   setLabels: (title?: string, xlabel?: string, ylabel?: string, locale?: string, timezone?: string) => void;
+}
+
+/**
+ * Match an existing axis config against an incoming one using the invariant:
+ *  - auto-side axes dedupe by scale alone (at most one per scale)
+ *  - explicit-side axes dedupe by (scale, side); explicit and auto are never merged
+ */
+function axisKeyMatches(a: AxisConfig, b: AxisConfig): boolean {
+  if (a.scale !== b.scale) return false;
+  const aAuto = a._autoSide === true;
+  const bAuto = b._autoSide === true;
+  if (aAuto !== bAuto) return false;
+  return aAuto ? true : a.side === b.side;
 }
 
 /** Rebuild the series config lookup map from the current seriesConfigs array. */
@@ -871,18 +897,22 @@ export function createChartStore(): ChartStore {
     },
 
     registerAxis(cfg: AxisConfig) {
-      store.axisConfigs = store.axisConfigs.filter(a => !(a.scale === cfg.scale && a.side === cfg.side));
+      store.axisConfigs = store.axisConfigs.filter(a => !axisKeyMatches(a, cfg));
       store.axisConfigs.push(cfg);
     },
 
-    unregisterAxis(scale: string, side: Side) {
-      store.axisConfigs = store.axisConfigs.filter(a => !(a.scale === scale && a.side === side));
+    unregisterAxis(cfg: AxisConfig) {
+      store.axisConfigs = store.axisConfigs.filter(a => !axisKeyMatches(a, cfg));
     },
 
     updateAxis(cfg: AxisConfig) {
-      store.axisConfigs = store.axisConfigs.map(a =>
-        (a.scale === cfg.scale && a.side === cfg.side) ? cfg : a,
-      );
+      store.axisConfigs = store.axisConfigs.map(a => {
+        if (!axisKeyMatches(a, cfg)) return a;
+        // For auto-side axes, preserve the store-derived side — it may have been
+        // flipped by applySeriesOrientations based on scale orientation, and the
+        // incoming cfg carries only the stale React-side default.
+        return cfg._autoSide === true ? { ...cfg, side: a.side } : cfg;
+      });
     },
 
     registerBand(cfg: BandConfig) {

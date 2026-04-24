@@ -191,15 +191,50 @@ const downsampled = lttbGroup(group, 500);
 
 ## Scale Utilities
 
-Low-level coordinate conversion for custom draw hooks.
+Low-level coordinate conversion for custom draw hooks. Prefer the
+orientation-aware helpers (`valToPx`, `projectPoint`, `scaleAxis`) — they work
+correctly on transposed charts, whereas `valToPos` requires the caller to know
+which plot-box dimension the scale maps to.
 
 ```tsx
-import { valToPos, posToVal } from 'uplot-plus';
+import { valToPos, posToVal, valToPx, projectPoint, scaleAxis } from 'uplot-plus';
+```
+
+### `valToPx(val: number, scale: ScaleState, plotBox: BBox)`
+
+Convert a data value to a CSS pixel position along the scale's own axis.
+Picks `plotBox.width/left` for horizontal scales and `plotBox.height/top` for
+vertical ones automatically.
+
+```tsx
+const pos = valToPx(dataValue, scale, plotBox);
+```
+
+### `projectPoint(xScale, yScale, xVal, yVal, plotBox)`
+
+Map an `(xVal, yVal)` data pair to screen-space `{px, py}`, handling orientation
+swaps. When `xScale.ori` is `Vertical` (a transposed chart), the x data value
+lands on screen Y and the y data value lands on screen X.
+
+```tsx
+const { px, py } = projectPoint(xScale, yScale, xVal, yVal, plotBox);
+```
+
+### `scaleAxis(scale: ScaleState, plotBox: BBox)`
+
+Return `{ dim, off }` for the plot-box dimension and offset the scale maps to
+— useful when you still want to call `valToPos` directly but need the axis
+lookup done for you.
+
+```tsx
+const { dim, off } = scaleAxis(scale, plotBox);
+const px = valToPos(val, scale, dim, off);
 ```
 
 ### `valToPos(val: number, scale: ScaleState, dim: number, off: number)`
 
-Convert a data value to a CSS pixel position within a dimension.
+Convert a data value to a CSS pixel position within a given dimension.
+Orientation-blind — use `valToPx` unless you already know `(dim, off)`.
 
 ```tsx
 const px = valToPos(dataValue, scale, plotBox.width, plotBox.left);

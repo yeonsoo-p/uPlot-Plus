@@ -1,8 +1,42 @@
 import type { BBox, ScaleState } from '../types';
+import { Orientation } from '../types';
 import type { BandConfig } from '../types/bands';
 import { valToPos } from '../core/Scale';
 import { hasData } from '../math/utils';
 import type { ResolvedTheme } from './theme';
+
+/** Per-point projection closure: takes (xVal, yVal) and writes screen (px, py). */
+type Projector = (xv: number, yv: number) => { px: number; py: number };
+
+/**
+ * Build a per-point projection that maps (xVal, yVal) → screen (px, py),
+ * orientation-aware. Hoists the orientation check and plot-box lookups out
+ * of the per-point loop so the inner closure only reads primitives.
+ */
+function makeProjector(
+  xScale: ScaleState,
+  yScale: ScaleState,
+  plotBox: BBox,
+  pxRatio: number,
+): Projector {
+  const xHoriz = xScale.ori === Orientation.Horizontal;
+  const xDim = xHoriz ? plotBox.width : plotBox.height;
+  const xOff = xHoriz ? plotBox.left : plotBox.top;
+  const yHoriz = yScale.ori === Orientation.Horizontal;
+  const yDim = yHoriz ? plotBox.width : plotBox.height;
+  const yOff = yHoriz ? plotBox.left : plotBox.top;
+
+  if (xHoriz) {
+    return (xv, yv) => ({
+      px: valToPos(xv, xScale, xDim, xOff) * pxRatio,
+      py: valToPos(yv, yScale, yDim, yOff) * pxRatio,
+    });
+  }
+  return (xv, yv) => ({
+    px: valToPos(yv, yScale, yDim, yOff) * pxRatio,
+    py: valToPos(xv, xScale, xDim, xOff) * pxRatio,
+  });
+}
 
 /**
  * Build a Path2D for the filled region between two series.
@@ -27,14 +61,13 @@ export function buildBandPath(
   // Skip if both series are all-null in the visible range
   if (!hasData(upperY, i0, i1) && !hasData(lowerY, i0, i1)) return null;
 
-  const toXPx = (val: number) => valToPos(val, xScale, plotBox.width, plotBox.left) * pxRatio;
-  const toYPx = (val: number) => valToPos(val, yScale, plotBox.height, plotBox.top) * pxRatio;
+  const project = makeProjector(xScale, yScale, plotBox, pxRatio);
 
   if (dir === 0) {
-    return buildFullBandPath(dataX, upperY, lowerY, i0, i1, toXPx, toYPx);
+    return buildFullBandPath(dataX, upperY, lowerY, i0, i1, project);
   }
 
-  return buildDirectionalBandPath(dataX, upperY, lowerY, i0, i1, toXPx, toYPx, dir);
+  return buildDirectionalBandPath(dataX, upperY, lowerY, i0, i1, project, dir);
 }
 
 /** Full band: trace upper forward, lower backward, close.  Splits into
@@ -46,8 +79,7 @@ function buildFullBandPath(
   lowerY: ArrayLike<number | null>,
   i0: number,
   i1: number,
-  toXPx: (v: number) => number,
-  toYPx: (v: number) => number,
+  project: Projector,
 ): Path2D | null {
   const path = new Path2D();
   let hasSegment = false;
@@ -71,23 +103,32 @@ function buildFullBandPath(
       segEnd++;
     }
 
-    // Forward pass: upper boundary (left to right)
+    // Forward pass: upper boundary
     {
       const sx = dataX[segStart];
       const su = upperY[segStart];
-      if (sx != null && su != null) path.moveTo(toXPx(sx), toYPx(su));
+      if (sx != null && su != null) {
+        const p = project(sx, su);
+        path.moveTo(p.px, p.py);
+      }
     }
     for (let i = segStart + 1; i <= segEnd; i++) {
       const xv = dataX[i];
       const uv = upperY[i];
-      if (xv != null && uv != null) path.lineTo(toXPx(xv), toYPx(uv));
+      if (xv != null && uv != null) {
+        const p = project(xv, uv);
+        path.lineTo(p.px, p.py);
+      }
     }
 
-    // Reverse pass: lower boundary (right to left)
+    // Reverse pass: lower boundary
     for (let i = segEnd; i >= segStart; i--) {
       const xv = dataX[i];
       const lv = lowerY[i];
-      if (xv != null && lv != null) path.lineTo(toXPx(xv), toYPx(lv));
+      if (xv != null && lv != null) {
+        const p = project(xv, lv);
+        path.lineTo(p.px, p.py);
+      }
     }
 
     path.closePath();
@@ -106,8 +147,7 @@ function buildDirectionalBandPath(
   lowerY: ArrayLike<number | null>,
   i0: number,
   i1: number,
-  toXPx: (v: number) => number,
-  toYPx: (v: number) => number,
+  project: Projector,
   dir: 1 | -1,
 ): Path2D | null {
   // Collect valid points where both series have data
@@ -149,14 +189,17 @@ function buildDirectionalBandPath(
     if (prev != null) {
       const crossX = interpolateCrossing(prev.x, prev.u, prev.l, p.x, p.u, p.l);
       const crossY = lerp(prev.u, p.u, (crossX - prev.x) / (p.x - prev.x));
-      upperPts.push({ px: toXPx(crossX), py: toYPx(crossY) });
-      lowerPts.push({ px: toXPx(crossX), py: toYPx(crossY) });
+      const cp = project(crossX, crossY);
+      upperPts.push({ px: cp.px, py: cp.py });
+      lowerPts.push({ px: cp.px, py: cp.py });
     }
 
     let segEnd = segStart;
     for (let pt = pts[segEnd]; pt != null && satisfies(pt.u, pt.l); pt = pts[++segEnd]) {
-      upperPts.push({ px: toXPx(pt.x), py: toYPx(pt.u) });
-      lowerPts.push({ px: toXPx(pt.x), py: toYPx(pt.l) });
+      const up = project(pt.x, pt.u);
+      const lp = project(pt.x, pt.l);
+      upperPts.push({ px: up.px, py: up.py });
+      lowerPts.push({ px: lp.px, py: lp.py });
     }
 
     // Check if there's a crossing after the last satisfying point (interpolate exit)
@@ -165,8 +208,9 @@ function buildDirectionalBandPath(
     if (exitCur != null && exitPrev != null) {
       const crossX = interpolateCrossing(exitPrev.x, exitPrev.u, exitPrev.l, exitCur.x, exitCur.u, exitCur.l);
       const crossY = lerp(exitPrev.u, exitCur.u, (crossX - exitPrev.x) / (exitCur.x - exitPrev.x));
-      upperPts.push({ px: toXPx(crossX), py: toYPx(crossY) });
-      lowerPts.push({ px: toXPx(crossX), py: toYPx(crossY) });
+      const cp = project(crossX, crossY);
+      upperPts.push({ px: cp.px, py: cp.py });
+      lowerPts.push({ px: cp.px, py: cp.py });
     }
 
     // Build sub-path: upper forward, lower backward

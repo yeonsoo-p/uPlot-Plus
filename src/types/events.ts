@@ -30,14 +30,31 @@ export interface ChartEventInfo {
   srcEvent: MouseEvent | TouchEvent;
 }
 
+/** Per-scale selection range — data-space bounds plus fractional bounds
+ *  along the scale's own axis (0..1). The fractional range reflects the
+ *  selection's extent on whichever screen dimension the scale maps to. */
+export interface SelectScaleRange {
+  min: number;
+  max: number;
+  /** Fractional start along the scale's axis (0..1) */
+  fracStart: number;
+  /** Fractional end along the scale's axis (0..1) */
+  fracEnd: number;
+}
+
 /** Info about a completed drag selection */
 export interface SelectEventInfo {
-  /** Fractional left edge [0..1] */
+  /** Data-space min/max (with fractional bounds) for each scale reported.
+   *  Horizontal scales get fractions along plotBox.width; vertical scales along
+   *  plotBox.height. When a reaction narrows the set (e.g. `zoomX`), only the
+   *  matching axis orientation is reported. */
+  ranges: Record<string, SelectScaleRange>;
+  /** Fractional left edge along plotBox.width (0..1). Always horizontal —
+   *  preserved for backwards compatibility; prefer `ranges[scaleId]` for
+   *  orientation-aware consumers. */
   left: number;
-  /** Fractional right edge [0..1] */
+  /** Fractional right edge along plotBox.width (0..1). @see `left` */
   right: number;
-  /** Data-space min/max for each x-scale */
-  ranges: Record<string, { min: number; max: number }>;
 }
 
 /** Callback for scale range changes (zoom/pan) */

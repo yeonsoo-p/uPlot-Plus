@@ -195,7 +195,7 @@ data values map to pixel positions. Renderless — returns
 | --- | --- | --- | --- |
 | `id` | `string` | — | Unique scale identifier **(required)** |
 | `auto` | `boolean` | `true` | Auto-range from data |
-| `ori` | `Orientation` | `Horizontal` for `"x"`, `Vertical` otherwise | Scale orientation |
+| `ori` | `Orientation` | `Horizontal` for `"x"`, `Vertical` otherwise | Scale orientation. `horizontalBars()` flips this at render time for its series' scales; set explicitly if you need a custom axis orientation. |
 | `dir` | `Direction` | `Forward` | `Forward` = normal, `Backward` = reversed |
 | `distr` | `Distribution` | `Linear` | Scale distribution (see table below) |
 | `log` | `number` | `10` | Log base when `distr={Distribution.Log}` |
@@ -314,6 +314,7 @@ Use the `fadeGradient()` and `withAlpha()` helpers from
 | `bars()` | `bars` | Bar/column charts. |
 | `groupedBars()` | `groupedBars` | Side-by-side grouped bars. |
 | `stackedBars()` | `stackedBars` | Stacked bar charts. |
+| `horizontalBars()` | `horizontalBars` | Horizontal bars (data-axis-swapped). Flips the series' x/y scales to produce bars growing along the x-axis. |
 | `monotoneCubic()` | `monotoneCubic` | Smooth curves preserving monotonicity. |
 | `catmullRom()` | `catmullRom` | Centripetal Catmull-Rom splines. |
 | `points()` | `points` | Scatter plots (points only, no lines). |
@@ -338,6 +339,34 @@ import { Series, bars, withAlpha, fadeGradient } from 'uplot-plus';
 `dash-patterns`, `bar-chart`, `stepped-lines`,
 `smooth-lines`, `fill-to`, `span-gaps`, `sparklines`,
 `gradients`.
+
+#### Transposed (horizontal) charts
+
+A series gains a `transposed` flag when it uses the `horizontalBars()` path
+builder. At render time this flips the scale orientations for that series:
+
+- The associated **x-scale** becomes `Orientation.Vertical` — its values map to
+  screen Y.
+- The series' **y-scale** becomes `Orientation.Horizontal` — its values map to
+  screen X.
+
+Everything downstream adapts automatically: axes re-derive their sides (auto-side
+axes flip between `Bottom`/`Left`), the cursor crosshair and point indicator
+project correctly, `<Band>`, annotation helpers, draw hooks via `dc.project()`,
+and zoom/pan interactions all follow the scale orientation. Do not share a
+scale between a horizontal and a vertical bar series — give each a separate
+y-scale. A warning is logged if the same scale is requested in both
+orientations.
+
+```tsx
+import { Chart, Series, Axis, horizontalBars } from 'uplot-plus';
+
+<Chart data={data}>
+  <Series group={0} index={0} paths={horizontalBars()} stroke="#3498db" />
+  <Axis scale="x" />  {/* auto-side: rendered on the Left */}
+  <Axis scale="y" />  {/* auto-side: rendered on the Bottom */}
+</Chart>
+```
 
 ---
 

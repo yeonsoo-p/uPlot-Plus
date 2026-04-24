@@ -1,6 +1,8 @@
 import { drawHLine } from '../../annotations';
 import { useAnnotationDraw } from './useAnnotationDraw';
 import { useStore } from '../../hooks/useChart';
+import { valToPx } from '../../core/Scale';
+import { Orientation } from '../../types';
 
 export interface HLineProps {
   /** Y data value where the line is drawn */
@@ -34,14 +36,21 @@ export function HLine(props: HLineProps): null {
     });
 
     if (p.label != null) {
-      const y = dc.valToY(p.value, p.yScale ?? 'y');
-      if (y == null) return;
       const { ctx, plotBox } = dc;
+      const pos = valToPx(p.value, scale, plotBox);
       ctx.font = p.labelFont ?? t.annotationFont;
       ctx.fillStyle = p.stroke ?? t.annotationStroke;
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'bottom';
-      ctx.fillText(p.label, plotBox.left + 4, y - 4);
+      if (scale.ori === Orientation.Horizontal) {
+        // Transposed: line is vertical on screen — label above the top edge.
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(p.label, pos, plotBox.top - 4);
+      } else {
+        // Line is horizontal on screen — label at the left edge.
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(p.label, plotBox.left + 4, pos - 4);
+      }
     }
   });
 
