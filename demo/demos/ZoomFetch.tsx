@@ -75,7 +75,7 @@ export default function ZoomFetch() {
         {loading && <span className="text-[#e67e22] font-bold">Loading...</span>}
       </div>
       <Chart width="auto" height={400} data={data} xlabel="X" ylabel="Value">
-        <Series group={0} index={0} label="Signal" />
+        <Series label="Signal" />
         <Legend />
       </Chart>
     </div>

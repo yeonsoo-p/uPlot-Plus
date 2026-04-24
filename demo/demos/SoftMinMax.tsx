@@ -24,7 +24,7 @@ export default function SoftMinMax() {
             max: { soft: 100, mode: 1 },
           }}
         />
-        <Series group={0} index={0} label="Data (soft 0-100)" />
+        <Series label="Data (soft 0-100)" />
         <Legend />
       </Chart>
     </div>

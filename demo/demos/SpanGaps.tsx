@@ -18,8 +18,8 @@ export default function SpanGaps() {
 
   return (
     <Chart width="auto" height={400} data={data} xlabel="Index" ylabel="Value">
-      <Series group={0} index={0} label="With Gaps (default)" />
-      <Series group={0} index={1} label="spanGaps = true" spanGaps />
+      <Series label="With Gaps (default)" />
+      <Series label="spanGaps = true" spanGaps />
     </Chart>
   );
 }

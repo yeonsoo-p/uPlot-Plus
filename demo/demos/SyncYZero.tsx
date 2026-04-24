@@ -18,8 +18,8 @@ export default function SyncYZero() {
         <Scale id="y2"  min={0} />
         <Axis scale="y1" label="Small (0-80)" stroke="#e74c3c" />
         <Axis scale="y2" side={Side.Right} label="Large (0-600)" stroke="#3498db" />
-        <Series group={0} index={0} yScale="y1" stroke="#e74c3c" label="Small Scale" />
-        <Series group={0} index={1} yScale="y2" stroke="#3498db" label="Large Scale" />
+        <Series yScale="y1" stroke="#e74c3c" label="Small Scale" />
+        <Series yScale="y2" stroke="#3498db" label="Large Scale" />
         <Legend />
       </Chart>
     </div>

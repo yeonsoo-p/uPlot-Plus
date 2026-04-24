@@ -46,7 +46,7 @@ export default function UpdateCursorSelectResize() {
         </span>
       </div>
       <Chart width="auto" height={400} data={data} xlabel="Tick" ylabel="Value">
-        <Series group={0} index={0} label="Live" />
+        <Series label="Live" />
         <Legend />
       </Chart>
     </div>

@@ -1,4 +1,4 @@
-import { Chart, Series, Scale, Axis, Legend, ThemeProvider } from 'uplot-plus';
+import { Chart, Series, Legend, ThemeProvider } from 'uplot-plus';
 import type { ChartTheme } from 'uplot-plus';
 
 const data = [{
@@ -36,12 +36,8 @@ export default function ApplyingThemes() {
           <ThemeProvider theme={ocean}>
             <div style={bg}>
               <Chart width={240} height={240} data={data}>
-                <Scale id="x" />
-                <Scale id="y" />
-                <Axis scale="x" />
-                <Axis scale="y" />
-                <Series group={0} index={0} label="A" />
-                <Series group={0} index={1} label="B" />
+                <Series label="A" />
+                <Series label="B" />
                 <Legend />
               </Chart>
             </div>
@@ -53,12 +49,8 @@ export default function ApplyingThemes() {
           <p className="text-xs text-gray-500 mb-2">Per-chart, no provider needed</p>
           <div style={bg}>
             <Chart width={240} height={240} data={data} theme={ocean}>
-              <Scale id="x" />
-              <Scale id="y" />
-              <Axis scale="x" />
-              <Axis scale="y" />
-              <Series group={0} index={0} label="A" />
-              <Series group={0} index={1} label="B" />
+              <Series label="A" />
+              <Series label="B" />
               <Legend />
             </Chart>
           </div>
@@ -69,12 +61,8 @@ export default function ApplyingThemes() {
           <p className="text-xs text-gray-500 mb-2">Pure CSS, no React API needed</p>
           <div style={{ ...bg, ...oceanCssVars }}>
             <Chart width={240} height={240} data={data}>
-              <Scale id="x" />
-              <Scale id="y" />
-              <Axis scale="x" />
-              <Axis scale="y" />
-              <Series group={0} index={0} label="A" />
-              <Series group={0} index={1} label="B" />
+              <Series label="A" />
+              <Series label="B" />
               <Legend />
             </Chart>
           </div>

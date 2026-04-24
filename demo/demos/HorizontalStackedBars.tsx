@@ -25,9 +25,9 @@ export default function HorizontalStackedBars() {
     <div>
       <Chart width="auto" height={500} data={data} title="Stacked Horizontal Bars" ylabel="Sales">
         <Axis scale="x" label="Month" values={fmtLabels(MONTH_NAMES)} />
-        <Series group={0} index={0} stroke="#3498db" fill="#3498db" label="Product A" paths={horizontalStackedBars()} />
-        <Series group={0} index={1} stroke="#2ecc71" fill="#2ecc71" label="Product B" paths={horizontalStackedBars(stackedSeries[0])} />
-        <Series group={0} index={2} stroke="#e74c3c" fill="#e74c3c" label="Product C" paths={horizontalStackedBars(stackedSeries[1])} />
+        <Series stroke="#3498db" fill="#3498db" label="Product A" paths={horizontalStackedBars()} />
+        <Series stroke="#2ecc71" fill="#2ecc71" label="Product B" paths={horizontalStackedBars(stackedSeries[0])} />
+        <Series stroke="#e74c3c" fill="#e74c3c" label="Product C" paths={horizontalStackedBars(stackedSeries[1])} />
         <Legend />
       </Chart>
     </div>

@@ -19,17 +19,18 @@ const ohlcData: DataInput = [
 ];
 
 describe('Candlestick internal series', () => {
-  it('auto-registered OHLC series have _internal flag', async () => {
+  it('auto-registered OHLC series have internal source flag', async () => {
     const { store } = renderChart(
       { data: ohlcData },
       <Candlestick />,
     );
     await flushEffects();
 
-    // Candlestick registers 4 hidden OHLC series (indices 0-3)
+    // Candlestick registers 4 hidden OHLC series (indices 0-3) — these claim
+    // every data slot, so fillSeries() injects nothing.
     expect(store.seriesConfigs.length).toBe(4);
     for (const cfg of store.seriesConfigs) {
-      expect(cfg._internal).toBe(true);
+      expect(cfg._source).toBe('internal');
       expect(cfg.show).toBe(false);
     }
   });
@@ -62,7 +63,7 @@ describe('Candlestick internal series', () => {
     const cfg = store.seriesConfigMap.get('0:0');
     expect(cfg).toBeDefined();
     expect(cfg!.label).toBe('My Open');
-    expect(cfg!._internal).toBeUndefined();
+    expect(cfg!._source).toBeUndefined();
   });
 
   it('explicit user Series wins regardless of JSX order', async () => {
@@ -78,7 +79,7 @@ describe('Candlestick internal series', () => {
     const cfg = store.seriesConfigMap.get('0:0');
     expect(cfg).toBeDefined();
     expect(cfg!.label).toBe('My Open');
-    expect(cfg!._internal).toBeUndefined();
+    expect(cfg!._source).toBeUndefined();
   });
 
   it('exposeUnderlyingSeries makes helpers visible in Legend', async () => {

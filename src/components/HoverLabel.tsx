@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { useStore } from '../hooks/useChart';
+import React, { useContext, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { createPortal } from 'react-dom';
+import { useStore, OverlayHostContext } from '../hooks/useChart';
 import { Panel, SeriesRow } from './overlay/SeriesPanel';
 import { useMeasuredOverlay, computeCursorPos } from '../hooks/useDraggableOverlay';
 import { getSeriesColor } from '../types/series';
@@ -29,6 +30,7 @@ export function HoverLabel({
   className,
 }: HoverLabelProps): React.ReactElement | null {
   const store = useStore();
+  const overlayHost = useContext(OverlayHostContext);
   const snap = useSyncExternalStore(store.subscribeCursor, store.getSnapshot);
   const [visible, setVisible] = useState(false);
   const trackedSeries = useRef(-1);
@@ -72,9 +74,10 @@ export function HoverLabel({
   );
   if (pos == null) return null;
 
-  return (
+  const content = (
     <Panel ref={panelRef} left={pos.x} top={pos.y} className={className} style={hoverPanelStyle}>
       <SeriesRow label={cfg.label} color={getSeriesColor(cfg)} />
     </Panel>
   );
+  return overlayHost != null ? createPortal(content, overlayHost) : content;
 }

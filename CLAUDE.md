@@ -6,7 +6,7 @@ High-performance React charting library rewriting uPlot from scratch in TypeScri
 
 Library code lives at the project root. The `uPlot/` and `uplot-wrappers/` directories are reference-only copies of the original library and its framework wrappers — do not modify them.
 
-```
+```tree
 ./
 ├── src/
 │   ├── components/    Chart, Series, Scale, Axis, Band, Legend, Tooltip, FloatingLegend, HoverLabel,
@@ -62,7 +62,7 @@ npm run test:e2e    # Playwright e2e tests (requires dev server running)
 - **23 components**: Chart, Scale, Series, Axis, Band, Legend, Tooltip, FloatingLegend, HoverLabel, ZoomRanger, Timeline, Sparkline, BoxWhisker, Candlestick, Heatmap, Vector, ThemeProvider, HLine, VLine, Region, VRegion, DiagonalLine, AnnotationLabel
 - **9 exported path builders**: linear (pixel decimation), stepped, bars, groupedBars, stackedBars, horizontalBars, monotoneCubic, catmullRom, points. Internal default is lttbLinear (LTTB downsampling + pixel decimation), applied by CanvasRenderer when no `paths` prop is set.
 - **Theming**: `ThemeProvider` sets CSS custom properties on a wrapper div; `Chart.theme` prop for per-chart overrides. Pre-built `DARK_THEME` preset. 40+ themeable properties (axes, grid, cursor, selection, series palette, candlestick, box-whisker, overlay panels, zoom ranger, annotations). CSS custom properties (`--uplot-*`) also work without ThemeProvider. `resolveTheme()` reads from `getComputedStyle(canvas)` on each full redraw.
-- **Default injection**: Chart auto-creates missing x/y scales, axes, and series colors — minimal config: just `<Chart data={data}><Series group={0} index={0} /></Chart>`
+- **Auto-fill defaults**: Chart auto-creates missing x/y scales, axes, **and series**. Minimal config: `<Chart data={data} />` — every `(group, index)` data slot renders with palette colors. Bare `<Series />` (no `group`/`index`) auto-bumps to the next unclaimed slot. Explicit `<Series group={g} index={i}>` *replaces* the fill at that slot. Opt out with `<Chart autoFillSeries={false}>`.
 - **Candlestick**: `<Candlestick />` auto-registers hidden OHLC series — no manual `<Series show={false}>` declarations needed.
 - **Annotations**: declarative `<HLine>`, `<VLine>`, `<Region>`, `<VRegion>`, `<DiagonalLine>`, `<AnnotationLabel>` components; also imperative drawHLine/drawVLine/drawLabel/drawRegion/drawVRegion/drawDiagonalLine
 - **Axis formatters**: fmtCompact (K/M/B), fmtSuffix (°C, %), fmtPrefix ($), fmtWrap (prefix+suffix), fmtHourMin, fmtMonthName, fmtDateStr, fmtLabels

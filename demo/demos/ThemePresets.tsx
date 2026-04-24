@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Chart, Series, Scale, Axis, Legend, Tooltip, ThemeProvider, DARK_THEME, palette } from 'uplot-plus';
+import { Chart, Series, Legend, Tooltip, ThemeProvider, DARK_THEME, palette } from 'uplot-plus';
 import type { ChartTheme } from 'uplot-plus';
 
 const data = [{
@@ -93,13 +93,9 @@ export default function ThemePresets() {
       <ThemeProvider theme={preset.theme}>
         <div style={{ background: preset.bg, padding: 10, borderRadius: 6, transition: 'background 0.3s' }}>
           <Chart width="auto" height={360} data={data} title="Theme Presets">
-            <Scale id="x" />
-            <Scale id="y" />
-            <Axis scale="x" />
-            <Axis scale="y" />
-            <Series group={0} index={0} label="Alpha" />
-            <Series group={0} index={1} label="Beta" />
-            <Series group={0} index={2} label="Gamma" />
+            <Series label="Alpha" />
+            <Series label="Beta" />
+            <Series label="Gamma" />
             <Legend />
             <Tooltip />
           </Chart>

@@ -39,8 +39,8 @@ export default function FlexAutoResize() {
     <div style={{ display: 'flex', width: '100%', height: 400, overflow: 'hidden', border: '1px dashed var(--color-border-light)', borderRadius: 6 }}>
       <div style={{ flex: 1, minWidth: 200, overflow: 'hidden' }}>
         <Chart width="auto" height={400} data={data} xlabel="Index" ylabel="Value">
-          <Series group={0} index={0} label="Sin" />
-          <Series group={0} index={1} label="Cos" />
+          <Series label="Sin" />
+          <Series label="Cos" />
           <Legend />
         </Chart>
       </div>

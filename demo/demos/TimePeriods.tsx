@@ -59,19 +59,19 @@ export default function TimePeriods() {
       <div className="mb-4">
         <Chart width="auto" height={160} data={hourly} title="Hourly (48h)">
           <Axis scale="x" values={fmtHour} />
-          <Series group={0} index={0} label="Hourly" />
+          <Series label="Hourly" />
         </Chart>
       </div>
       <div className="mb-4">
         <Chart width="auto" height={160} data={daily} title="Daily (60d)">
           <Axis scale="x" values={fmtDay} />
-          <Series group={0} index={0} label="Daily" />
+          <Series label="Daily" />
         </Chart>
       </div>
       <div>
         <Chart width="auto" height={160} data={monthly} title="Monthly (3yr)">
           <Axis scale="x" values={fmtMonth} />
-          <Series group={0} index={0} label="Monthly" />
+          <Series label="Monthly" />
         </Chart>
       </div>
     </div>

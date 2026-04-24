@@ -1,5 +1,5 @@
 import { useMemo, useReducer } from 'react';
-import { Chart, Series, Scale, Axis, Band, Legend, Tooltip, HLine, Region, ThemeProvider } from 'uplot-plus';
+import { Chart, Series, Band, Legend, Tooltip, HLine, Region, ThemeProvider } from 'uplot-plus';
 import type { ChartTheme } from 'uplot-plus';
 
 // --- Demo data: line series + band + annotation targets ---
@@ -168,14 +168,10 @@ export default function ThemeExplorer() {
         <ThemeProvider theme={theme}>
           <div style={{ background: state.bg, padding: 10, borderRadius: 6, transition: 'background 0.3s' }}>
             <Chart width={500} height={380} data={data} title="Theme Explorer Preview">
-              <Scale id="x" />
-              <Scale id="y" />
-              <Axis scale="x" />
-              <Axis scale="y" />
-              <Series group={0} index={0} label="Series A" />
-              <Series group={0} index={1} label="Series B" />
-              <Series group={0} index={2} label="Upper" dash={[4, 4]} />
-              <Series group={0} index={3} label="Lower" dash={[4, 4]} />
+              <Series label="Series A" />
+              <Series label="Series B" />
+              <Series label="Upper" dash={[4, 4]} />
+              <Series label="Lower" dash={[4, 4]} />
               <Band series={[2, 3]} group={0} />
               <HLine value={55} />
               <Region yMin={45} yMax={65} />

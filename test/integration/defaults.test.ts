@@ -25,7 +25,9 @@ describe('store-level defaults', () => {
 
     expect(store.scaleManager.getScale('x')).toBeDefined();
     expect(store.scaleManager.getScale('y')).toBeDefined();
-    expect(store.seriesConfigs).toHaveLength(0);
+    // fillSeries() injects one default config for the single (0,0) data slot
+    expect(store.seriesConfigs).toHaveLength(1);
+    expect(store.seriesConfigs[0]?._source).toBe('fill');
     expect(store.axisConfigs).toHaveLength(2);
     expect(store.axisConfigs[0]).toMatchObject({ scale: 'x', side: Side.Bottom, show: true, label: 'X Axis' });
     expect(store.axisConfigs[1]).toMatchObject({ scale: 'y', side: Side.Left, show: true, label: 'Y Axis' });

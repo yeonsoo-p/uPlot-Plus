@@ -17,19 +17,19 @@ export default function LegendDemo() {
     <div>
       <div className="mb-4">
         <Chart width="auto" height={250} data={data} title="Legend at bottom (default)">
-          <Series group={0} index={0} label="Alpha" />
-          <Series group={0} index={1} label="Beta" />
-          <Series group={0} index={2} label="Gamma" />
-          <Series group={0} index={3} label="Delta" />
+          <Series label="Alpha" />
+          <Series label="Beta" />
+          <Series label="Gamma" />
+          <Series label="Delta" />
           <Legend />
         </Chart>
       </div>
       <div>
         <Chart width="auto" height={250} data={data} title="Legend at top — click series to toggle">
-          <Series group={0} index={0} label="Alpha" />
-          <Series group={0} index={1} label="Beta" />
-          <Series group={0} index={2} label="Gamma" />
-          <Series group={0} index={3} label="Delta" />
+          <Series label="Alpha" />
+          <Series label="Beta" />
+          <Series label="Gamma" />
+          <Series label="Delta" />
           <Legend position="top" />
         </Chart>
       </div>

@@ -36,8 +36,8 @@ export default function ZoomRangerSyncDemo() {
         syncScaleKey="zr-sync"
         actions={[['wheel', 'zoomX'], ['leftDrag', 'zoomX']]}
       >
-        <Series group={0} index={0} label="Signal A" />
-        <Series group={0} index={1} label="Signal B" />
+        <Series label="Signal A" />
+        <Series label="Signal B" />
       </Chart>
 
       <div className="mt-2">

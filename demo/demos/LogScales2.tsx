@@ -29,14 +29,14 @@ export default function LogScales2() {
         <Chart width="auto" height={220} data={data} title="Log base 10">
           <Scale id="y"  distr={Distribution.Log} log={10} />
           <Axis scale="y" label="Value (log10)" values={fmtLog10} />
-          <Series group={0} index={0} label="Base 10" />
+          <Series label="Base 10" />
         </Chart>
       </div>
       <div>
         <Chart width="auto" height={220} data={data} title="Log base 2">
           <Scale id="y"  distr={Distribution.Log} log={2} />
           <Axis scale="y" label="Value (log2)" values={fmtLog2} />
-          <Series group={0} index={0} label="Base 2" />
+          <Series label="Base 2" />
         </Chart>
       </div>
     </div>

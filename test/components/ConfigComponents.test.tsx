@@ -17,7 +17,9 @@ describe('Series config registration', () => {
   });
 
   it('unregisters series config on unmount', async () => {
-    const { store, unmount } = renderChart({}, <Series group={0} index={0} />);
+    // autoFillSeries off — otherwise fillSeries re-injects a default at the
+    // freed slot. Tested in autoFillSeries.test.tsx.
+    const { store, unmount } = renderChart({ autoFillSeries: false }, <Series group={0} index={0} />);
     await flushEffects();
     expect(store.seriesConfigs.length).toBe(1);
     unmount();

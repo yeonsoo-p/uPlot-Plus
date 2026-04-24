@@ -21,8 +21,8 @@ export default function ZoomWheel() {
 
   return (
     <Chart width="auto" height={400} data={data} >
-      <Series group={0} index={0} label="Damped sine" />
-      <Series group={0} index={1} label="Cosine" />
+      <Series label="Damped sine" />
+      <Series label="Cosine" />
       <Legend />
     </Chart>
   );

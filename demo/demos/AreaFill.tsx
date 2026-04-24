@@ -20,9 +20,9 @@ export default function AreaFill() {
 
   return (
     <Chart width="auto" height={400} data={data}>
-      <Series group={0} index={0} stroke="#ff0000" fill={withAlpha('#ff0000', 0.1)} label="Red" />
-      <Series group={0} index={1} stroke="#00ff00" fill={withAlpha('#00ff00', 0.1)} label="Green" />
-      <Series group={0} index={2} stroke="#0000ff" fill={withAlpha('#0000ff', 0.1)} label="Blue" />
+      <Series stroke="#ff0000" fill={withAlpha('#ff0000', 0.1)} label="Red" />
+      <Series stroke="#00ff00" fill={withAlpha('#00ff00', 0.1)} label="Green" />
+      <Series stroke="#0000ff" fill={withAlpha('#0000ff', 0.1)} label="Blue" />
     </Chart>
   );
 }

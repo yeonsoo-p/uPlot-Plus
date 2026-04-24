@@ -66,8 +66,15 @@ export interface SeriesConfig {
 export interface ResolvedSeriesConfig extends SeriesConfig {
   _autoStroke?: boolean;
   _autoFill?: boolean;
-  /** Marks helper series auto-registered by specialized components (Candlestick, BoxWhisker). */
-  _internal?: boolean;
+  /**
+   * Provenance of this config:
+   *  - `'internal'` — auto-registered by a specialized component (Candlestick, BoxWhisker).
+   *    Hidden from Legend/Tooltip; yields to explicit user series at the same slot.
+   *  - `'fill'` — auto-injected by `fillSeries()` to occupy an unclaimed data slot.
+   *    Cleared and rebuilt by `applyDefaults()` whenever data shape or explicit configs change.
+   *  - `undefined` — user-declared.
+   */
+  _source?: 'internal' | 'fill';
 }
 
 /** Check if a CSS color string is effectively fully transparent. */

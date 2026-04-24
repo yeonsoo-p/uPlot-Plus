@@ -14,7 +14,7 @@ export default function Annotations() {
     <div>
       <Chart width="auto" height={400} data={data} xlabel="Sample" ylabel="Value">
         <Scale id="y" auto={false} min={10} max={90} />
-        <Series group={0} index={0} label="Signal" />
+        <Series label="Signal" />
 
         {/* Shaded region between y=40 and y=60 */}
         <Region yMin={40} yMax={60} fill="rgba(46,204,113,0.12)" stroke="rgba(46,204,113,0.4)" strokeWidth={1} dash={[3, 3]} />

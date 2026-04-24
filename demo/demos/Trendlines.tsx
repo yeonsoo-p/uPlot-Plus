@@ -39,7 +39,7 @@ export default function Trendlines() {
 
   return (
     <Chart width="auto" height={400} data={data} xlabel="X" ylabel="Y">
-      <Series group={0} index={0} label="Data"
+      <Series label="Data"
         points={{ show: true, size: 4, fill: '#3498db' }} />
       <DiagonalLine
         slope={slope} intercept={intercept}

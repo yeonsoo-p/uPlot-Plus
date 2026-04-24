@@ -22,8 +22,8 @@ export default function YScaleDrag() {
     <div>
       <Chart width="auto" height={400} data={data} ylabel="Temperature">
         <Scale id="y2"  />
-        <Series group={0} index={0} label="Temperature" />
-        <Series group={0} index={1} yScale="y2" stroke="#1f78b4" label="Humidity" />
+        <Series label="Temperature" />
+        <Series yScale="y2" stroke="#1f78b4" label="Humidity" />
         <Axis scale="y2" side={Side.Right} label="Humidity" stroke="#1f78b4" />
         <Legend />
       </Chart>

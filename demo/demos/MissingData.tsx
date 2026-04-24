@@ -30,9 +30,9 @@ export default function MissingData() {
       <Scale id="mb"  />
       <Axis scale="pct" values={fmtSuffix('%', 1)} />
       <Axis scale="mb" side={Side.Right} values={fmtSuffix(' MB', 2)} grid={{ show: false }} />
-      <Series group={0} index={0} yScale="pct" stroke="red" fill="rgba(255,0,0,0.05)" label="CPU" />
-      <Series group={0} index={1} yScale="pct" stroke="blue" fill="rgba(0,0,255,0.05)" label="RAM" />
-      <Series group={0} index={2} yScale="mb" stroke="green" fill="rgba(0,255,0,0.05)" label="TCP Out" />
+      <Series yScale="pct" stroke="red" fill="rgba(255,0,0,0.05)" label="CPU" />
+      <Series yScale="pct" stroke="blue" fill="rgba(0,0,255,0.05)" label="RAM" />
+      <Series yScale="mb" stroke="green" fill="rgba(0,255,0,0.05)" label="TCP Out" />
     </Chart>
   );
 }

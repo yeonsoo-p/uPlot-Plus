@@ -61,7 +61,7 @@ export default function DrawHooksComposable() {
   return (
     <div>
       <Chart width="auto" height={400} data={data} xlabel="Sample" ylabel="Value">
-        <Series group={0} index={0} label="Signal" stroke="#2980b9" />
+        <Series label="Signal" stroke="#2980b9" />
         <ThresholdOverlay />
         <CrosshairLabel />
       </Chart>

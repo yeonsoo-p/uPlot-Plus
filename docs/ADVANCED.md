@@ -61,7 +61,7 @@ function ZoomableChart({ data }) {
         <Scale id="y" />
         <Axis scale="x" />
         <Axis scale="y" />
-        <Series group={0} index={0} yScale="y" stroke="#e74c3c" />
+        <Series stroke="#e74c3c" />
       </Chart>
     </>
   );

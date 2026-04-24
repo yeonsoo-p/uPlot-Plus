@@ -9,7 +9,7 @@ function MiniChart({ title, data }: { title: string; data: ChartData }) {
   return (
     <div className="inline-block mr-4 mb-4 align-top">
       <Chart width={240} height={180} data={data} title={title}>
-        <Series group={0} index={0}
+        <Series
           points={{ show: true, size: 6, fill: '#2980b9' }} />
       </Chart>
     </div>

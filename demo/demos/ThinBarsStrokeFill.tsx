@@ -17,13 +17,13 @@ export default function ThinBarsStrokeFill() {
   return (
     <Chart width="auto" height={400} data={data} xlabel="Item" ylabel="Value">
       {/* No specifics — auto palette assigns stroke and fill */}
-      <Series group={0} index={0} label="Stroke and Fill" paths={groupedBars(0, 4)} />
+      <Series label="Stroke and Fill" paths={groupedBars(0, 4)} />
       {/* Fill only — transparent stroke hides the outline */}
-      <Series group={0} index={1} stroke="transparent" fill="rgba(52, 152, 219, 0.6)" label="Fill Only" paths={groupedBars(1, 4)} />
+      <Series stroke="transparent" fill="rgba(52, 152, 219, 0.6)" label="Fill Only" paths={groupedBars(1, 4)} />
       {/* Stroke only — transparent fill shows just the outline */}
-      <Series group={0} index={2} stroke="#e74c3c" fill="transparent" label="Stroke Only" paths={groupedBars(2, 4)} />
+      <Series stroke="#e74c3c" fill="transparent" label="Stroke Only" paths={groupedBars(2, 4)} />
       {/* Both specified explicitly */}
-      <Series group={0} index={3} stroke="#27ae60" fill="rgba(39, 174, 96, 0.3)" label="Custom Stroke + Fill" paths={groupedBars(3, 4)} />
+      <Series stroke="#27ae60" fill="rgba(39, 174, 96, 0.3)" label="Custom Stroke + Fill" paths={groupedBars(3, 4)} />
       <Legend />
     </Chart>
   );

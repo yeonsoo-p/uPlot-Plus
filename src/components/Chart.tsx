@@ -3,7 +3,7 @@ import type { ChartProps } from '../types';
 import { DEFAULT_ACTIONS } from '../types/interaction';
 import type { DrawCallback, CursorDrawCallback } from '../types/hooks';
 import { useChartStore } from '../hooks/useChartStore';
-import { ChartContext } from '../hooks/useChart';
+import { ChartContext, OverlayHostContext } from '../hooks/useChart';
 import { useInteraction } from '../hooks/useInteraction';
 import { useCursorSyncGroup } from '../sync/useCursorSyncGroup';
 import { useScaleSyncGroup } from '../sync/useScaleSyncGroup';
@@ -22,9 +22,11 @@ export function Chart({
   onDraw, onCursorDraw, syncCursorKey, syncScaleKey, actions, theme, locale, timezone,
   onClick, onContextMenu, onDblClick, onCursorMove, onCursorLeave,
   onScaleChange, onSelect,
+  autoFillSeries = true,
 }: ChartProps) {
   const store = useChartStore();
   const [containerEl, setContainerEl] = useState<HTMLDivElement | null>(null);
+  const [overlayHostEl, setOverlayHostEl] = useState<HTMLDivElement | null>(null);
 
   const pxRatio = pxRatioOverride ?? (typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1);
 
@@ -138,6 +140,15 @@ export function Chart({
     setContainerEl(node);
   }, []);
 
+  // Stable overlay-host callback ref — overlays portal here so their
+  // positioned ancestor is the canvas container, not the outer wrapper.
+  const overlayHostElRef = useRef<HTMLDivElement | null>(null);
+  const overlayHostRef = useCallback((node: HTMLDivElement | null) => {
+    if (overlayHostElRef.current === node) return;
+    overlayHostElRef.current = node;
+    setOverlayHostEl(node);
+  }, []);
+
   // Ref wrapper for onDraw — layout effect so it's current before redrawSync
   const onDrawRef = useRef<DrawCallback | undefined>(onDraw);
   useLayoutEffect(() => { onDrawRef.current = onDraw; });
@@ -149,6 +160,12 @@ export function Chart({
   // Tracks whether data has been loaded at least once — gates redrawSync
   // so the first mount doesn't paint an empty chart before data/configs register.
   const mountedRef = useRef(false);
+
+  // Sync the autoFillSeries flag *before* the data layout effect runs so that
+  // the first applyDefaults(Data) call sees the user's intended flag value.
+  useLayoutEffect(() => {
+    store.setAutoFillSeries(autoFillSeries);
+  }, [store, autoFillSeries]);
 
   // Update store data — layout effect so data is current before redrawSync
   const prevStoreDataRef = useRef(data);
@@ -304,8 +321,11 @@ export function Chart({
             }}
           />
           )}
+          <div ref={overlayHostRef} data-testid="chart-overlay-host" />
         </div>
-        {children}
+        <OverlayHostContext.Provider value={overlayHostEl}>
+          {children}
+        </OverlayHostContext.Provider>
       </div>
     </ChartContext.Provider>
   );

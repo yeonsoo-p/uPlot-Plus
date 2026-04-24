@@ -37,7 +37,7 @@ export default function LargeDataset() {
 
   return (
     <Chart width="auto" height={400} data={data} xlabel="Index" ylabel="Value">
-      <Series group={0} index={0} label="2M Points" />
+      <Series label="2M Points" />
     </Chart>
   );
 }

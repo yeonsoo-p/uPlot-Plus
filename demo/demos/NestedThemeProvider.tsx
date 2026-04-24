@@ -1,4 +1,4 @@
-import { Chart, Series, Scale, Axis, Legend, ThemeProvider, DARK_THEME } from 'uplot-plus';
+import { Chart, Series, Legend, ThemeProvider, DARK_THEME } from 'uplot-plus';
 import type { ChartTheme } from 'uplot-plus';
 
 const data = [{
@@ -29,12 +29,8 @@ export default function NestedThemeProvider() {
           <div>
             <h4 style={{ color: '#ccc' }} className="mb-1">Base Only <span className="text-xs font-normal opacity-60">— inherits outer DARK_THEME</span></h4>
             <Chart width={240} height={240} data={data}>
-              <Scale id="x" />
-              <Scale id="y" />
-              <Axis scale="x" />
-              <Axis scale="y" />
-              <Series group={0} index={0} label="Primary" />
-              <Series group={0} index={1} label="Secondary" />
+              <Series label="Primary" />
+              <Series label="Secondary" />
               <Legend />
             </Chart>
           </div>
@@ -43,12 +39,8 @@ export default function NestedThemeProvider() {
             <div>
               <h4 style={{ color: '#ccc' }} className="mb-1">Red Accent <span className="text-xs font-normal opacity-60">— overrides seriesColors, cursor</span></h4>
               <Chart width={240} height={240} data={data}>
-                <Scale id="x" />
-                <Scale id="y" />
-                <Axis scale="x" />
-                <Axis scale="y" />
-                <Series group={0} index={0} label="Primary" />
-                <Series group={0} index={1} label="Secondary" />
+                <Series label="Primary" />
+                <Series label="Secondary" />
                 <Legend />
               </Chart>
             </div>
@@ -58,12 +50,8 @@ export default function NestedThemeProvider() {
             <div>
               <h4 style={{ color: '#ccc' }} className="mb-1">Blue Accent <span className="text-xs font-normal opacity-60">— overrides seriesColors, cursor</span></h4>
               <Chart width={240} height={240} data={data}>
-                <Scale id="x" />
-                <Scale id="y" />
-                <Axis scale="x" />
-                <Axis scale="y" />
-                <Series group={0} index={0} label="Primary" />
-                <Series group={0} index={1} label="Secondary" />
+                <Series label="Primary" />
+                <Series label="Secondary" />
                 <Legend />
               </Chart>
             </div>

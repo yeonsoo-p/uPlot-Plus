@@ -24,8 +24,8 @@ export default function DraggableLabelDemo() {
       <div>
         <h4 className="mt-0 mb-2">Basic — drag to reposition</h4>
         <Chart width="auto" height={300} data={data} xlabel="Time" ylabel="Value">
-          <Series group={0} index={0} label="Sine" />
-          <Series group={0} index={1} label="Cosine" />
+          <Series label="Sine" />
+          <Series label="Cosine" />
           <DraggableLabel position="top-left">Peak region</DraggableLabel>
         </Chart>
       </div>
@@ -33,8 +33,8 @@ export default function DraggableLabelDemo() {
       <div>
         <h4 className="mt-0 mb-2">Styled + position callback</h4>
         <Chart width="auto" height={300} data={data} xlabel="Time" ylabel="Value">
-          <Series group={0} index={0} label="Sine" />
-          <Series group={0} index={1} label="Cosine" />
+          <Series label="Sine" />
+          <Series label="Cosine" />
           <DraggableLabel
             position="bottom-right"
             idleOpacity={0.5}
@@ -51,8 +51,8 @@ export default function DraggableLabelDemo() {
         <h4 className="mt-0 mb-2">Keyboard accessible</h4>
         <p className="mt-0 mb-2 text-sm text-muted dark:text-muted-lighter">Tab to label, arrow keys to move (Shift for fine control)</p>
         <Chart width="auto" height={300} data={data} xlabel="Time" ylabel="Value">
-          <Series group={0} index={0} label="Sine" />
-          <Series group={0} index={1} label="Cosine" />
+          <Series label="Sine" />
+          <Series label="Cosine" />
           <DraggableLabel position="top-right" ariaLabel="Draggable note">
             Keyboard movable
           </DraggableLabel>

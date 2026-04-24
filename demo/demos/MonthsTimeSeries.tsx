@@ -25,8 +25,8 @@ export default function MonthsTimeSeries() {
     <div>
       <Chart width="auto" height={400} data={data} ylabel="Value">
         <Axis scale="x" label="Month" values={fmtMonthName()} />
-        <Series group={0} index={0} label="Metric A" />
-        <Series group={0} index={1} label="Metric B" />
+        <Series label="Metric A" />
+        <Series label="Metric B" />
         <Legend />
       </Chart>
     </div>

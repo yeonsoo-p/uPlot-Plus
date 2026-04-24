@@ -6,8 +6,8 @@ describe('Focus mode', () => {
     const store = createChartStore();
     expect(store.focusedSeries).toBeNull();
 
-    store.setFocus(2);
-    expect(store.focusedSeries).toBe(2);
+    store.setFocus(0, 2);
+    expect(store.focusedSeries).toEqual({ group: 0, index: 2 });
 
     store.setFocus(null);
     expect(store.focusedSeries).toBeNull();
@@ -17,7 +17,7 @@ describe('Focus mode', () => {
     const store = createChartStore();
     const markSpy = vi.spyOn(store.scheduler, 'mark');
 
-    store.setFocus(0);
+    store.setFocus(0, 0);
     expect(markSpy).toHaveBeenCalled();
   });
 

@@ -749,11 +749,12 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
           if (store.focusAlpha < 1) {
             const cursor = store.cursorManager.state;
             if (cursor.activeGroup >= 0 && cursor.activeSeriesIdx >= 0) {
-              const idx = store.seriesConfigs.findIndex(
-                s => s.group === cursor.activeGroup && s.index === cursor.activeSeriesIdx,
-              );
-              if (idx >= 0 && store.focusedSeries !== idx) {
-                store.focusedSeries = idx;
+              const focused = store.focusedSeries;
+              if (focused == null
+                || focused.group !== cursor.activeGroup
+                || focused.index !== cursor.activeSeriesIdx
+              ) {
+                store.focusedSeries = { group: cursor.activeGroup, index: cursor.activeSeriesIdx };
                 store.scheduleRedraw();
               }
             }

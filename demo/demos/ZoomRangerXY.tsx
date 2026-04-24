@@ -28,8 +28,8 @@ export default function ZoomRangerXYDemo() {
         <Scale id="x" auto={range == null} min={range?.[0]} max={range?.[1]} />
         <Scale id="y2"  />
         <Axis scale="y2" side={Side.Right} label="Signal B" />
-        <Series group={0} index={0} label="Signal A" />
-        <Series group={0} index={1} yScale="y2" stroke="#9c27b0" label="Signal B" />
+        <Series label="Signal A" />
+        <Series yScale="y2" stroke="#9c27b0" label="Signal B" />
       </Chart>
 
       <div className="mt-2">

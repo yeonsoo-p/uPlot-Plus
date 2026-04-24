@@ -77,7 +77,7 @@ export default function SelectFetch() {
         xlabel="X"
         ylabel="Value"
       >
-        <Series group={0} index={0} label="Signal" />
+        <Series label="Signal" />
         <Legend />
       </Chart>
     </div>

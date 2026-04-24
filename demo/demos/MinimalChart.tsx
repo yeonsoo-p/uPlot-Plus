@@ -22,28 +22,26 @@ export default function MinimalChart() {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* 1. Minimal — auto scales, axes, and colors */}
+      {/* 1. Minimal — auto-fills every data slot, auto-creates scales/axes/colors */}
       <div>
-        <h4 className="mt-0 mb-2">Minimal: just data + series</h4>
-        <Chart width="auto" height={180} data={{ x, y: y1 }}>
-          <Series group={0} index={0} />
-        </Chart>
+        <h4 className="mt-0 mb-2">Minimal: just data</h4>
+        <Chart width="auto" height={180} data={{ x, y: y1 }} />
       </div>
 
-      {/* 2. Custom axis labels via Chart props */}
+      {/* 2. Custom axis labels via Chart props; bare <Series /> picks the next slot */}
       <div>
         <h4 className="mt-0 mb-2">Custom labels via xlabel / ylabel props</h4>
         <Chart width="auto" height={180} data={{ x, y: y1 }} xlabel="Time (s)" ylabel="Temperature">
-          <Series group={0} index={0} label="Sensor A" />
+          <Series label="Sensor A" />
         </Chart>
       </div>
 
-      {/* 3. Full control when needed */}
+      {/* 3. Full control when needed — explicit slots customize each line */}
       <div>
         <h4 className="mt-0 mb-2">Full control with explicit children</h4>
         <Chart width="auto" height={200} data={[{ x, series: [y1, y2] }]} xlabel="Time (s)" ylabel="Temperature">
-          <Series group={0} index={0} label="Indoor" />
-          <Series group={0} index={1} label="Outdoor" />
+          <Series index={0} label="Indoor" />
+          <Series index={1} label="Outdoor" />
         </Chart>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Chart, Series, Candlestick, Scale, Axis, Band, Legend, Tooltip, ThemeProvider, DARK_THEME, bars } from 'uplot-plus';
+import { Chart, Series, Candlestick, Band, Legend, Tooltip, ThemeProvider, DARK_THEME, bars } from 'uplot-plus';
 import type { ChartTheme } from 'uplot-plus';
 
 // --- Shared data ---
@@ -89,34 +89,22 @@ export default function ThemedDashboard() {
         <div style={{ background: active.bg, padding: 12, borderRadius: 8, transition: 'background 0.3s' }}>
           <div className="grid grid-cols-2 gap-3">
             <Chart width={380} height={200} data={lineData} title="Metrics">
-              <Scale id="x" />
-              <Scale id="y" />
-              <Axis scale="x" />
-              <Axis scale="y" />
-              <Series group={0} index={0} label="Requests" />
-              <Series group={0} index={1} label="Latency" />
+              <Series label="Requests" />
+              <Series label="Latency" />
               <Legend />
               <Tooltip />
             </Chart>
 
             <Chart width={380} height={200} data={barData} title="Categories">
-              <Scale id="x" />
-              <Scale id="y" />
-              <Axis scale="x" />
-              <Axis scale="y" />
-              <Series group={0} index={0} label="Revenue" paths={bars()} />
-              <Series group={0} index={1} label="Costs" paths={bars()} />
+              <Series label="Revenue" paths={bars()} />
+              <Series label="Costs" paths={bars()} />
               <Legend />
             </Chart>
 
             <Chart width={380} height={200} data={bandData} title="Confidence">
-              <Scale id="x" />
-              <Scale id="y" />
-              <Axis scale="x" />
-              <Axis scale="y" />
-              <Series group={0} index={0} label="Mean" />
-              <Series group={0} index={1} label="Upper" dash={[4, 4]} />
-              <Series group={0} index={2} label="Lower" dash={[4, 4]} />
+              <Series label="Mean" />
+              <Series label="Upper" dash={[4, 4]} />
+              <Series label="Lower" dash={[4, 4]} />
               <Band series={[1, 2]} group={0} />
             </Chart>
 

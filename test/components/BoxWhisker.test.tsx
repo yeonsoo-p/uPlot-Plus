@@ -45,22 +45,22 @@ describe('BoxWhisker convenience mode', () => {
 
     const cfg = store.seriesConfigs.find(s => s.group === 0 && s.index === 0);
     expect(cfg).toBeDefined();
-    expect(cfg!._internal).toBe(true);
+    expect(cfg!._source).toBe('internal');
     expect(cfg!.show).toBe(false);
   });
 
   it('skips auto-provisioning when autoScales is false', async () => {
     const { store } = renderChart(
-      { data: placeholderData },
+      { data: placeholderData, autoFillSeries: false },
       <BoxWhisker boxes={boxes} autoScales={false} />,
     );
     await flushEffects();
 
-    // No BoxWhisker-registered series or extra scales
+    // No BoxWhisker-registered series or fill-injected ones
     expect(store.seriesConfigs.length).toBe(0);
   });
 
-  it('exposeUnderlyingSeries removes _internal flag', async () => {
+  it('exposeUnderlyingSeries clears the internal source flag', async () => {
     const { store } = renderChart(
       { data: placeholderData },
       <BoxWhisker boxes={boxes} exposeUnderlyingSeries />,
@@ -69,7 +69,7 @@ describe('BoxWhisker convenience mode', () => {
 
     const cfg = store.seriesConfigs.find(s => s.group === 0 && s.index === 0);
     expect(cfg).toBeDefined();
-    expect(cfg!._internal).toBe(false);
+    expect(cfg!._source).toBeUndefined();
   });
 
   it('empty boxes array does not register NaN scales', async () => {

@@ -24,6 +24,8 @@ export interface ScaleConfig {
   ori?: Orientation;
   /** Range configuration for auto-ranging */
   range?: RangeConfig;
+  /** Internal: true if created by injectDefaults (eligible for retirement when no series references it). */
+  _default?: boolean;
 }
 
 /** Range padding/bounds configuration */

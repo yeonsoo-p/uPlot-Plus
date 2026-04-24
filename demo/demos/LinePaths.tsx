@@ -14,12 +14,12 @@ export default function LinePaths() {
   return (
     <div>
       <Chart width="auto" height={500} data={data} xlabel="Index" ylabel="Value">
-        <Series group={0} index={0} label="linear" paths={linear()} />
-        <Series group={0} index={1} label="monotoneCubic" paths={monotoneCubic()} />
-        <Series group={0} index={2} label="catmullRom" paths={catmullRom()} />
-        <Series group={0} index={3} label="stepped" paths={stepped(1)} />
-        <Series group={0} index={4} stroke="#9b59b6" label="bars" paths={bars()} />
-        <Series group={0} index={5} label="points" paths={points()} points={{ show: true, size: 8, fill: '#1abc9c' }} />
+        <Series label="linear" paths={linear()} />
+        <Series label="monotoneCubic" paths={monotoneCubic()} />
+        <Series label="catmullRom" paths={catmullRom()} />
+        <Series label="stepped" paths={stepped(1)} />
+        <Series stroke="#9b59b6" label="bars" paths={bars()} />
+        <Series label="points" paths={points()} points={{ show: true, size: 8, fill: '#1abc9c' }} />
         <Legend />
       </Chart>
     </div>

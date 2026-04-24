@@ -29,8 +29,8 @@ export default function ZoomModifierKeys() {
         xlabel="Time"
         ylabel="Value"
       >
-        <Series group={0} index={0} label="Sine" />
-        <Series group={0} index={1} label="Cosine" />
+        <Series label="Sine" />
+        <Series label="Cosine" />
         <Legend />
       </Chart>
     </div>

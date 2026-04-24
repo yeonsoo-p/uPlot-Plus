@@ -25,52 +25,91 @@ import { valToPx, projectPoint, isScaleReady } from '../core/Scale';
 import type { EventCallbacks } from '../types/events';
 import { withAlpha } from '../colors';
 
-/**
- * Inject sensible defaults for missing y-scales, series, and axes.
- * Called at the top of the full redraw path so users can render charts
- * without explicitly declaring Scale/Axis/Series children.
- *
- * Each check is independent — users can provide any subset of children
- * and only the missing pieces get auto-generated.
- */
-function injectDefaults(store: ChartStore): void {
+// ---------------------------------------------------------------------------
+// Defaults: derived state computed from (data shape, explicit configs, theme,
+// autoFillSeries flag). Each function is idempotent and does one thing. They
+// run at the discrete events that change their inputs (setData, register/
+// unregisterSeries, setAutoFillSeries, theme/label change), batched into a
+// single applyDefaults() pass per affected event.
+//
+// Naming:
+//  - ensure*  : create-if-missing only (no removal). Right for scales/axes
+//               that the user can declare alongside system-created ones.
+//  - bind*    : assign a relationship between two existing things.
+//  - fill*    : occupy unclaimed slots; drops old fills and re-adds.
+//  - recolor* : reassign a derived field on every entry that opted in.
+//  - pick*    : compute a derived selection (no mutation).
+// ---------------------------------------------------------------------------
+
+/** Create the default 'x' scale if no x-scale has been registered. */
+function ensureXScale(store: ChartStore): void {
+  if (store.scaleManager.getScale('x')) return;
+  const cfg: ScaleConfig = { id: 'x', auto: true, _default: true };
+  store.scaleConfigs.push(cfg);
+  store.scaleManager.addScale(cfg);
+}
+
+/** Map every data group with no x-scale binding to the 'x' scale. */
+function bindGroupsToX(store: ChartStore): void {
   const data = store.dataStore.data;
-  if (data.length === 0) return;
-
-  // 1. Default x-scale (if none registered)
-  if (!store.scaleManager.getScale('x')) {
-    const cfg: ScaleConfig = { id: 'x', auto: true };
-    store.scaleConfigs.push(cfg);
-    store.scaleManager.addScale(cfg);
-  }
-
-  // Map unmapped data groups to the 'x' scale
   for (let i = 0; i < data.length; i++) {
     if (!store.scaleManager.getGroupXScaleKey(i)) {
       store.scaleManager.setGroupXScale(i, 'x');
     }
   }
+}
 
-  // 2. Ensure every y-scale referenced by a series exists
-  const registeredScales = new Set(store.scaleConfigs.map(s => s.id));
-  const referencedYScales = new Set<string>();
-  for (const s of store.seriesConfigs) {
-    referencedYScales.add(s.yScale);
+/**
+ * Create scales for every yScale referenced by a series.
+ * If no series exist yet, ensures at least the default 'y' scale.
+ * Returns the set of y-scale ids known to be referenced (used by ensureAxes).
+ */
+function ensureSeriesScales(store: ChartStore): Set<string> {
+  const registered = new Set(store.scaleConfigs.map(s => s.id));
+  const referenced = new Set<string>();
+  for (const s of store.seriesConfigs) referenced.add(s.yScale);
+  if (referenced.size === 0 && !registered.has('y')) referenced.add('y');
+  for (const yId of referenced) {
+    if (registered.has(yId)) continue;
+    const cfg: ScaleConfig = { id: yId, auto: true, _default: true };
+    store.scaleConfigs.push(cfg);
+    store.scaleManager.addScale(cfg);
+    registered.add(yId);
   }
-  // If no series registered yet, ensure at least a default 'y' scale
-  if (referencedYScales.size === 0 && !registeredScales.has('y')) {
-    referencedYScales.add('y');
-  }
-  for (const yId of referencedYScales) {
-    if (!registeredScales.has(yId)) {
-      const cfg: ScaleConfig = { id: yId, auto: true };
-      store.scaleConfigs.push(cfg);
-      store.scaleManager.addScale(cfg);
-      registeredScales.add(yId);
+  return referenced;
+}
+
+/**
+ * Drop `_default` scales and axes that no live series references.
+ * Preserves the 'x' default while data exists, since data groups bind to it.
+ */
+function retireUnusedDefaults(store: ChartStore): void {
+  const referencedScales = new Set<string>();
+  for (const s of store.seriesConfigs) referencedScales.add(s.yScale);
+  if (store.dataStore.data.length > 0) referencedScales.add('x');
+
+  const keptScales: ScaleConfig[] = [];
+  for (const cfg of store.scaleConfigs) {
+    if (cfg._default === true && !referencedScales.has(cfg.id)) {
+      store.scaleManager.removeScale(cfg.id);
+      continue;
     }
+    keptScales.push(cfg);
   }
+  if (keptScales.length !== store.scaleConfigs.length) store.scaleConfigs = keptScales;
 
-  // 3. Default x-axis (if no x-axis registered)
+  const keptAxes = store.axisConfigs.filter(
+    cfg => cfg._default !== true || referencedScales.has(cfg.scale),
+  );
+  if (keptAxes.length !== store.axisConfigs.length) store.axisConfigs = keptAxes;
+}
+
+/**
+ * Create default x-axis (if none) and a default axis for every referenced
+ * y-scale that doesn't yet have one. Refreshes labels on existing default
+ * axes from store.xlabel / store.ylabel each call.
+ */
+function ensureAxes(store: ChartStore, referencedYScales: Set<string>): void {
   const hasXAxis = store.axisConfigs.some(a => a.scale === 'x');
   if (!hasXAxis) {
     store.axisConfigs.push({
@@ -80,14 +119,10 @@ function injectDefaults(store: ChartStore): void {
       _autoSide: true,
     });
   } else {
-    // Update label on existing default x-axis
     const defXAxis = store.axisConfigs.find(a => a.scale === 'x' && a._default === true);
-    if (defXAxis != null) {
-      defXAxis.label = store.xlabel ?? 'X Axis';
-    }
+    if (defXAxis != null) defXAxis.label = store.xlabel ?? 'X Axis';
   }
 
-  // 4. Ensure every y-scale has at least one axis
   const axisScales = new Set(store.axisConfigs.map(a => a.scale));
   for (const yId of referencedYScales) {
     if (!axisScales.has(yId)) {
@@ -99,12 +134,170 @@ function injectDefaults(store: ChartStore): void {
       });
       axisScales.add(yId);
     } else {
-      // Update label on existing default y-axis
       const defYAxis = store.axisConfigs.find(a => a.scale === yId && a._default === true);
-      if (defYAxis != null) {
-        defYAxis.label = store.ylabel ?? 'Y Axis';
-      }
+      if (defYAxis != null) defYAxis.label = store.ylabel ?? 'Y Axis';
     }
+  }
+}
+
+/**
+ * Auto-inject series for every (group, index) data slot that no explicit
+ * config has claimed.
+ *
+ * Idempotent: when (data, explicit configs, autoFillSeries) haven't shifted the
+ * desired fill set, this returns without touching `store.seriesConfigs` — same
+ * array reference, same fill objects. Existing fills' `show` toggles and
+ * identity survive across redraws so downstream caches keyed on the array
+ * reference (CursorManager) and on cfg identity stay valid.
+ */
+function fillSeries(store: ChartStore): void {
+  const before = store.seriesConfigs;
+
+  if (!store.autoFillSeries) {
+    if (before.some(s => s._source === 'fill')) {
+      store.seriesConfigs = before.filter(s => s._source !== 'fill');
+      rebuildSeriesConfigMap(store);
+    }
+    return;
+  }
+
+  const data = store.dataStore.data;
+  const claimed = new Set<string>();
+  const existingFills = new Set<string>();
+  for (const s of before) {
+    const key = `${s.group}:${s.index}`;
+    if (s._source === 'fill') existingFills.add(key);
+    else claimed.add(key);
+  }
+
+  const wantFills = new Set<string>();
+  for (let g = 0; g < data.length; g++) {
+    const group = data[g];
+    if (group == null) continue;
+    for (let i = 0; i < group.series.length; i++) {
+      const key = `${g}:${i}`;
+      if (!claimed.has(key)) wantFills.add(key);
+    }
+  }
+
+  // Fast path: existing fills exactly match desired set → no-op
+  if (existingFills.size === wantFills.size) {
+    let allMatch = true;
+    for (const key of wantFills) {
+      if (!existingFills.has(key)) { allMatch = false; break; }
+    }
+    if (allMatch) return;
+  }
+
+  // Rebuild — preserve existing fill identity for slots that should still exist
+  const palette = store.theme.seriesColors;
+  const next = before.filter(s => {
+    if (s._source !== 'fill') return true;
+    return wantFills.has(`${s.group}:${s.index}`);
+  });
+
+  for (let g = 0; g < data.length; g++) {
+    const group = data[g];
+    if (group == null) continue;
+    for (let i = 0; i < group.series.length; i++) {
+      const key = `${g}:${i}`;
+      if (claimed.has(key) || existingFills.has(key)) continue;
+      const colorIdx = next.length;
+      next.push({
+        group: g,
+        index: i,
+        yScale: 'y',
+        show: true,
+        stroke: palette[colorIdx % palette.length] ?? '#000',
+        _autoStroke: true,
+        _source: 'fill',
+      });
+    }
+  }
+  store.seriesConfigs = next;
+  rebuildSeriesConfigMap(store);
+}
+
+/**
+ * Re-apply palette colors to every series config with `_autoStroke: true`,
+ * keyed by current array position. Handles theme/palette swaps. Also
+ * recomputes `_autoFill` colors derived from the new stroke.
+ */
+function recolorSeries(store: ChartStore): void {
+  const palette = store.theme.seriesColors;
+  const seriesConfigs = store.seriesConfigs;
+  for (let i = 0; i < seriesConfigs.length; i++) {
+    const cfg = seriesConfigs[i];
+    if (cfg == null || !cfg._autoStroke) continue;
+    const newStroke = palette[i % palette.length] ?? '#000';
+    if (cfg.stroke === newStroke) continue;
+    const newFill = cfg._autoFill && typeof newStroke === 'string'
+      ? withAlpha(newStroke, 0.5) : cfg.fill;
+    seriesConfigs[i] = { ...cfg, stroke: newStroke, fill: newFill };
+  }
+  rebuildSeriesConfigMap(store);
+}
+
+/**
+ * Pick the series that should participate in y-scale auto-ranging.
+ * Visible series always participate. Hidden series are included only when
+ * their yScale has no visible siblings — a fallback so scales like Candlestick
+ * (all helpers `show=false`) still get a range.
+ */
+function pickScaleParticipants(seriesConfigs: ResolvedSeriesConfig[]): Array<{ group: number; index: number; yScale: string }> {
+  const visibleScales = new Set<string>();
+  for (const s of seriesConfigs) if (s.show !== false) visibleScales.add(s.yScale);
+  const out: Array<{ group: number; index: number; yScale: string }> = [];
+  for (const s of seriesConfigs) {
+    if (s.show !== false || !visibleScales.has(s.yScale)) {
+      out.push({ group: s.group, index: s.index, yScale: s.yScale });
+    }
+  }
+  return out;
+}
+
+/** Bit flags identifying which class of input changed. */
+export const DirtyDefault = {
+  None: 0,
+  /** Data was set or its shape changed (group count or per-group series count). */
+  Data: 1,
+  /** Explicit series/scale/axis configs changed (mount, unmount, prop sync). */
+  Config: 2,
+  /** Resolved theme changed (CSS vars or ThemeProvider revision). */
+  Theme: 4,
+  /** autoFillSeries flag toggled. */
+  Flag: 8,
+  /** Run everything. */
+  All: 0xff,
+} as const;
+
+/**
+ * Single orchestrator for all derived defaults. Idempotent — each sub-pass
+ * only touches the slice of state it owns. Callers pass the dirty bits that
+ * describe what changed; sub-passes guard themselves on those bits.
+ */
+function applyDefaults(store: ChartStore, dirty: number): void {
+  // The data-derived passes need data to exist. Until first setData, skip.
+  if (store.dataStore.data.length === 0) return;
+
+  if (dirty & (DirtyDefault.Data | DirtyDefault.Config)) {
+    ensureXScale(store);
+    bindGroupsToX(store);
+  }
+
+  if (dirty & (DirtyDefault.Data | DirtyDefault.Config | DirtyDefault.Flag)) {
+    // fillSeries reads explicit configs to know what's claimed; runs before
+    // ensureSeriesScales so its fills' yScales count as referenced.
+    fillSeries(store);
+  }
+
+  if (dirty & (DirtyDefault.Data | DirtyDefault.Config | DirtyDefault.Flag)) {
+    const referenced = ensureSeriesScales(store);
+    ensureAxes(store, referenced);
+  }
+
+  if (dirty & (DirtyDefault.Theme | DirtyDefault.Config | DirtyDefault.Flag)) {
+    recolorSeries(store);
   }
 }
 
@@ -325,8 +518,8 @@ export interface ChartStore {
   unclippedDrawHooks: Set<DrawCallback>;
   cursorDrawHooks: Set<CursorDrawCallback>;
 
-  // Focus mode: index of focused series, or null for none
-  focusedSeries: number | null;
+  /** Focus mode: (group, index) of focused series, or null for none */
+  focusedSeries: { group: number; index: number } | null;
   /** Alpha for non-focused series (0-1, default 1 = disabled) */
   focusAlpha: number;
   /** Action map: maps user gestures to chart reactions */
@@ -341,6 +534,12 @@ export interface ChartStore {
   locale: string | undefined;
   /** IANA timezone for time axis labels */
   timezone: string | undefined;
+  /**
+   * When true (default), `fillSeries()` auto-injects a default config for every
+   * data slot that no explicit `<Series>` claims. When false, only explicit
+   * Series children render — chart with data but no Series shows axes only.
+   */
+  autoFillSeries: boolean;
 
   // Immutable snapshot for UI subscribers (rebuilt before notifications)
   snapshot: ChartSnapshot;
@@ -367,7 +566,8 @@ export interface ChartStore {
   registerSeries: (cfg: ResolvedSeriesConfig) => void;
   unregisterSeries: (group: number, index: number) => void;
   toggleSeries: (group: number, index: number) => void;
-  setFocus: (seriesIdx: number | null) => void;
+  /** Set the focused series by (group, index), or null to clear. */
+  setFocus: (group: number | null, index?: number) => void;
   setSize: (w: number, h: number, dpr?: number) => void;
   scheduleRedraw: () => void;
   scheduleCursorRedraw: () => void;
@@ -404,6 +604,8 @@ export interface ChartStore {
   setCanvas: (node: HTMLCanvasElement | null) => void;
   /** Set title, axis labels, locale, and timezone */
   setLabels: (title?: string, xlabel?: string, ylabel?: string, locale?: string, timezone?: string) => void;
+  /** Toggle the auto-fill flag and re-run defaults. */
+  setAutoFillSeries: (enabled: boolean) => void;
 }
 
 /**
@@ -467,6 +669,7 @@ export function createChartStore(): ChartStore {
     ylabel: undefined,
     locale: undefined,
     timezone: undefined,
+    autoFillSeries: true,
     snapshot: EMPTY_SNAPSHOT,
     revision: 0,
     eventCallbacks: {},
@@ -491,8 +694,9 @@ export function createChartStore(): ChartStore {
       const existing = store.seriesConfigs.find(
         s => s.group === cfg.group && s.index === cfg.index,
       );
-      // Internal helper series never overwrite explicit user series
-      if (cfg._internal && existing != null && !existing._internal) return;
+      // Internal helper series never overwrite explicit user series; an
+      // existing _source==='fill' is always replaceable.
+      if (cfg._source === 'internal' && existing != null && existing._source !== 'internal' && existing._source !== 'fill') return;
 
       store.seriesConfigs = store.seriesConfigs.filter(
         s => !(s.group === cfg.group && s.index === cfg.index),
@@ -500,6 +704,13 @@ export function createChartStore(): ChartStore {
       store.seriesConfigs.push(cfg);
       rebuildSeriesConfigMap(store);
       store.renderer.clearGroupCache(cfg.group);
+      // Only fillSeries needs to react to a slot being claimed. Axes and
+      // scales reconcile in the next redraw — running them now would race
+      // with sibling <Axis>/<Scale> mounts that haven't fired yet.
+      fillSeries(store);
+      // Bump revision so subscribers see the slot change even when the total
+      // count is unchanged (explicit replacing fill at the same slot).
+      store.revision++;
     },
 
     unregisterSeries(group: number, index: number) {
@@ -508,6 +719,16 @@ export function createChartStore(): ChartStore {
       );
       rebuildSeriesConfigMap(store);
       store.renderer.clearGroupCache(group);
+      fillSeries(store);
+      retireUnusedDefaults(store);
+      store.revision++;
+    },
+
+    setAutoFillSeries(enabled: boolean) {
+      if (store.autoFillSeries === enabled) return;
+      store.autoFillSeries = enabled;
+      fillSeries(store);
+      store.scheduleRedraw();
     },
 
     toggleSeries(group: number, index: number) {
@@ -522,8 +743,8 @@ export function createChartStore(): ChartStore {
       }
     },
 
-    setFocus(seriesIdx: number | null) {
-      store.focusedSeries = seriesIdx;
+    setFocus(group: number | null, index?: number) {
+      store.focusedSeries = group == null ? null : { group, index: index ?? 0 };
       store.scheduleRedraw();
     },
 
@@ -561,7 +782,7 @@ export function createChartStore(): ChartStore {
     },
 
     redraw() {
-      const { scaleManager, dataStore, renderer, seriesConfigs, width, height, pxRatio, canvas, scheduler } = store;
+      const { scaleManager, dataStore, renderer, width, height, pxRatio, canvas, scheduler } = store;
 
       if (canvas == null || width === 0 || height === 0) return;
 
@@ -583,7 +804,7 @@ export function createChartStore(): ChartStore {
           store.plotBox,
           pxRatio,
           dataStore.data,
-          seriesConfigs,
+          store.seriesConfigs,
           getScale,
           (gi) => scaleManager.getGroupXScaleKey(gi),
           undefined,
@@ -616,21 +837,11 @@ export function createChartStore(): ChartStore {
         store.revision++;
       }
 
-      // Re-apply palette colors for series with auto-assigned strokes
-      const palette = store.theme.seriesColors;
-      for (let i = 0; i < seriesConfigs.length; i++) {
-        const cfg = seriesConfigs[i];
-        if (cfg == null || !cfg._autoStroke) continue;
-        const newStroke = palette[i % palette.length] ?? '#000';
-        if (cfg.stroke === newStroke) continue;
-        const newFill = cfg._autoFill && typeof newStroke === 'string'
-          ? withAlpha(newStroke, 0.5) : cfg.fill;
-        seriesConfigs[i] = { ...cfg, stroke: newStroke, fill: newFill };
-      }
-      rebuildSeriesConfigMap(store);
-
-      // 0. Inject defaults for missing y-scales, series, and axes
-      injectDefaults(store);
+      // Run all default reconcilers — idempotent safety net for state that
+      // discrete-event callers may not have flushed yet (first paint, theme
+      // swap, direct dataStore mutation in tests, etc.). Each sub-pass
+      // skips work cheaply when its inputs haven't changed.
+      applyDefaults(store, DirtyDefault.All);
 
       // 0b. Apply per-series orientation hints (horizontalBars sets transposed: true)
       applySeriesOrientations(store);
@@ -645,19 +856,9 @@ export function createChartStore(): ChartStore {
       });
 
       // 3. Auto-range all scales (single pass — windows already set)
-      // Use visible series for ranging. If a y-scale has NO visible series
-      // (e.g. Candlestick where helper series are show=false, or BoxWhisker
-      // which uses internal-only series), fall back to including hidden
-      // series so the scale still gets a range.
-      const visible = seriesConfigs.filter(s => s.show !== false);
-      const visibleScales = new Set(visible.map(s => s.yScale));
-      const seriesScaleMap = seriesConfigs
-        .filter(s => s.show !== false || !visibleScales.has(s.yScale))
-        .map(s => ({
-          group: s.group,
-          index: s.index,
-          yScale: s.yScale,
-        }));
+      // Read seriesConfigs after applyDefaults — fillSeries may have reassigned the array.
+      const seriesConfigs = store.seriesConfigs;
+      const seriesScaleMap = pickScaleParticipants(seriesConfigs);
 
       scaleManager.autoRange(dataStore.data, seriesScaleMap, dataStore);
 
@@ -723,11 +924,15 @@ export function createChartStore(): ChartStore {
       ctx.rect(store.plotBox.left, store.plotBox.top, store.plotBox.width, store.plotBox.height);
       ctx.clip();
 
+      const focused = store.focusedSeries;
       for (let i = 0; i < renderList.length; i++) {
         const info = renderList[i];
         if (info == null) continue;
         // Focus mode: dim non-focused series via canvas globalAlpha
-        if (store.focusedSeries != null && i !== store.focusedSeries) {
+        const isFocused = focused != null
+          && info.config.group === focused.group
+          && info.config.index === focused.index;
+        if (focused != null && !isFocused) {
           ctx.globalAlpha = store.focusAlpha;
           renderer.drawSeries(info, store.plotBox, 1);
           ctx.globalAlpha = 1;
@@ -933,9 +1138,33 @@ export function createChartStore(): ChartStore {
     },
 
     setData(data: ChartData) {
+      // Streaming guard: only re-run data-derived defaults when the *shape*
+      // changes (group count or per-group series count). Pure value updates
+      // (per-frame appends) skip the reconcile.
+      const prev = store.dataStore.data;
+      let sameShape = data.length === prev.length;
+      if (sameShape) {
+        for (let i = 0; i < data.length; i++) {
+          const a = data[i];
+          const b = prev[i];
+          if (a == null || b == null || a.series.length !== b.series.length) {
+            sameShape = false;
+            break;
+          }
+        }
+      }
       store.dataStore.setData(data);
       store.renderer.clearCache();
       store.revision++;
+      if (!sameShape) {
+        // Data shape changed — re-derive data-driven defaults now so any
+        // bare <Series /> mounted after this resolves to the correct slot.
+        // Axes/scales still defer to redraw to avoid racing with explicit
+        // <Axis>/<Scale> mounts that share the same commit.
+        ensureXScale(store);
+        bindGroupsToX(store);
+        fillSeries(store);
+      }
     },
 
     setCanvas(node: HTMLCanvasElement | null) {

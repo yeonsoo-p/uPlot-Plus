@@ -1,10 +1,14 @@
 // Components
 export { Chart } from './components/Chart';
 export { Scale } from './components/Scale';
+export type { ScaleProps } from './components/Scale';
 export { Series } from './components/Series';
+export type { SeriesProps } from './components/Series';
 export { Axis } from './components/Axis';
+export type { AxisProps } from './components/Axis';
 export { Band } from './components/Band';
 export { Legend } from './components/Legend';
+export type { LegendProps } from './components/Legend';
 export { Tooltip } from './components/Tooltip';
 export { ZoomRanger } from './components/ZoomRanger';
 export { Timeline } from './components/Timeline';
@@ -12,6 +16,7 @@ export { Sparkline } from './components/Sparkline';
 export { FloatingLegend } from './components/FloatingLegend';
 export { HoverLabel } from './components/HoverLabel';
 export { BoxWhisker } from './components/BoxWhisker';
+export { Candlestick } from './components/Candlestick';
 export { Heatmap } from './components/Heatmap';
 export { Vector } from './components/Vector';
 
@@ -78,7 +83,6 @@ export type { AnnotationStyle, DiagonalLineStyle } from './annotations';
 export type { LttbResult } from './types/downsample';
 export type { ZoomRangerProps } from './components/ZoomRanger';
 export type { TimelineProps, TimelineLane, TimelineSegment } from './types/timeline';
-export type { CandlestickProps } from './components/Candlestick';
 export type { SparklineProps } from './components/Sparkline';
 export type { FloatingLegendProps } from './components/FloatingLegend';
 export type { HoverLabelProps } from './components/HoverLabel';
@@ -94,7 +98,7 @@ export { bars, groupedBars, stackedBars, horizontalBars, horizontalGroupedBars, 
 export { monotoneCubic } from './paths/monotoneCubic';
 export { catmullRom } from './paths/catmullRom';
 export { points } from './paths/points';
-export { Candlestick } from './components/Candlestick';
+export type { CandlestickProps } from './components/Candlestick';
 
 // Data utilities
 export { stackGroup } from './math/stack';

@@ -1,5 +1,6 @@
-import React, { useSyncExternalStore } from 'react';
-import { useStore } from '../hooks/useChart';
+import React, { useContext, useSyncExternalStore } from 'react';
+import { createPortal } from 'react-dom';
+import { useStore, OverlayHostContext } from '../hooks/useChart';
 import { useDraggableOverlay } from '../hooks/useDraggableOverlay';
 import { Panel, SeriesRow, formatSeriesValue } from './overlay/SeriesPanel';
 import { getSeriesColor } from '../types/series';
@@ -44,6 +45,7 @@ export function FloatingLegend({
   className,
 }: FloatingLegendProps): React.ReactElement | null {
   const store = useStore();
+  const overlayHost = useContext(OverlayHostContext);
   const snap = useSyncExternalStore(store.subscribeCursor, store.getSnapshot);
 
   const { activeGroup, activeDataIdx } = snap;
@@ -52,7 +54,7 @@ export function FloatingLegend({
   const rowContent: Array<{ label: string; value: string }> = [];
   // Hidden series (show=false) are shown with reduced opacity so users can toggle them back on.
   // Internal helper series and legend=false series are excluded entirely.
-  const rows = store.seriesConfigs.filter(c => c.legend !== false && !c._internal).map((cfg) => {
+  const rows = store.seriesConfigs.filter(c => c.legend !== false && c._source !== 'internal').map((cfg) => {
     const color = getSeriesColor(cfg);
     const value = formatSeriesValue(store, cfg.group, cfg.index, activeGroup, activeDataIdx);
     const label = cfg.label ?? `Series ${cfg.index}`;
@@ -82,7 +84,7 @@ export function FloatingLegend({
 
   const isClickable = mode === 'draggable';
 
-  return (
+  const content = (
     <Panel
       ref={overlay.panelRef}
       left={overlay.renderPos.x}
@@ -104,4 +106,5 @@ export function FloatingLegend({
       ))}
     </Panel>
   );
+  return overlayHost != null ? createPortal(content, overlayHost) : content;
 }

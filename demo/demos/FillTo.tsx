@@ -15,8 +15,8 @@ export default function FillTo() {
 
   return (
     <Chart width="auto" height={400} data={data} xlabel="Index" ylabel="Value">
-      <Series group={0} index={0} stroke="#e74c3c" fill="rgba(231,76,60,0.15)" label="Fill to 0" fillTo={0} />
-      <Series group={0} index={1} stroke="#3498db" fill="rgba(52,152,219,0.15)" label="Fill to 30" fillTo={30} />
+      <Series stroke="#e74c3c" fill="rgba(231,76,60,0.15)" label="Fill to 0" fillTo={0} />
+      <Series stroke="#3498db" fill="rgba(52,152,219,0.15)" label="Fill to 30" fillTo={30} />
       <Series group={0} index={2} stroke="#2ecc71" fill="rgba(46,204,113,0.15)" label="Fill to min" fillTo={(min, _max) => min} />
     </Chart>
   );

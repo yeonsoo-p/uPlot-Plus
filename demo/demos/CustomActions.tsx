@@ -84,8 +84,8 @@ export default function CustomActions() {
       onKeyUp={(e) => { if (e.key === 'q' || e.key === 'Q') qHeld.current = false; }}
     >
       <Chart width="auto" height={400} data={data} actions={actions} xlabel="Sample" ylabel="Value">
-        <Series group={0} index={0} label="Signal A" width={thickSeries.has(0) ? 5 : 2} />
-        <Series group={0} index={1} label="Signal B" width={thickSeries.has(1) ? 5 : 2} />
+        <Series label="Signal A" width={thickSeries.has(0) ? 5 : 2} />
+        <Series label="Signal B" width={thickSeries.has(1) ? 5 : 2} />
         <Legend />
       </Chart>
       {log.length > 0 && (

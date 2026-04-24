@@ -14,11 +14,11 @@ export default function DashPatterns() {
 
   return (
     <Chart width="auto" height={400} data={data}>
-      <Series group={0} index={0} label="Solid" />
-      <Series group={0} index={1} label="Dashed [5,5]" dash={[5, 5]} />
-      <Series group={0} index={2} label="Dash-dot [10,5,2,5]" dash={[10, 5, 2, 5]} />
-      <Series group={0} index={3} label="Long dash [15,5]" dash={[15, 5]} cap="round" />
-      <Series group={0} index={4} label="Dotted [2,4]" dash={[2, 4]} cap="round" />
+      <Series label="Solid" />
+      <Series label="Dashed [5,5]" dash={[5, 5]} />
+      <Series label="Dash-dot [10,5,2,5]" dash={[10, 5, 2, 5]} />
+      <Series label="Long dash [15,5]" dash={[15, 5]} cap="round" />
+      <Series label="Dotted [2,4]" dash={[2, 4]} cap="round" />
     </Chart>
   );
 }

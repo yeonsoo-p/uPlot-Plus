@@ -61,8 +61,8 @@ export default function UseChartDemo() {
   return (
     <div>
       <Chart width="auto" height={350} data={data} >
-        <Series group={0} index={0} label="Sine" stroke="#e74c3c" />
-        <Series group={0} index={1} label="Cosine" stroke="#3498db" />
+        <Series label="Sine" stroke="#e74c3c" />
+        <Series label="Cosine" stroke="#3498db" />
         <Legend />
         <ChartInfoPanel />
       </Chart>

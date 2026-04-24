@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { createPortal } from 'react-dom';
 import { useDraggableOverlay } from '../hooks/useDraggableOverlay';
+import { OverlayHostContext } from '../hooks/useChart';
 import type { OverlayPosition } from '../types/common';
 import { panelStyle } from './overlay/SeriesPanel';
 
@@ -41,6 +43,7 @@ export function DraggableLabel({
   className,
   style: styleProp,
 }: DraggableLabelProps): React.ReactElement | null {
+  const overlayHost = useContext(OverlayHostContext);
   const overlay = useDraggableOverlay({
     mode: 'draggable',
     show,
@@ -63,7 +66,7 @@ export function DraggableLabel({
     }
   };
 
-  return (
+  const content = (
     <div
       ref={overlay.panelRef}
       className={className}
@@ -84,4 +87,5 @@ export function DraggableLabel({
       {children}
     </div>
   );
+  return overlayHost != null ? createPortal(content, overlayHost) : content;
 }

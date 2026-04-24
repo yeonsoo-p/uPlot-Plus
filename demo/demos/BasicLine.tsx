@@ -21,8 +21,8 @@ export default function BasicLine() {
 
   return (
     <Chart width="auto" height={400} data={data} xlabel="Time (s)" ylabel="Value">
-      <Series group={0} index={0} label="Sine" />
-      <Series group={0} index={1} label="Cosine" />
+      <Series label="Sine" />
+      <Series label="Cosine" />
     </Chart>
   );
 }

@@ -20,8 +20,8 @@ export default function ScaleDirection() {
       <Scale id="temp"  />
       <Axis scale="depth" label="Depth" values={fmtSuffix('m')} stroke="#2980b9" />
       <Axis scale="temp" side={Side.Right} label="Temperature (°C)" stroke="#e67e22" grid={{ show: false }} />
-      <Series group={0} index={0} yScale="depth" stroke="#2980b9" label="Depth" />
-      <Series group={0} index={1} yScale="temp" stroke="#e67e22" label="Temperature" />
+      <Series yScale="depth" stroke="#2980b9" label="Depth" />
+      <Series yScale="temp" stroke="#e67e22" label="Temperature" />
     </Chart>
   );
 }

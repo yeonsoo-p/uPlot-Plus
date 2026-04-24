@@ -53,7 +53,7 @@ export default function AxisIndicators() {
           border={{ show: true, stroke: '#c0392b', width: 1 }}
         />
 
-        <Series group={0} index={0} label="Signal" />
+        <Series label="Signal" />
       </Chart>
     </div>
   );

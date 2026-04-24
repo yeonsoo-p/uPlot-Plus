@@ -73,8 +73,8 @@ export default function ResponsiveDemo() {
       >
         {size != null && (
           <Chart width={size.width} height={size.height} data={data} xlabel="Index" ylabel="Value">
-            <Series group={0} index={0} label="Sin" />
-            <Series group={0} index={1} label="Cos" />
+            <Series label="Sin" />
+            <Series label="Cos" />
             <Legend />
           </Chart>
         )}

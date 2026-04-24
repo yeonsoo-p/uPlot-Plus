@@ -5,6 +5,17 @@ import type { ScaleState } from '../types/scales';
 
 export const ChartContext = createContext<ChartStore | null>(null);
 
+/**
+ * Host element for plot-area overlays (Tooltip, FloatingLegend, HoverLabel,
+ * DraggableLabel). Lives inside the canvas container, so overlays positioned
+ * with `plotBox`-relative coordinates land in the correct spot regardless of
+ * what siblings (e.g. a top-aligned Legend with `order: -1`) shift the canvas.
+ *
+ * `null` until Chart mounts the host. Overlays should fall back to inline
+ * render in that window.
+ */
+export const OverlayHostContext = createContext<HTMLElement | null>(null);
+
 /** Internal: access raw mutable store. Not part of the public API. */
 export function useStore(): ChartStore {
   const store = useContext(ChartContext);
@@ -31,8 +42,8 @@ export interface ChartAPI extends ChartSnapshot {
   getDataY(group: number, index: number): ArrayLike<number | null>;
   /** Toggle a series' visibility */
   toggleSeries(group: number, index: number): void;
-  /** Set or clear the focused series */
-  setFocus(seriesIdx: number | null): void;
+  /** Set the focused series by (group, index), or pass null to clear. */
+  setFocus(group: number | null, index?: number): void;
 }
 
 /**
@@ -70,6 +81,6 @@ export function useChart(channel: 'cursor' | 'full' = 'cursor'): ChartAPI {
 
     // Controlled mutations
     toggleSeries: (g, i) => store.toggleSeries(g, i),
-    setFocus: (idx) => store.setFocus(idx),
+    setFocus: (group, index) => store.setFocus(group, index),
   };
 }

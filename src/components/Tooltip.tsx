@@ -1,5 +1,6 @@
-import React, { useSyncExternalStore } from 'react';
-import { useStore } from '../hooks/useChart';
+import React, { useContext, useSyncExternalStore } from 'react';
+import { createPortal } from 'react-dom';
+import { useStore, OverlayHostContext } from '../hooks/useChart';
 import { useDraggableOverlay } from '../hooks/useDraggableOverlay';
 import type { TooltipProps, TooltipData, TooltipItem } from '../types/tooltip';
 import { Panel, SeriesRow, formatValue } from './overlay/SeriesPanel';
@@ -31,6 +32,7 @@ export function Tooltip({
   idleOpacity = 0.8,
 }: TooltipProps): React.ReactElement | null {
   const store = useStore();
+  const overlayHost = useContext(OverlayHostContext);
   const snap = useSyncExternalStore(store.subscribeCursor, store.getSnapshot);
 
   const { activeGroup, activeDataIdx } = snap;
@@ -54,7 +56,7 @@ export function Tooltip({
     // Hidden series (show=false) are excluded from tooltip — showing values for
     // invisible lines is confusing. Internal helpers and legend=false also excluded.
     for (const cfg of store.seriesConfigs) {
-      if (cfg.show === false || cfg.legend === false || cfg._internal) continue;
+      if (cfg.show === false || cfg.legend === false || cfg._source === 'internal') continue;
       const yData = store.dataStore.getYValues(cfg.group, cfg.index);
       const val = cfg.group === activeGroup ? (yData[activeDataIdx] ?? null) : null;
       items.push({
@@ -68,7 +70,7 @@ export function Tooltip({
   } else if (mode === 'draggable') {
     // Draggable mode: show series with dashes when cursor is off-chart
     for (const cfg of store.seriesConfigs) {
-      if (cfg.show === false || cfg.legend === false || cfg._internal) continue;
+      if (cfg.show === false || cfg.legend === false || cfg._source === 'internal') continue;
       items.push({
         label: cfg.label ?? `Series ${cfg.index}`,
         value: null,
@@ -123,8 +125,9 @@ export function Tooltip({
 
   // ---- Custom render function ----
 
+  let content: React.ReactElement;
   if (children) {
-    return (
+    content = (
       <div
         ref={overlay.panelRef}
         className={className}
@@ -141,29 +144,29 @@ export function Tooltip({
         {children(tooltipData)}
       </div>
     );
+  } else {
+    // ---- Default render ----
+    content = (
+      <Panel
+        ref={overlay.panelRef}
+        left={overlay.renderPos.x}
+        top={overlay.renderPos.y}
+        className={className}
+        style={panelStyle}
+        data-testid="tooltip-panel"
+        {...overlay.panelHandlers}
+      >
+        {xLabel && <div style={xLabelStyle}>{xLabel}</div>}
+        {items.map((item) => (
+          <SeriesRow
+            key={`${item.group}:${item.index}`}
+            label={item.label}
+            color={item.color}
+            value={formatValue(item.value)}
+          />
+        ))}
+      </Panel>
+    );
   }
-
-  // ---- Default render ----
-
-  return (
-    <Panel
-      ref={overlay.panelRef}
-      left={overlay.renderPos.x}
-      top={overlay.renderPos.y}
-      className={className}
-      style={panelStyle}
-      data-testid="tooltip-panel"
-      {...overlay.panelHandlers}
-    >
-      {xLabel && <div style={xLabelStyle}>{xLabel}</div>}
-      {items.map((item) => (
-        <SeriesRow
-          key={`${item.group}:${item.index}`}
-          label={item.label}
-          color={item.color}
-          value={formatValue(item.value)}
-        />
-      ))}
-    </Panel>
-  );
+  return overlayHost != null ? createPortal(content, overlayHost) : content;
 }

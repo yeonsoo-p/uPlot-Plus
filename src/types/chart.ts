@@ -69,4 +69,10 @@ export interface ChartProps {
   locale?: string;
   /** IANA timezone for time axis labels (default: browser local timezone) */
   timezone?: string;
+  /**
+   * Auto-render every data slot that has no explicit `<Series>` child (default: true).
+   * Set to `false` to render only explicit `<Series>` children — a chart with data
+   * but no Series children will show axes only.
+   */
+  autoFillSeries?: boolean;
 }

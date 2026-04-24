@@ -63,16 +63,12 @@ import { Chart, Series, ThemeProvider, DARK_THEME } from 'uplot-plus';
 
 // Pre-built dark theme
 <ThemeProvider theme={DARK_THEME}>
-  <Chart data={data} width={800} height={400}>
-    <Series group={0} index={0} />
-  </Chart>
+  <Chart data={data} width={800} height={400} />
 </ThemeProvider>
 
 // Custom partial overrides
 <ThemeProvider theme={{ axisStroke: '#ccc', seriesColors: ['#e74c3c', '#3498db'] }}>
-  <Chart data={data} width={800} height={400}>
-    <Series group={0} index={0} />
-  </Chart>
+  <Chart data={data} width={800} height={400} />
 </ThemeProvider>
 ```
 
@@ -109,25 +105,37 @@ panelShadow,hiddenOpacity,zIndex,tooltipZIndex}`,
 Root container. Creates the canvas, initializes the chart
 store, and provides context to all children.
 
-**Smart defaults:** `<Scale>`, `<Axis>` children are optional.
-If omitted, Chart auto-creates x/y scales and bottom/left
-axes. Series get auto-assigned colors from a 15-color palette
-when `stroke` is not provided. Data accepts three forms:
-`{ x, y }` (single series), `[{ x, y }, ...]` (multiple
-groups), or `[{ x, series: [...] }, ...]` (full form).
+**Smart defaults:** `<Scale>`, `<Axis>`, and `<Series>`
+children are all optional. If omitted, Chart auto-creates
+x/y scales, bottom/left axes, and one default series per
+data slot — `<Chart data={data} />` renders meaningful output
+on its own. Auto-filled series get palette colors in
+registration order. Pass `autoFillSeries={false}` to opt
+out of automatic series; only explicit `<Series>` children
+will render. Data accepts three forms: `{ x, y }` (single
+series), `[{ x, y }, ...]` (multiple groups), or
+`[{ x, series: [...] }, ...]` (full form).
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `width` | `number` | — | Chart width in CSS pixels **(required)** |
-| `height` | `number` | — | Chart height in CSS pixels **(required)** |
+| `width` | `SizeValue` | — | Width in CSS pixels or `'auto'` to fill container **(required)** |
+| `height` | `SizeValue` | — | Height in CSS pixels or `'auto'` to fill container **(required)** |
 | `data` | `DataInput` | — | Chart data **(required)** — `{ x, y }`, `[{ x, y }]`, or `[{ x, series }]` |
 | `children` | `ReactNode` | — | Scale, Series, Axis, Legend, etc. |
 | `className` | `string` | — | CSS class name |
+| `minWidth` | `number` | — | Min width in CSS pixels (when `width='auto'`) |
+| `minHeight` | `number` | — | Min height in CSS pixels (when `height='auto'`) |
 | `title` | `string` | — | Title drawn on canvas above the plot area |
 | `xlabel` | `string` | `'X Axis'` | Label for auto-generated x-axis |
 | `ylabel` | `string` | `'Y Axis'` | Label for auto-generated y-axis |
+| `ariaLabel` | `string` | — | Accessible label (overrides title for screen readers) |
+| `autoFillSeries` | `boolean` | `true` | Auto-render every data slot lacking an explicit `<Series>`. Set `false` for explicit-only mode. |
 | `pxRatio` | `number` | `devicePixelRatio` | Device pixel ratio override |
-| `syncKey` | `string` | — | Sync cursor across charts with the same key |
+| `syncCursorKey` | `string` | — | Cursor sync — charts with the same key share cursor position |
+| `syncScaleKey` | `string` | — | Scale-range sync — charts and ZoomRangers with the same key share zoom state |
+| `theme` | `ChartTheme` | — | Per-chart theme overrides (sets CSS custom properties on the wrapper) |
+| `locale` | `string` | browser locale | BCP 47 locale for number/date formatting |
+| `timezone` | `string` | browser TZ | IANA timezone for time-axis labels |
 | `actions` | `ActionList` | `DEFAULT_ACTIONS` | Gesture→reaction overrides (merged with defaults) |
 | `onDraw` | `DrawCallback` | — | Custom draw on persistent layer |
 | `onCursorDraw` | `CursorDrawCallback` | — | Custom draw on cursor overlay |
@@ -169,19 +177,26 @@ Built-in reaction strings: `zoomX`, `zoomY`, `zoomXY`,
 `panX`, `panY`, `panXY`, `reset`, `none`.
 
 ```tsx
-import { Chart, Scale, Series, Axis } from 'uplot-plus';
+import { Chart } from 'uplot-plus';
+
+// Smallest possible chart — auto-fill renders the y-series with palette[0]
+<Chart width={800} height={400} data={{ x, y }} />
+
+// Add explicit children only for the slots you want to customize.
+import { Scale, Series, Axis } from 'uplot-plus';
 
 <Chart width={800} height={400} data={data}>
   <Scale id="x" />
   <Scale id="y" />
   <Axis scale="x" label="X-Axis" />
   <Axis scale="y" label="Y-Axis" />
-  <Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Series A" />
+  <Series stroke="#e74c3c" width={2} label="Series A" />
 </Chart>
 ```
 
-**Demos:** All demos use Chart. Key examples: `basic-line`,
-`zoom-wheel`, `sync-cursor`, `draw-hooks`.
+**Demos:** All demos use Chart. Key examples: `minimal-chart`,
+`simple-data`, `basic-line`, `zoom-wheel`, `sync-cursor`,
+`draw-hooks`.
 
 ---
 
@@ -253,15 +268,22 @@ Registers a data series with the chart store. Each series
 references a `(group, index)` tuple in the data and maps to
 a y-scale. Renderless — returns `null`.
 
-**Smart defaults:** `yScale` defaults to `'y'`, `stroke` is
-auto-assigned from a 15-color palette based on registration
-order, and `show` defaults to `true`. The minimal series
-declaration is just `<Series group={0} index={0} />`.
+**Smart defaults:** `group` and `index` are both optional. A
+bare `<Series />` (no slot props) auto-bumps to the next
+unclaimed `(group, index)` slot in data order. Provide either
+to pin a slot — `<Series index={2} />` is slot `(0, 2)`. When
+`<Chart autoFillSeries>` is on (the default), unreferenced
+data slots get auto-filled with palette colors; declaring an
+explicit `<Series>` simply *replaces* the fill at that slot.
+
+`yScale` defaults to `'y'`, `stroke` is auto-assigned from a
+15-color palette based on registration order, and `show`
+defaults to `true`.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `group` | `number` | — | Data group index **(required)** |
-| `index` | `number` | — | Series index within group **(required)** |
+| `group` | `number` | auto-bump | Data group index. Omit to auto-pick the next unclaimed slot. |
+| `index` | `number` | auto-bump | Series index within group. Omit to auto-pick the next unclaimed slot. |
 | `yScale` | `string` | `'y'` | Y-axis scale key |
 | `show` | `boolean` | `true` | Visibility |
 | `label` | `string` | — | Legend/tooltip label |
@@ -322,17 +344,17 @@ Use the `fadeGradient()` and `withAlpha()` helpers from
 ```tsx
 import { Series, bars, withAlpha, fadeGradient } from 'uplot-plus';
 
-// Line series
-<Series group={0} index={0} yScale="y" stroke="#e74c3c" width={2} label="Revenue" />
+// Line series — slot defaults to (0, 0)
+<Series stroke="#e74c3c" width={2} label="Revenue" />
 
 // Bar series
-<Series group={0} index={0} yScale="y" paths={bars()} stroke="#3498db" fill="#3498db80" />
+<Series paths={bars()} stroke="#3498db" fill="#3498db80" />
 
 // Area fill with gradient
-<Series group={0} index={0} yScale="y" stroke="#4285f4" fill={fadeGradient('#4285f4')} />
+<Series stroke="#4285f4" fill={fadeGradient('#4285f4')} />
 
 // Dashed line with points
-<Series group={0} index={0} yScale="y" stroke="#888" dash={[6, 4]} points={{ show: true, size: 6 }} />
+<Series stroke="#888" dash={[6, 4]} points={{ show: true, size: 6 }} />
 ```
 
 **Demos:** `basic-line`, `area-fill`, `point-styles`,
@@ -362,7 +384,7 @@ orientations.
 import { Chart, Series, Axis, horizontalBars } from 'uplot-plus';
 
 <Chart data={data}>
-  <Series group={0} index={0} paths={horizontalBars()} stroke="#3498db" />
+  <Series paths={horizontalBars()} stroke="#3498db" />
   <Axis scale="x" />  {/* auto-side: rendered on the Left */}
   <Axis scale="y" />  {/* auto-side: rendered on the Bottom */}
 </Chart>
@@ -452,8 +474,8 @@ import { Band } from 'uplot-plus';
   <Scale id="y" />
   <Axis scale="x" />
   <Axis scale="y" />
-  <Series group={0} index={0} yScale="y" stroke="blue" label="Upper" />
-  <Series group={0} index={1} yScale="y" stroke="blue" label="Lower" />
+  <Series index={0} stroke="blue" label="Upper" />
+  <Series index={1} stroke="blue" label="Lower" />
   <Band series={[0, 1]} group={0} fill="rgba(100,150,255,0.2)" />
 </Chart>
 ```
@@ -697,7 +719,7 @@ import { HLine, VLine, Region, AnnotationLabel } from 'uplot-plus';
   <Scale id="y" auto={false} min={10} max={90} />
   <Axis scale="x" />
   <Axis scale="y" />
-  <Series group={0} index={0} yScale="y" stroke="#2980b9" width={2} />
+  <Series stroke="#2980b9" width={2} />
   <Region yMin={65} yMax={90} yScale="y" fill="rgba(231, 76, 60, 0.08)" />
   <HLine value={65} yScale="y" stroke="#e74c3c" width={2} dash={[6, 4]} label="Threshold: 65" />
   <VLine value={100} xScale="x" stroke="#8e44ad" dash={[4, 4]} />
@@ -886,7 +908,7 @@ import { Chart, Series, Axis, Vector, fmtSuffix } from 'uplot-plus';
 
 <Chart width={800} height={400} data={chartData} ylabel="Wind Speed (km/h)">
   <Axis scale="x" label="Time (hours)" values={fmtSuffix('h')} />
-  <Series group={0} index={0} label="Speed" dash={[4, 3]} />
+  <Series label="Speed" dash={[4, 3]} />
   <Vector directions={directions} />
 </Chart>
 ```
@@ -938,7 +960,7 @@ const [range, setRange] = useState<[number, number] | null>(null);
   <Scale id="y" />
   <Axis scale="x" />
   <Axis scale="y" />
-  <Series group={0} index={0} yScale="y" stroke="#3498db" />
+  <Series stroke="#3498db" />
 </Chart>
 ```
 

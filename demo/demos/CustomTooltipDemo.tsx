@@ -30,9 +30,9 @@ export default function CustomTooltipDemo() {
       <div>
         <h4 className="mt-0 mb-2">Cursor mode — custom render function</h4>
         <Chart width="auto" height={400} data={data} xlabel="Day" ylabel="Value ($K)">
-          <Series group={0} index={0} label="Revenue" stroke={COLORS[0]} />
-          <Series group={0} index={1} label="Cost" stroke={COLORS[1]} />
-          <Series group={0} index={2} label="Profit" stroke={COLORS[2]} />
+          <Series label="Revenue" stroke={COLORS[0]} />
+          <Series label="Cost" stroke={COLORS[1]} />
+          <Series label="Profit" stroke={COLORS[2]} />
           <Legend />
           <Tooltip>
             {(tooltipData) => (
@@ -65,9 +65,9 @@ export default function CustomTooltipDemo() {
       <div>
         <h4 className="mt-0 mb-2">Draggable mode — drag to reposition, values update with cursor</h4>
         <Chart width="auto" height={400} data={data} xlabel="Day" ylabel="Value ($K)">
-          <Series group={0} index={0} label="Revenue" stroke={COLORS[0]} />
-          <Series group={0} index={1} label="Cost" stroke={COLORS[1]} />
-          <Series group={0} index={2} label="Profit" stroke={COLORS[2]} />
+          <Series label="Revenue" stroke={COLORS[0]} />
+          <Series label="Cost" stroke={COLORS[1]} />
+          <Series label="Profit" stroke={COLORS[2]} />
           <Legend />
           <Tooltip mode="draggable" position="top-left" />
         </Chart>

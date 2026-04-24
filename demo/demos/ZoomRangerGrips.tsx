@@ -25,7 +25,7 @@ export default function ZoomRangerGripsDemo() {
     <div>
       <Chart width="auto" height={300} data={data}>
         <Scale id="x" auto={range == null} min={range?.[0]} max={range?.[1]} />
-        <Series group={0} index={0} label="Value" />
+        <Series label="Value" />
       </Chart>
 
       <div className="mt-2">

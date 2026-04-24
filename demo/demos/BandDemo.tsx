@@ -34,18 +34,18 @@ export default function BandDemo() {
     <div>
       <h4 className="mt-3 mb-1">Confidence Interval</h4>
       <Chart width="auto" height={280} data={confData} xlabel="Sample" ylabel="Value">
-        <Series group={0} index={0} label="Mean" stroke="#2980b9" width={2} />
-        <Series group={0} index={1} label="Upper" stroke="#85c1e9" width={1} dash={[4, 4]} />
-        <Series group={0} index={2} label="Lower" stroke="#85c1e9" width={1} dash={[4, 4]} />
+        <Series label="Mean" stroke="#2980b9" width={2} />
+        <Series label="Upper" stroke="#85c1e9" width={1} dash={[4, 4]} />
+        <Series label="Lower" stroke="#85c1e9" width={1} dash={[4, 4]} />
         <Band series={[1, 2]} group={0} fill="rgba(41, 128, 185, 0.15)" />
         <Legend />
       </Chart>
 
       <h4 className="mt-3 mb-1">Multiple Bands Between Series</h4>
       <Chart width="auto" height={280} data={multiData} xlabel="Sample" ylabel="Value">
-        <Series group={0} index={0} label="Series A" stroke="#e74c3c" />
-        <Series group={0} index={1} label="Series B" stroke="#27ae60" />
-        <Series group={0} index={2} label="Series C" stroke="#8e44ad" />
+        <Series label="Series A" stroke="#e74c3c" />
+        <Series label="Series B" stroke="#27ae60" />
+        <Series label="Series C" stroke="#8e44ad" />
         <Band series={[0, 1]} group={0} fill="rgba(231, 76, 60, 0.1)" />
         <Band series={[1, 2]} group={0} fill="rgba(39, 174, 96, 0.1)" />
         <Legend />

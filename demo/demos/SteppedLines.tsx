@@ -12,9 +12,9 @@ export default function SteppedLines() {
 
   return (
     <Chart width="auto" height={400} data={data} xlabel="Index" ylabel="Value">
-      <Series group={0} index={0} label="Step After (default)" paths={stepped(1)} />
-      <Series group={0} index={1} label="Step Before" paths={stepped(-1)} />
-      <Series group={0} index={2} label="Mid Step" paths={stepped(0)} />
+      <Series label="Step After (default)" paths={stepped(1)} />
+      <Series label="Step Before" paths={stepped(-1)} />
+      <Series label="Mid Step" paths={stepped(0)} />
     </Chart>
   );
 }

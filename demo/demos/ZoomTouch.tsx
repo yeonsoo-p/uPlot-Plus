@@ -19,7 +19,7 @@ export default function ZoomTouch() {
   return (
     <div>
       <Chart width="auto" height={400} data={data} >
-        <Series group={0} index={0} label="Signal" />
+        <Series label="Signal" />
       </Chart>
     </div>
   );

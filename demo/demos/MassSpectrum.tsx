@@ -63,12 +63,9 @@ export default function MassSpectrum() {
       <Axis scale="x" label="m/z" values={fmtSuffix('')} />
       <Axis scale="y" label="Intensity" values={fmtIntensity} />
       <Series
-        group={0}
-        index={0}
         stroke="#2c3e50"
         label="Intensity"
-        paths={bars()}
-      />
+        paths={bars()} />
     </Chart>
   );
 }

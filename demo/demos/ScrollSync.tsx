@@ -18,7 +18,7 @@ export default function ScrollSync() {
         {LABELS.map((label, i) => (
           <div key={label} className="mb-3">
             <Chart width="auto" height={150} data={datasets[i] ?? []} syncCursorKey="scroll" ylabel={label}>
-              <Series group={0} index={0} label={label} />
+              <Series label={label} />
               <Legend />
             </Chart>
           </div>

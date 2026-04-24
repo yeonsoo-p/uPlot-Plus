@@ -39,16 +39,10 @@ export default function DataSmoothing() {
   return (
     <Chart width="auto" height={400} data={data} xlabel="Sample" ylabel="Value">
       <Series
-        group={0}
-        index={0}
-        label="Noisy"
-      />
+        label="Noisy" />
       <Series
-        group={0}
-        index={1}
         width={2.5}
-        label="Smoothed (MA-15)"
-      />
+        label="Smoothed (MA-15)" />
       <Legend />
     </Chart>
   );

@@ -17,7 +17,7 @@ export default function AxisAutosize() {
     <div>
       <Chart width="auto" height={400} data={data} xlabel="Sample">
         <Axis scale="y" label="Value" values={fmtMillions} />
-        <Series group={0} index={0} label="Large Values" />
+        <Series label="Large Values" />
       </Chart>
     </div>
   );

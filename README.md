@@ -10,15 +10,22 @@ High-performance React charting library ripped off from [uPlot](https://github.c
 npm install uplot-plus react react-dom
 ```
 
-Scales, axes, and colors are auto-injected when omitted — the simplest chart is just data + series:
+Scales, axes, series, and colors are all auto-injected when omitted — the simplest chart is just `<Chart data={data} />`:
 
 ```tsx
-import { Chart, Series } from 'uplot-plus';
+import { Chart } from 'uplot-plus';
 
 const data = { x: [1, 2, 3, 4, 5], y: [10, 25, 13, 30, 18] };
 
-<Chart width={800} height={400} data={data}>
-  <Series group={0} index={0} label="Revenue" />
+<Chart width={800} height={400} data={data} />
+```
+
+Every `(group, index)` slot present in `data` auto-renders with a palette color. Declare a `<Series>` only when you want to customize a slot — bare `<Series />` (no `group`/`index`) auto-bumps to the next unclaimed slot:
+
+```tsx
+// Override the first series; second series stays on auto palette
+<Chart data={[{ x, series: [y1, y2] }]}>
+  <Series label="Revenue" stroke="red" />
 </Chart>
 ```
 
@@ -34,10 +41,12 @@ const data = [{ x: [1, 2, 3, 4, 5], series: [[10, 25, 13, 30, 18], [5, 15, 20, 1
   <Scale id="y" />
   <Axis scale="x" label="X-Axis" />
   <Axis scale="y" label="Y-Axis" />
-  <Series group={0} index={0} yScale="y" stroke="#e74c3c" label="Series A" />
-  <Series group={0} index={1} yScale="y" stroke="#3498db" label="Series B" />
+  <Series index={0} stroke="#e74c3c" label="Series A" />
+  <Series index={1} stroke="#3498db" label="Series B" />
 </Chart>
 ```
+
+Pass `autoFillSeries={false}` on `<Chart>` to opt out — only explicit `<Series>` children will render.
 
 ## Chart Types
 
@@ -78,9 +87,7 @@ Every user gesture maps to a chart reaction via the **action map**. Default beha
 
 ```tsx
 // Defaults: leftDrag→zoomX, leftDblclick→reset, wheel→zoomX, yGutterDrag→panY, xGutterDrag→panX
-<Chart data={data} width={800} height={400}>
-  <Series group={0} index={0} />
-</Chart>
+<Chart data={data} width={800} height={400} />
 ```
 
 Override any gesture by passing `[action, reaction]` tuples — merged with defaults internally:
@@ -119,7 +126,7 @@ Custom function matchers for actions the built-in classifiers don't cover:
 ## Components
 
 | Component | Description |
-|-----------|-------------|
+| ----------- | ------------- |
 | `<Chart>` | Root container — creates the canvas, manages the chart store |
 | `<Scale>` | Registers a scale (linear, log, asinh, ordinal) |
 | `<Series>` | Registers a data series with stroke, fill, path builder |
@@ -182,25 +189,19 @@ import { HLine, VLine, Region, AnnotationLabel } from 'uplot-plus';
 Switch between light/dark themes, customize colors, or style via CSS custom properties:
 
 ```tsx
-import { Chart, Series, ThemeProvider, DARK_THEME } from 'uplot-plus';
+import { Chart, ThemeProvider, DARK_THEME } from 'uplot-plus';
 
 // Dark mode via ThemeProvider
 <ThemeProvider theme={DARK_THEME}>
-  <Chart data={data} width={800} height={400}>
-    <Series group={0} index={0} />
-  </Chart>
+  <Chart data={data} width={800} height={400} />
 </ThemeProvider>
 
 // Per-chart theme override
-<Chart data={data} width={800} height={400} theme={{ seriesColors: ['#e74c3c', '#3498db'] }}>
-  <Series group={0} index={0} />
-</Chart>
+<Chart data={data} width={800} height={400} theme={{ seriesColors: ['#e74c3c', '#3498db'] }} />
 
 // CSS custom properties (no ThemeProvider needed)
 <div style={{ '--uplot-axis-stroke': '#8ab4f8', '--uplot-grid-stroke': 'rgba(138,180,248,0.1)' }}>
-  <Chart data={data} width={800} height={400}>
-    <Series group={0} index={0} />
-  </Chart>
+  <Chart data={data} width={800} height={400} />
 </div>
 ```
 
@@ -219,7 +220,6 @@ import { Chart, Series, ThemeProvider, DARK_THEME } from 'uplot-plus';
 | Theme presets | `THEME_DEFAULTS`, `DARK_THEME` |
 
 > Full API and examples: [docs/UTILITIES.md](docs/UTILITIES.md)
-
 > Advanced: [Event callbacks, hooks, controlled scales](docs/ADVANCED.md)
 
 ## Development

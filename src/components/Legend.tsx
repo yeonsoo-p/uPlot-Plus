@@ -12,7 +12,7 @@ import {
   overlayHiddenOpacity,
 } from './overlay/SeriesPanel';
 
-interface LegendProps extends LegendConfig {
+export interface LegendProps extends LegendConfig {
   className?: string;
 }
 
@@ -90,7 +90,7 @@ export function Legend({ show = true, position = 'bottom', className }: LegendPr
       {/* Hidden series (show=false) are shown with reduced opacity so users can toggle them back on.
           Internal helper series and legend=false series are excluded entirely. */}
       {store.seriesConfigs.map((cfg) => {
-        if (cfg.legend === false || cfg._internal) return null;
+        if (cfg.legend === false || cfg._source === 'internal') return null;
         const color = getSeriesColor(cfg);
         const valueStr = formatSeriesValue(store, cfg.group, cfg.index, activeGroup, activeDataIdx);
 

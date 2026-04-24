@@ -14,7 +14,7 @@ export default function DataTypes() {
           Plain arrays — promoted to Float64Array internally
         </p>
         <Chart width={250} height={180} data={{ x: [1, 2, 3, 4, 5], y: [10, 40, 20, 50, 30] }}>
-          <Series group={0} index={0} label="Plain" />
+          <Series label="Plain" />
         </Chart>
       </div>
 
@@ -32,7 +32,7 @@ export default function DataTypes() {
             y: new Float64Array([10, 40, 20, 50, 30]),
           }}
         >
-          <Series group={0} index={0} label="Typed" />
+          <Series label="Typed" />
         </Chart>
       </div>
 
@@ -43,7 +43,7 @@ export default function DataTypes() {
           Nullable arrays — nulls become gaps
         </p>
         <Chart width={250} height={180} data={{ x: [1, 2, 3, 4, 5], y: [10, null, 30, null, 50] }}>
-          <Series group={0} index={0} label="Nullable" />
+          <Series label="Nullable" />
         </Chart>
       </div>
     </div>

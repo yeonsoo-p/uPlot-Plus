@@ -40,7 +40,7 @@ export default function ResizeDemo() {
       </div>
       <div className="inline-block border border-dashed border-gray-300">
         <Chart width={width} height={height} data={data} xlabel="Index" ylabel="Value">
-          <Series group={0} index={0} label="Signal" />
+          <Series label="Signal" />
           <Legend />
         </Chart>
       </div>

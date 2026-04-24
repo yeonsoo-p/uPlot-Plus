@@ -11,7 +11,6 @@ import LegendDemo from './LegendDemo';
 import NoData from './NoData';
 
 // --- Line Styles ---
-import SmoothLines from './SmoothLines';
 import SteppedLines from './SteppedLines';
 import LinePaths from './LinePaths';
 import SpanGaps from './SpanGaps';
@@ -33,8 +32,7 @@ import HorizontalStackedBars from './HorizontalStackedBars';
 // --- Scales ---
 import MultipleScales from './MultipleScales';
 import DependentScales from './DependentScales';
-import LogScales from './LogScales';
-import LogScales2 from './LogScales2';
+import LogScales from './LogScales2';
 import AsinhScales from './AsinhScales';
 import ScaleDirection from './ScaleDirection';
 import ScalePadding from './ScalePadding';
@@ -62,11 +60,8 @@ import TimelineDiscrete from './TimelineDiscrete';
 // --- Cursor & Interaction ---
 import UseChartDemo from './UseChartDemo';
 import SyncCursor from './SyncCursor';
-import CursorBind from './CursorBind';
-import CursorSnap from './CursorSnap';
 import FocusCursor from './FocusCursor';
 import NearestNonNull from './NearestNonNull';
-import Tooltips from './Tooltips';
 import CursorTooltip from './CursorTooltip';
 import HoverLabel from './HoverLabel';
 import FloatingLegendDemo from './FloatingLegendDemo';
@@ -89,7 +84,6 @@ import SelectFetch from './SelectFetch';
 // --- Data Handling ---
 import MissingData from './MissingData';
 import SparseData from './SparseData';
-import PathGapClip from './PathGapClip';
 import AlignData from './AlignData';
 import MultiXAxis from './MultiXAxis';
 import AddDelSeries from './AddDelSeries';
@@ -100,7 +94,6 @@ import CustomTooltipDemo from './CustomTooltipDemo';
 import DraggableLabelDemo from './DraggableLabelDemo';
 
 // --- Layout & Streaming ---
-import StreamingHookDemo from './StreamingHookDemo';
 import Sparklines from './Sparklines';
 import ResizeDemo from './ResizeDemo';
 import ResponsiveDemo from './ResponsiveDemo';
@@ -119,7 +112,6 @@ import BandDemo from './BandDemo';
 import DrawHooks from './DrawHooks';
 import Annotations from './Annotations';
 import Gradients from './Gradients';
-import HighLowBands from './HighLowBands';
 
 // --- Theming ---
 import ThemePresets from './ThemePresets';
@@ -172,7 +164,6 @@ export const demos: DemoEntry[] = [
   { id: 'no-data', title: 'No Data / Edge Cases', description: 'Single point, two points, and all-null edge cases.', category: 'Data Handling', component: NoData, sourceFile: 'NoData' },
 
   // --- Line Styles ---
-  { id: 'smooth-lines', title: 'Smooth Lines', description: 'Linear vs monotone cubic vs Catmull-Rom spline interpolation.', category: 'Line Styles', component: SmoothLines, sourceFile: 'SmoothLines' },
   { id: 'stepped-lines', title: 'Stepped Lines', description: 'Staircase paths with step-after, step-before, and mid-step alignment.', category: 'Line Styles', component: SteppedLines, sourceFile: 'SteppedLines' },
   { id: 'line-paths', title: 'Line Paths', description: 'All path builder types: linear, monotoneCubic, catmullRom, stepped, bars, points.', category: 'Line Styles', component: LinePaths, sourceFile: 'LinePaths' },
   { id: 'span-gaps', title: 'Span Gaps', description: 'spanGaps connects series across null values instead of breaking the line.', category: 'Line Styles', component: SpanGaps, sourceFile: 'SpanGaps' },
@@ -194,8 +185,7 @@ export const demos: DemoEntry[] = [
   // --- Scales ---
   { id: 'multiple-scales', title: 'Multiple Scales', description: 'Temperature and humidity on independent y-scales with left/right axes.', category: 'Scales', component: MultipleScales, sourceFile: 'MultipleScales' },
   { id: 'dependent-scales', title: 'Dependent Scales', description: 'Fahrenheit left axis with derived Celsius right axis.', category: 'Scales', component: DependentScales, sourceFile: 'DependentScales' },
-  { id: 'log-scales', title: 'Log Scales', description: 'Logarithmic y-scale (base 10) for exponential growth data.', category: 'Scales', component: LogScales, sourceFile: 'LogScales' },
-  { id: 'log-scales-2', title: 'Log Scales (Base 2 vs 10)', description: 'Logarithmic scale comparison: base 10 vs base 2.', category: 'Scales', component: LogScales2, sourceFile: 'LogScales2' },
+  { id: 'log-scales', title: 'Log Scales', description: 'Logarithmic scale comparison: base 10 vs base 2.', category: 'Scales', component: LogScales, sourceFile: 'LogScales2' },
   { id: 'asinh-scales', title: 'Asinh Scales', description: 'Inverse hyperbolic sine scale for data spanning negative-to-positive.', category: 'Scales', component: AsinhScales, sourceFile: 'AsinhScales' },
   { id: 'scale-direction', title: 'Scale Direction', description: 'Reversed y-axis (dir=-1) for depth charts where values increase downward.', category: 'Scales', component: ScaleDirection, sourceFile: 'ScaleDirection' },
   { id: 'scale-padding', title: 'Scale Padding', description: 'Scale with extra padding around data range.', category: 'Scales', component: ScalePadding, sourceFile: 'ScalePadding' },
@@ -222,11 +212,8 @@ export const demos: DemoEntry[] = [
 
   // --- Cursor & Interaction ---
   { id: 'sync-cursor', title: 'Sync Cursor', description: 'Two charts sharing cursor position via syncCursorKey.', category: 'Cursor & Interaction', component: SyncCursor, sourceFile: 'SyncCursor' },
-  { id: 'cursor-bind', title: 'Cursor Bind', description: 'Two charts synced via syncCursorKey with different data.', category: 'Cursor & Interaction', component: CursorBind, sourceFile: 'CursorBind' },
-  { id: 'cursor-snap', title: 'Cursor Snap', description: 'Cursor snapping with sparse data (30 points).', category: 'Cursor & Interaction', component: CursorSnap, sourceFile: 'CursorSnap' },
   { id: 'focus-cursor', title: 'Focus Cursor', description: 'Proximity-based focus dims non-closest series on hover.', category: 'Cursor & Interaction', component: FocusCursor, sourceFile: 'FocusCursor' },
   { id: 'nearest-non-null', title: 'Nearest Non-Null', description: 'Cursor snapping that skips over null values.', category: 'Cursor & Interaction', component: NearestNonNull, sourceFile: 'NearestNonNull' },
-  { id: 'tooltips', title: 'Tooltips', description: 'Default tooltip component showing all series values at cursor.', category: 'Tooltips & Legends', component: Tooltips, sourceFile: 'Tooltips' },
   { id: 'cursor-tooltip', title: 'Cursor + Tooltip Sync', description: 'Two synced charts each with tooltip following cursor.', category: 'Tooltips & Legends', component: CursorTooltip, sourceFile: 'CursorTooltip' },
   { id: 'hover-label', title: 'Hover Label', description: 'Hover over a series for 1 second to show its label as a floating tag.', category: 'Cursor & Interaction', component: HoverLabel, sourceFile: 'HoverLabel' },
   { id: 'floating-legend', title: 'Floating Legend', description: 'Draggable legend widget inside the chart area with live values.', category: 'Tooltips & Legends', component: FloatingLegendDemo, sourceFile: 'FloatingLegendDemo' },
@@ -252,7 +239,6 @@ export const demos: DemoEntry[] = [
   // --- Data Handling ---
   { id: 'missing-data', title: 'Missing Data', description: 'Null values in data arrays create gaps. Dual y-axes with custom formatters.', category: 'Data Handling', component: MissingData, sourceFile: 'MissingData' },
   { id: 'sparse-data', title: 'Sparse Data', description: 'Very sparse data (10 points across large x-range).', category: 'Data Handling', component: SparseData, sourceFile: 'SparseData' },
-  { id: 'path-gap-clip', title: 'Path Gap Clip', description: 'Null gaps vs spanGaps for handling missing data points.', category: 'Data Handling', component: PathGapClip, sourceFile: 'PathGapClip' },
   { id: 'align-data', title: 'Align Data', description: 'Merge datasets with different x-values using alignData() utility.', category: 'Data Handling', component: AlignData, sourceFile: 'AlignData' },
   { id: 'multi-x-axis', title: 'Multi X-Axis', description: 'uPlot+ exclusive: two data groups with independent x-ranges on one chart.', category: 'Data Handling', component: MultiXAxis, sourceFile: 'MultiXAxis' },
   { id: 'add-del-series', title: 'Add/Remove Series', description: 'Toggle buttons to dynamically add/remove series.', category: 'Data Handling', component: AddDelSeries, sourceFile: 'AddDelSeries' },
@@ -264,7 +250,6 @@ export const demos: DemoEntry[] = [
   { id: 'responsive-demo', title: 'Responsive', description: 'Auto-size chart to container via ResizeObserver.', category: 'Layout & Streaming', component: ResponsiveDemo, sourceFile: 'ResponsiveDemo' },
   { id: 'flex-auto-resize', title: 'Flex Auto Resize', description: 'Drag-resizable flex layout with width="auto" chart.', category: 'Layout & Streaming', component: FlexAutoResize, sourceFile: 'FlexAutoResize' },
   { id: 'scroll-sync', title: 'Scroll Sync', description: 'Multiple synced charts in a scrollable container.', category: 'Layout & Streaming', component: ScrollSync, sourceFile: 'ScrollSync' },
-  { id: 'streaming-hook', title: 'Streaming Demo', description: 'Streaming with plain useState: start/stop, FPS counter, sliding window.', category: 'Layout & Streaming', component: StreamingHookDemo, sourceFile: 'StreamingHookDemo' },
   { id: 'stream-data', title: 'Stream Data', description: '3-series 60fps streaming with 2000-point sliding window and FPS counter.', category: 'Layout & Streaming', component: StreamData, sourceFile: 'StreamData' },
   { id: 'realtime-sine', title: 'Real-Time Sine', description: '10,000-point scrolling sine waves at 60fps — inspired by webgl-plot-react.', category: 'Layout & Streaming', component: RealtimeSine, sourceFile: 'RealtimeSine' },
   { id: 'large-dataset', title: 'Large Dataset', description: '2,000,000 points rendered with minimal configuration to test performance.', category: 'Layout & Streaming', component: LargeDataset, sourceFile: 'LargeDataset' },
@@ -275,7 +260,6 @@ export const demos: DemoEntry[] = [
   { id: 'draw-hooks', title: 'Draw Hooks', description: 'onDraw for threshold lines/zones, onCursorDraw for crosshair labels.', category: 'Annotations & Drawing', component: DrawHooks, sourceFile: 'DrawHooks' },
   { id: 'annotations', title: 'Annotations', description: 'Declarative annotation components: horizontal lines, vertical markers, horizontal and vertical regions, and labels.', category: 'Annotations & Drawing', component: Annotations, sourceFile: 'Annotations' },
   { id: 'gradients', title: 'Gradients', description: 'Area chart with linear gradient fills from top to bottom.', category: 'Annotations & Drawing', component: Gradients, sourceFile: 'Gradients' },
-  { id: 'high-low-bands', title: 'High/Low Bands', description: 'Band component fills the region between upper and lower confidence bounds.', category: 'Annotations & Drawing', component: HighLowBands, sourceFile: 'HighLowBands' },
   { id: 'band-demo', title: 'Band Component', description: 'Band component: confidence intervals, between-series fills, and multiple bands.', category: 'Annotations & Drawing', component: BandDemo, sourceFile: 'BandDemo' },
   { id: 'draw-hooks-composable', title: 'Composable Draw Hooks', description: 'useDrawHook and useCursorDrawHook as composable child components for canvas drawing.', category: 'Annotations & Drawing', component: DrawHooksComposable, sourceFile: 'DrawHooksComposable' },
   { id: 'palette-colors', title: 'Palette & Colors', description: 'palette(), withAlpha(), fadeGradient() — auto-generate colors, transparency, and gradient fills.', category: 'Annotations & Drawing', component: PaletteColors, sourceFile: 'PaletteColors' },

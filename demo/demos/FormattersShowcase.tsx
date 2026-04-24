@@ -55,7 +55,7 @@ export default function FormattersShowcase() {
           <Chart width={W} height={H} data={compactData}>
             <Scale id="y" auto />
             <Axis scale="y" side={Side.Left} values={fmtCompact()} />
-            <Series group={0} index={0} stroke="#e74c3c" />
+            <Series stroke="#e74c3c" />
           </Chart>
         </SmallChart>
 
@@ -63,7 +63,7 @@ export default function FormattersShowcase() {
           <Chart width={W} height={H} data={suffData}>
             <Scale id="y" auto />
             <Axis scale="y" side={Side.Left} values={fmtSuffix('°C', 1)} />
-            <Series group={0} index={0} stroke="#3498db" />
+            <Series stroke="#3498db" />
           </Chart>
         </SmallChart>
 
@@ -71,7 +71,7 @@ export default function FormattersShowcase() {
           <Chart width={W} height={H} data={hourData}>
             <Scale id="x" time auto />
             <Axis scale="x" side={Side.Bottom} values={fmtHourMin()} />
-            <Series group={0} index={0} stroke="#2ecc71" />
+            <Series stroke="#2ecc71" />
           </Chart>
         </SmallChart>
 
@@ -79,7 +79,7 @@ export default function FormattersShowcase() {
           <Chart width={W} height={H} data={monthData}>
             <Scale id="x" time auto />
             <Axis scale="x" side={Side.Bottom} values={fmtMonthName()} />
-            <Series group={0} index={0} stroke="#9b59b6" />
+            <Series stroke="#9b59b6" />
           </Chart>
         </SmallChart>
 
@@ -87,7 +87,7 @@ export default function FormattersShowcase() {
           <Chart width={W} height={H} data={dateData}>
             <Scale id="x" time auto />
             <Axis scale="x" side={Side.Bottom} values={fmtDateStr({ month: 'short', day: 'numeric' })} />
-            <Series group={0} index={0} stroke="#e67e22" />
+            <Series stroke="#e67e22" />
           </Chart>
         </SmallChart>
 
@@ -95,7 +95,7 @@ export default function FormattersShowcase() {
           <Chart width={W} height={H} data={catData}>
             <Scale id="x" auto />
             <Axis scale="x" side={Side.Bottom} values={fmtLabels(labels)} />
-            <Series group={0} index={0} stroke="#1abc9c" />
+            <Series stroke="#1abc9c" />
           </Chart>
         </SmallChart>
       </div>

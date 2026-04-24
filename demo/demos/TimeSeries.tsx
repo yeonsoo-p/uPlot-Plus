@@ -29,8 +29,8 @@ export default function TimeSeries() {
       <Axis scale="x" label="Time (UTC)" values={fmtHourMin({ utc: true })} space={80} />
       <Axis scale="req" label="Requests" values={fmtCompact({ decimals: 1 })} stroke="#2980b9" />
       <Axis scale="err" side={Side.Right} label="Errors" stroke="#e74c3c" grid={{ show: false }} />
-      <Series group={0} index={0} yScale="req" stroke="#2980b9" fill={withAlpha('#2980b9', 0.1)} label="Requests" />
-      <Series group={0} index={1} yScale="err" stroke="#e74c3c" label="Errors" />
+      <Series yScale="req" stroke="#2980b9" fill={withAlpha('#2980b9', 0.1)} label="Requests" />
+      <Series yScale="err" stroke="#e74c3c" label="Errors" />
       <Legend />
     </Chart>
   );

@@ -20,7 +20,7 @@ export default function ZoomVariations() {
   return (
     <div>
       <Chart width="auto" height={400} data={data} actions={[['wheel', 'zoomXY']]} xlabel="X" ylabel="Value">
-        <Series group={0} index={0} label="Sine Wave" />
+        <Series label="Sine Wave" />
         <Legend />
       </Chart>
     </div>

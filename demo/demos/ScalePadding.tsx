@@ -24,12 +24,12 @@ export default function ScalePadding() {
               max: { pad: 0.1 },
             }}
           />
-          <Series group={0} index={0} label="Padded" />
+          <Series label="Padded" />
         </Chart>
       </div>
       <div>
         <Chart width="auto" height={200} data={data} title="Without padding (default)">
-          <Series group={0} index={0} label="Default" />
+          <Series label="Default" />
         </Chart>
       </div>
     </div>

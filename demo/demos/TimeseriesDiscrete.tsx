@@ -43,14 +43,11 @@ export default function TimeseriesDiscrete() {
         <Axis scale="x" label="Time" values={fmtTime} />
         <Axis scale="y" label="Status" values={fmtStatus} />
         <Series
-          group={0}
-          index={0}
           stroke="#e74c3c"
           fill="rgba(231, 76, 60, 0.15)"
           label="Service Status"
           paths={stepped(1)}
-          fillTo={-0.5}
-        />
+          fillTo={-0.5} />
         <Legend />
       </Chart>
     </div>

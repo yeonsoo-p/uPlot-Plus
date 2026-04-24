@@ -49,8 +49,8 @@ export default function EventCallbacks() {
           xlabel="Sample"
           ylabel="Value"
         >
-          <Series group={0} index={0} label="Signal A" />
-          <Series group={0} index={1} label="Signal B" />
+          <Series label="Signal A" />
+          <Series label="Signal B" />
           <Legend />
         </Chart>
 

@@ -22,11 +22,8 @@ export default function NearestNonNull() {
     <div>
       <Chart width="auto" height={400} data={data} xlabel="Index" ylabel="Value">
         <Series
-          group={0}
-          index={0}
           label="Sparse Signal"
-          points={{ show: true, size: 6, fill: '#2980b9' }}
-        />
+          points={{ show: true, size: 6, fill: '#2980b9' }} />
         <Legend />
       </Chart>
     </div>

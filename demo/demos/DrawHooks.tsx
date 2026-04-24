@@ -40,7 +40,7 @@ export default function DrawHooks() {
   return (
     <Chart width="auto" height={400} data={data} onCursorDraw={onCursorDraw} xlabel="Sample" ylabel="Value">
       <Scale id="y" auto={false} min={10} max={90} />
-      <Series group={0} index={0} label="Signal" />
+      <Series label="Signal" />
       <Region yMin={65} yMax={90} fill="rgba(231, 76, 60, 0.08)" />
       <HLine value={65} stroke="#e74c3c" width={2} dash={[6, 4]} label="Threshold: 65" />
     </Chart>

@@ -1,4 +1,4 @@
-import { Chart, Series, Candlestick, Scale, Axis, Band, Tooltip, HLine, Region, ThemeProvider, ZoomRanger } from 'uplot-plus';
+import { Chart, Series, Candlestick, Band, Tooltip, HLine, Region, ThemeProvider, ZoomRanger } from 'uplot-plus';
 import type { ChartTheme } from 'uplot-plus';
 
 // --- Candlestick data ---
@@ -104,13 +104,9 @@ export default function ComponentThemes() {
         {label('bandFill  annotation.stroke  annotation.fill  annotation.labelFill  annotation.font')}
         <ThemeProvider theme={bandTheme}>
           <Chart width={780} height={200} data={bandData}>
-            <Scale id="x" />
-            <Scale id="y" />
-            <Axis scale="x" />
-            <Axis scale="y" />
-            <Series group={0} index={0} label="Mean" />
-            <Series group={0} index={1} label="Upper" dash={[4, 4]} />
-            <Series group={0} index={2} label="Lower" dash={[4, 4]} />
+            <Series label="Mean" />
+            <Series label="Upper" dash={[4, 4]} />
+            <Series label="Lower" dash={[4, 4]} />
             <Band series={[1, 2]} group={0} />
             <HLine value={50} />
             <Region yMin={40} yMax={60} />
@@ -124,12 +120,8 @@ export default function ComponentThemes() {
         <ThemeProvider theme={cursorTheme}>
           <div style={{ background: '#121212', padding: 8, borderRadius: 6 }}>
             <Chart width={780} height={200} data={cursorData}>
-              <Scale id="x" />
-              <Scale id="y" />
-              <Axis scale="x" />
-              <Axis scale="y" />
-              <Series group={0} index={0} label="Signal" />
-              <Series group={0} index={1} label="Baseline" />
+              <Series label="Signal" />
+              <Series label="Baseline" />
               <Tooltip />
             </Chart>
           </div>
@@ -141,11 +133,7 @@ export default function ComponentThemes() {
         {label('ranger.accent  ranger.dim')}
         <ThemeProvider theme={rangerTheme}>
           <Chart width={780} height={200} data={rangerData}>
-            <Scale id="x" />
-            <Scale id="y" />
-            <Axis scale="x" />
-            <Axis scale="y" />
-            <Series group={0} index={0} label="Metric" />
+            <Series label="Metric" />
             <ZoomRanger width={780} height={60} data={rangerData} />
           </Chart>
         </ThemeProvider>
