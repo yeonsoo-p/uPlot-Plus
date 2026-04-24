@@ -4,7 +4,7 @@ import { notifyScaleChanges } from './useChartStore';
 import type { SelectState, ScaleState } from '../types';
 import type { ChartEventInfo, NearestPoint, SelectEventInfo } from '../types/events';
 import type { ActionContext, ActionKey, ReactionValue, DragContinuation } from '../types/interaction';
-import { posToVal, valToPos, invalidateScaleCache, isScaleReady } from '../core/Scale';
+import { posToVal, projectPoint, invalidateScaleCache, isScaleReady } from '../core/Scale';
 import { Side, Orientation, sideOrientation, DirtyFlag } from '../types/common';
 import { clamp } from '../math/utils';
 
@@ -624,11 +624,10 @@ export function setupInteraction(store: ChartStore, el: HTMLElement): () => void
 
             let pxX = cx;
             let pxY = cy;
-            if (xScale != null && isScaleReady(xScale)) {
-              pxX = valToPos(xVal, xScale, plotBox.width, plotBox.left) - plotBox.left;
-            }
-            if (yScale != null && isScaleReady(yScale)) {
-              pxY = valToPos(yVal, yScale, plotBox.height, plotBox.top) - plotBox.top;
+            if (xScale != null && yScale != null && isScaleReady(xScale) && isScaleReady(yScale)) {
+              const pointPx = projectPoint(xScale, yScale, xVal, yVal, plotBox);
+              pxX = pointPx.px - plotBox.left;
+              pxY = pointPx.py - plotBox.top;
             }
 
             const dx = cx - pxX;

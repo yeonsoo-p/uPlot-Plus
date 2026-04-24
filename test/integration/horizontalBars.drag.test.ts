@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { createChartStore, type ChartStore } from '@/hooks/useChartStore';
 import { setupInteraction } from '@/hooks/useInteraction';
 import { Orientation, Side } from '@/types/common';
+import type { ChartEventInfo } from '@/types/events';
 
 /**
  * Drag/pinch/wheel/gutter behavior for horizontal-bar charts (transposed mode):
@@ -158,6 +159,28 @@ describe('Horizontal bars: drag-to-zoom (default leftDrag → zoomX)', () => {
     expect(h.store.selectState.height).toBeCloseTo(200, 0);
 
     h.el.dispatchEvent(mouseEvent('mouseup', mid.clientX, mid.clientY));
+  });
+});
+
+describe('Horizontal bars: cursor event coordinates', () => {
+  let h: TestHarness;
+  beforeEach(() => { h = setup(); });
+  afterEach(() => { h.cleanup(); });
+
+  it('reports nearest-point pixels using transposed scale orientation', () => {
+    const cb = vi.fn<(info: ChartEventInfo) => void>();
+    h.store.eventCallbacks.onCursorMove = cb;
+
+    const { clientX, clientY } = plotToClient(h, 490, 280);
+    h.el.dispatchEvent(mouseEvent('mousemove', clientX, clientY));
+
+    expect(cb).toHaveBeenCalledTimes(1);
+    const point = cb.mock.calls[0]![0].point;
+    expect(point).not.toBeNull();
+    expect(point!.dataIdx).toBe(2);
+    expect(point!.pxX).toBeCloseTo(490, 0);
+    expect(point!.pxY).toBeCloseTo(280, 0);
+    expect(point!.dist).toBeCloseTo(0, 6);
   });
 });
 

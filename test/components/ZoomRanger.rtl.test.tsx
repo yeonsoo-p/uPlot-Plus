@@ -117,4 +117,42 @@ describe('ZoomRanger component', () => {
     expect(container.querySelector('[data-testid="zoom-ranger-dim-left"]')).toBeInTheDocument();
     expect(container.querySelector('[data-testid="zoom-ranger-dim-right"]')).toBeInTheDocument();
   });
+
+  it('does not clobber selection when initialRange is passed as a fresh array literal on rerender', async () => {
+    // Regression: callers commonly pass `initialRange={[a, b]}` inline, which
+    // changes reference every render. Selection updates (keyboard, drag) trigger
+    // onRangeChange → parent setState → parent re-render → new initialRange ref.
+    // The reset effect must not re-fire when the *values* are unchanged.
+    const spy = vi.fn();
+    const { container, rerender } = render(
+      <ZoomRanger width={400} height={80} data={testData} initialRange={[10, 60]} onRangeChange={spy} />,
+    );
+    await flushEffects();
+
+    // Simulate a user-driven selection change → keyboard ArrowRight on the slider
+    const slider = container.querySelector('[role="slider"]');
+    expect(slider).not.toBeNull();
+    act(() => {
+      slider?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    });
+    await flushEffects();
+
+    const callsBeforeRerender = spy.mock.calls.length;
+    const lastCall = spy.mock.calls[spy.mock.calls.length - 1]!;
+    const movedMin = Number(lastCall[0]);
+    const movedMax = Number(lastCall[1]);
+
+    // Rerender with a *new array* but same values — must not reset selection
+    rerender(
+      <ZoomRanger width={400} height={80} data={testData} initialRange={[10, 60]} onRangeChange={spy} />,
+    );
+    await flushEffects();
+
+    // Either no new call, or any new call carries the post-keyboard range (not the original)
+    const newCalls = spy.mock.calls.slice(callsBeforeRerender);
+    for (const c of newCalls) {
+      expect(Number(c[0])).toBeCloseTo(movedMin, 1);
+      expect(Number(c[1])).toBeCloseTo(movedMax, 1);
+    }
+  });
 });

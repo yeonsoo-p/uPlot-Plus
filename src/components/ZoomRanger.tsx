@@ -134,7 +134,13 @@ export function ZoomRanger({
     return DEFAULT_SELECTION;
   });
 
-  // Sync selFrac when initialRange or x-domain changes after mount
+  // Sync selFrac when initialRange or x-domain changes after mount.
+  // Compare by *value*, not reference: callers commonly pass `initialRange={[a, b]}`
+  // as a fresh array literal, which would otherwise re-fire this effect on every
+  // parent render and clobber user-driven selection changes.
+  const lastInitialRangeRef = useRef<[number, number] | null>(
+    initialRange != null ? [initialRange[0], initialRange[1]] : null,
+  );
   useEffect(() => {
     if (initialRange == null || normalized.length === 0) return;
     const group = normalized[0];
@@ -142,6 +148,9 @@ export function ZoomRanger({
     const xFirst = group.x[0];
     const xLast = group.x[group.x.length - 1];
     if (xFirst == null || xLast == null) return;
+    const last = lastInitialRangeRef.current;
+    if (last != null && last[0] === initialRange[0] && last[1] === initialRange[1]) return;
+    lastInitialRangeRef.current = [initialRange[0], initialRange[1]];
     setSelFrac(rangeToFrac(initialRange, xFirst, xLast));
   }, [initialRange, normalized]);
 
