@@ -47,8 +47,6 @@ export interface SeriesConfig {
   cap?: CanvasLineCap;
   /** Line join */
   join?: CanvasLineJoin;
-  /** Pixel alignment: 0=none (default, smooth anti-aliased curves), 1=round to pixel (crisp lines), N=round to increment */
-  pxAlign?: number;
   /** Fill-to value or function. Defaults to scaleY.min for line builders, 0 for bars. */
   fillTo?: number | ((min: number, max: number) => number);
   /** Per-point baseline data for stacked fills. Overrides fillTo per data point. */

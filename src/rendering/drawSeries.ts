@@ -87,14 +87,9 @@ export function drawSeriesPath(
       ctx.setLineDash(config.dash.map(d => d * pxRatio));
     }
 
-    // Pixel alignment: shift by half-pixel for odd-width lines to avoid anti-aliasing blur
-    const pxAlign = config.pxAlign ?? 0;
     const offset = (lineWidth % 2) / 2;
-    const doAlign = pxAlign === 1 && offset > 0;
-
-    if (doAlign) ctx.translate(offset, offset);
+    if (offset > 0) ctx.translate(offset, offset);
     ctx.stroke(paths.stroke);
-    // No need to un-translate: ctx.restore() below resets the transform
   }
 
   ctx.restore();

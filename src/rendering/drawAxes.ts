@@ -92,6 +92,8 @@ export function drawAxesGrid(
 ): void {
   const t = theme ?? THEME_DEFAULTS;
 
+  ctx.textRendering = 'optimizeLegibility';
+
   const plotLft = round(plotBox.left * pxRatio);
   const plotTop = round(plotBox.top * pxRatio);
   const plotWid = round(plotBox.width * pxRatio);
@@ -156,7 +158,7 @@ export function drawAxesGrid(
 
     // Draw tick labels
     {
-      const tickSize = ticks?.show !== false ? ((ticks?.size ?? 10) * pxRatio) : 0;
+      const tickSize = ticks?.show !== false ? round((ticks?.size ?? 10) * pxRatio) : 0;
       const axisGap = round((config.gap ?? 5) * pxRatio);
 
       const basePos = round(axis._pos * pxRatio);

@@ -175,11 +175,6 @@ export function incrRoundDn(num: number, incr: number, _fixFloat = true): number
   return _fixFloat ? fixFloat(floor(fixFloat(num / incr)) * incr) : floor(num / incr) * incr;
 }
 
-/** Generate a pixel-rounding function from a pxAlign value (ported from uPlot) */
-export function pxRoundGen(pxAlign: number): (v: number) => number {
-  return pxAlign === 0 ? (v: number) => v : pxAlign === 1 ? round : (v: number) => incrRound(v, pxAlign);
-}
-
 /** Generate increment values for tick spacing */
 export function genIncrs(base: number, minExp: number, maxExp: number, mults: number[]): number[] {
   const incrs: number[] = [];

@@ -47,7 +47,7 @@ export function bars(): PathBuilder {
     idx0: number,
     idx1: number,
     dir: Direction,
-    pxRound: (v: number) => number,
+    _pxRound: (v: number) => number,
     opts?: PathBuilderOpts,
   ): SeriesPaths => {
     const barWidthFrac = opts?.barWidth ?? 0.6;
@@ -59,8 +59,8 @@ export function bars(): PathBuilder {
     // Column axis = scaleX (categories); value axis = scaleY (values).
     // Pixel mapping is the same in both orientations — the renderer feeds
     // the appropriate dim/off based on each scale's ori.
-    const pixelForCol = (val: number) => pxRound(valToPos(val, scaleX, xDim, xOff));
-    const pixelForVal = (val: number) => pxRound(valToPos(val, scaleY, yDim, yOff));
+    const pixelForCol = (val: number) => Math.round(valToPos(val, scaleX, xDim, xOff));
+    const pixelForVal = (val: number) => Math.round(valToPos(val, scaleY, yDim, yOff));
 
     // Find minimum column spacing from adjacent x-values
     let colWid = xDim;
@@ -84,10 +84,10 @@ export function bars(): PathBuilder {
 
     const gapWid = colWid * (1 - barWidthFrac);
     const fullGap = Math.max(0, gapWid + extraGap);
-    const totalBarWid = Math.max(1, pxRound(colWid - fullGap));
+    const totalBarWid = Math.max(1, Math.round(colWid - fullGap));
 
     // For grouped bars, divide the total bar width by groupCount
-    const barWid = groupCount > 1 ? Math.max(1, pxRound(totalBarWid / Math.max(1, groupCount))) : totalBarWid;
+    const barWid = groupCount > 1 ? Math.max(1, Math.round(totalBarWid / Math.max(1, groupCount))) : totalBarWid;
 
     const fillToVal = opts?.fillTo ?? scaleY.min ?? 0;
     const fillToValPx = pixelForVal(fillToVal);
@@ -123,7 +123,7 @@ export function bars(): PathBuilder {
       // Bar in (col, val) space:
       //   - centered at colPx (with group offset) along the column axis
       //   - extends from ptFillToValPx to valPx along the value axis
-      const colStart = pxRound(colPx - barWid / 2 + groupOffset);
+      const colStart = Math.round(colPx - barWid / 2 + groupOffset);
       const valStart = Math.min(valPx, ptFillToValPx);
       const valEnd = Math.max(valPx, ptFillToValPx);
       const barLen = valEnd - valStart;
